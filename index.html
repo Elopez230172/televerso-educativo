@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeleVerso Educativo</title>
     
-    <!-- Librerías de diseño e iconos -->
+    <!-- Librerías de diseño e interactividad -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Librerías funcionales -->
+    <!-- Librerías de utilidades -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Conexión a Firebase Firestore -->
+    <!-- Conexión segura a Firebase Firestore -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -24,16 +24,16 @@
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // =========================================================================
-        // COLOCA AQUÍ TUS CLAVES COPIADAS DE FIREBASE
+        // REEMPLAZA ESTE BLOQUE CON TUS CLAVES REALES DE FIREBASE
         // =========================================================================
         const firebaseConfig = {
-            apiKey: "AIzaSyDeb4oRwQtKR5l2Etr4FAryxCHnWhTs6T4",
-         authDomain: "televerso-educativo.firebaseapp.com",
-          projectId: "televerso-educativo",
-          storageBucket: "televerso-educativo.firebasestorage.app",
-          messagingSenderId: "274364376511",
-          appId: "1:274364376511:web:d7898bce2e5306b776ed0a",
-          measurementId: "G-W3V5YN3CE5"
+           apiKey: "AIzaSyDeb4oRwQtKR5l2Etr4FAryxCHnWhTs6T4",
+  authDomain: "televerso-educativo.firebaseapp.com",
+  projectId: "televerso-educativo",
+  storageBucket: "televerso-educativo.firebasestorage.app",
+  messagingSenderId: "274364376511",
+  appId: "1:274364376511:web:d7898bce2e5306b776ed0a",
+  measurementId: "G-W3V5YN3CE5"
         };
 
         try {
@@ -43,7 +43,7 @@
             window.isFirebaseActive = true;
             window.dispatchEvent(new Event('firebase-ready'));
         } catch (error) {
-            console.error("Error al iniciar Firebase:", error);
+            console.error("Error al inicializar Firebase:", error);
             window.isFirebaseActive = false;
         }
     </script>
@@ -85,7 +85,7 @@
 </head>
 <body class="selection:bg-indigo-500 selection:text-white antialiased">
 
-    <!-- BARRA SUPERIOR -->
+    <!-- BARRA SUPERIOR CON ACCESO RESTRINGIDO A DOCENTES -->
     <header class="glass-panel sticky top-0 z-40 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-login')">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -95,12 +95,12 @@
                 <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-300">TeleVerso Educativo</span>
                 <div class="flex items-center space-x-2">
                     <span id="connection-badge" class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
-                    <span id="connection-text" class="text-[10px] text-emerald-400 font-semibold">Nube Conectada</span>
+                    <span id="connection-text" class="text-[10px] text-emerald-400 font-semibold">Sistema Seguro Activo</span>
                 </div>
             </div>
         </div>
-        <button onclick="openTeacherModal()" class="btn-glow px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2">
-            <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
+        <button onclick="promptTeacherAccess()" class="btn-glow px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2">
+            <i class="fa-solid fa-lock text-indigo-400"></i>
             <span>Panel Docente</span>
         </button>
     </header>
@@ -108,7 +108,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- PANTALLA 1: PORTADA LIMPIA (SIN CAJAS DE ACCESO) -->
+        <!-- PANTALLA 1: PORTADA LIMPIA (SIN CAJAS DE TEXTO NI CLAVES) -->
         <div id="view-login" class="flex flex-col items-center justify-center min-h-[78vh]">
             <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-lg text-center relative border border-white/15">
                 <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-4 cursor-pointer" title="TeleVerso 3D"></div>
@@ -116,9 +116,9 @@
                 <h1 class="text-3xl sm:text-4xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
                     TeleVerso Educativo
                 </h1>
-                <p class="text-slate-300 text-sm mb-8">Plataforma interactiva para Telesecundaria</p>
+                <p class="text-slate-300 text-sm mb-8">Usa tu credencial QR asignada por tu docente para entrar a tus actividades.</p>
                 
-                <!-- Resumen directo de los cuatro campos formativos -->
+                <!-- Tarjetas informativas de los campos formativos -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
                     <div class="glass-card p-3 rounded-xl border-l-2 border-l-blue-500">
                         <i class="fa-solid fa-comments text-blue-400 mb-1 text-xs"></i>
@@ -142,30 +142,30 @@
             </div>
         </div>
 
-        <!-- PANTALLA 2: PANEL DEL ALUMNO (ENTRADA DIRECTA TRAS ESCANEO) -->
+        <!-- PANTALLA 2: PANEL DEL ALUMNO (AISLADO Y PRIVADO) -->
         <div id="view-student" class="hidden space-y-6">
             <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Panel de Explorador</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Expediente Personal del Estudiante</span>
                     <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-extrabold text-white">¡Bienvenido!</h2>
-                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando datos del grupo...</p>
+                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando...</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center space-x-3 border-amber-500/30">
                         <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
                         <div>
-                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntuación</span>
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntos Acumulados</span>
                             <span id="student-score-display" class="text-xl font-black text-white">0</span>
                         </div>
                     </div>
                     <button onclick="logoutStudent()" class="px-4 py-2.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-xl font-semibold text-sm transition flex items-center space-x-1.5">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span>Salir</span>
+                        <span>Cerrar Sesión</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Botones de selección de campos -->
+            <!-- Selector de campos formativos disponibles -->
             <div class="flex overflow-x-auto space-x-3 pb-2">
                 <button onclick="switchFieldTab('lenguajes')" id="tab-btn-lenguajes" class="px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition">Lenguajes</button>
                 <button onclick="switchFieldTab('etica')" id="tab-btn-etica" class="px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition">Ética y Sociedades</button>
@@ -175,7 +175,7 @@
             <div id="tab-content-lenguajes" class="space-y-6">
                 <div class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500 max-w-xl">
                     <h4 class="text-lg font-bold text-white mb-2">Figuras Retóricas</h4>
-                    <p class="text-slate-300 text-xs mb-6">Identifica metáforas, hipérboles y personificaciones en expresiones comunitarias.</p>
+                    <p class="text-slate-300 text-xs mb-6">Identifica metáforas, hipérboles y personificaciones en textos comunitarios.</p>
                     <button onclick="startMission('L1')" class="btn-glow w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
@@ -184,7 +184,7 @@
             <div id="tab-content-etica" class="hidden space-y-6">
                 <div class="glass-card p-6 rounded-3xl border-t-2 border-t-amber-500 max-w-xl">
                     <h4 class="text-lg font-bold text-white mb-2">Evidencia vs Interpretación</h4>
-                    <p class="text-slate-300 text-xs mb-6">Distingue entre datos empíricos e interpretaciones en el registro histórico.</p>
+                    <p class="text-slate-300 text-xs mb-6">Distingue entre hechos empíricos y sesgos ideológicos en la historia.</p>
                     <button onclick="startMission('R1')" class="btn-glow w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
@@ -192,7 +192,7 @@
 
     </main>
 
-    <!-- VENTANA MODAL PARA MISIONES -->
+    <!-- VENTANA DE MISIONES / RETOS -->
     <div id="mission-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 relative">
             <button onclick="closeMissionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -200,16 +200,22 @@
         </div>
     </div>
 
-    <!-- VENTANA MODAL DEL PANEL DOCENTE -->
+    <!-- VENTANA DEL PANEL DOCENTE (PROTEGIDA POR PIN) -->
     <div id="teacher-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 relative max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
-                <h3 class="text-2xl font-black text-white"><i class="fa-solid fa-users-gear text-indigo-400 mr-2"></i>Gestión de Alumnos y Credenciales QR</h3>
+                <div>
+                    <h3 class="text-2xl font-black text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
+                        <span>Panel de Administración Docente</span>
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">Gestión de grupos y generación de credenciales individuales</p>
+                </div>
                 <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="overflow-y-auto space-y-6">
                 <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
-                    <label class="block text-xs font-bold text-indigo-300 mb-2">Crear Grupo Escolar</label>
+                    <label class="block text-xs font-bold text-indigo-300 mb-2">Crear Nuevo Grupo</label>
                     <div class="flex gap-2">
                         <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500">
                         <button onclick="saveNewGroup()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Crear Grupo</button>
@@ -222,11 +228,11 @@
         </div>
     </div>
 
-    <!-- MODAL DE LA CREDENCIAL QR -->
+    <!-- VENTANA DE LA CREDENCIAL QR -->
     <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center border border-white/20">
             <h4 id="qr-student-title" class="text-xl font-bold text-white mb-2">Credencial QR</h4>
-            <p class="text-slate-300 text-xs mb-4">Apunta con la cámara del celular para ingresar directamente.</p>
+            <p class="text-slate-300 text-xs mb-4">Escanea con la cámara para ingresar a tu cuenta personal.</p>
             
             <div class="bg-white p-4 rounded-2xl inline-block mb-5 shadow-2xl">
                 <div id="qrcode-container" class="flex justify-center items-center min-h-[180px] min-w-[180px]"></div>
@@ -238,12 +244,17 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN CON ENTRADA DIRECTA -->
+    <!-- LÓGICA DE PROGRAMACIÓN CON AISLAMIENTO Y RESTRICCIÓN DE SEGURIDAD -->
     <script>
-        const LOCAL_STORAGE_KEY = "TELEVERSO_CACHE_DATA";
+        // =========================================================================
+        // PARÁMETROS CONFIGURABLES
+        // =========================================================================
+        const TEACHER_PIN = "050117"; // PIN numérico para ingresar al Panel Docente
+        const PERMANENT_STORAGE_KEY = "TELEVERSO_PERMANENT_DB";
         const ACTIVE_STUDENT_KEY = "TELEVERSO_ACTIVE_STUDENT_ID";
 
-        let dbState = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { groups: {}, students: {} };
+        // Recuperación no destructiva: Si ya existen datos previos, nunca se sobrescriben
+        let dbState = JSON.parse(localStorage.getItem(PERMANENT_STORAGE_KEY)) || { groups: {}, students: {} };
         let currentUser = null;
         let activeMissionKey = null;
         let gameSessionState = {};
@@ -254,24 +265,62 @@
                 statements: [
                     { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la acción humana de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
-                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Una exageración poética.' }
+                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Exageración poética del llanto.' }
                 ]
             },
             'R1': {
                 title: "Evidencia vs Interpretación",
                 statements: [
-                    { text: `"Los filos líticos muestran estrías por corte de gramíneas."`, cat: 'E', exp: 'Evidencia: Observable con microscopio.' },
-                    { text: `"Las sociedades cazadoras vivían en violencia perpetua."`, cat: 'I', exp: 'Interpretación: Sesgo ideológico.' }
+                    { text: `"Los filos líticos muestran estrías por corte de gramíneas."`, cat: 'E', exp: 'Evidencia Observable: Registro empírico con microscopio.' },
+                    { text: `"Las sociedades cazadoras vivían en perpetuo salvajismo."`, cat: 'I', exp: 'Interpretación Especulativa: Sesgo teleológico desacreditado.' }
                 ]
             }
         };
 
-        function saveCache() {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbState));
+        // Guardado no destructivo en memoria local persistente
+        function persistDatabase() {
+            localStorage.setItem(PERMANENT_STORAGE_KEY, JSON.stringify(dbState));
         }
 
         // =========================================================================
-        // SINCRONIZACIÓN Y ACCESO INMEDIATO POR URL
+        // CONTROL DE ACCESO RESTRINGIDO AL PANEL DOCENTE
+        // =========================================================================
+        async function promptTeacherAccess() {
+            const { value: enteredPin } = await Swal.fire({
+                title: 'Acceso Restringido para Docentes',
+                input: 'password',
+                inputLabel: 'Ingresa tu PIN de seguridad',
+                inputPlaceholder: 'PIN docente',
+                inputAttributes: {
+                    maxlength: 10,
+                    autocapitalize: 'off',
+                    autocorrect: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Verificar e Ingresar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'glass-panel rounded-3xl text-white',
+                    confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl',
+                    cancelButton: 'bg-slate-800 font-bold px-5 py-2.5 rounded-xl'
+                }
+            });
+
+            if (enteredPin === TEACHER_PIN) {
+                document.getElementById('teacher-modal').classList.remove('hidden');
+                renderTeacherGroups();
+            } else if (enteredPin !== undefined) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso Denegado',
+                    text: 'El PIN ingresado es incorrecto.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
+                });
+            }
+        }
+
+        // =========================================================================
+        // SINCRONIZACIÓN Y AUTOLOGIN DIRECTO DEL ALUMNO
         // =========================================================================
         function initSync() {
             if (!window.cloudDb || !window.cloudOps) {
@@ -282,17 +331,17 @@
 
             const { collection, onSnapshot } = window.cloudOps;
 
-            // Escuchar grupos
+            // Escuchar grupos de manera incremental
             onSnapshot(collection(window.cloudDb, "groups"), (snap) => {
                 snap.forEach(d => { dbState.groups[d.id] = d.data(); });
-                saveCache();
+                persistDatabase();
                 renderTeacherGroups();
             });
 
-            // Escuchar alumnos y verificar inicio de sesión al recibir datos
+            // Escuchar alumnos de manera incremental
             onSnapshot(collection(window.cloudDb, "students"), (snap) => {
                 snap.forEach(d => { dbState.students[d.id] = d.data(); });
-                saveCache();
+                persistDatabase();
                 renderTeacherGroups();
                 
                 if (currentUser && dbState.students[currentUser.id]) {
@@ -300,17 +349,16 @@
                     renderStudentDashboard();
                 }
 
-                // Evalúa inmediatamente si la URL tiene el parámetro ?student=
                 processAutoLogin();
             });
         }
 
-        // Comprobación prioritaria para entrar directo
+        // Procesa el enlace del QR: Solo el alumno autenticado ve sus datos
         function processAutoLogin() {
             const urlParams = new URLSearchParams(window.location.search);
-            const paramId = urlParams.get('student');
+            const studentParam = urlParams.get('student');
             const savedId = localStorage.getItem(ACTIVE_STUDENT_KEY);
-            const targetId = (paramId || savedId || "").trim();
+            const targetId = (studentParam || savedId || "").trim();
 
             if (targetId && dbState.students[targetId]) {
                 currentUser = dbState.students[targetId];
@@ -324,13 +372,14 @@
             currentUser = null;
             localStorage.removeItem(ACTIVE_STUDENT_KEY);
             
-            // Retira el parámetro de la URL para que no vuelva a autologuearse al recargar
+            // Eliminar parámetro de la URL sin refrescar
             const cleanUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
             
             switchView('view-login');
         }
 
+        // Renderizado aislado: El estudiante no tiene acceso a datos de sus compañeros
         function renderStudentDashboard() {
             if (!currentUser) return;
             document.getElementById('student-welcome-name').innerText = `¡Hola, ${currentUser.name}!`;
@@ -340,7 +389,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE Y GENERADOR DE QR
+        // GESTIÓN DOCENTE Y GENERADOR DE CÓDIGOS QR
         // =========================================================================
         async function saveNewGroup() {
             const input = document.getElementById('new-group-name');
@@ -350,8 +399,9 @@
             const gId = 'GRP-' + Date.now();
             const groupData = { id: gId, name: name, students: [] };
 
+            // Modificación incremental: No toca datos previos
             dbState.groups[gId] = groupData;
-            saveCache();
+            persistDatabase();
             renderTeacherGroups();
             input.value = '';
 
@@ -360,18 +410,18 @@
                     const { doc, setDoc } = window.cloudOps;
                     await setDoc(doc(window.cloudDb, "groups", gId), groupData);
                 } catch (e) {
-                    console.warn("Grupo guardado localmente:", e);
+                    console.warn("Grupo guardado solo en memoria local:", e);
                 }
             }
         }
 
         async function promptAddStudent(groupId) {
             const { value: studentName } = await Swal.fire({
-                title: 'Registrar Alumno',
+                title: 'Registrar Nuevo Estudiante',
                 input: 'text',
                 inputPlaceholder: 'Nombre y apellido',
                 showCancelButton: true,
-                confirmButtonText: 'Registrar',
+                confirmButtonText: 'Registrar Alumno',
                 cancelButtonText: 'Cancelar',
                 customClass: {
                     popup: 'glass-panel rounded-3xl text-white',
@@ -383,6 +433,7 @@
             if (!studentName || !studentName.trim()) return;
 
             const cleanName = studentName.trim();
+            // Identificador interno no visible para seguridad del QR
             const sId = 'id_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
 
             const studentData = {
@@ -393,11 +444,13 @@
                 completedMissions: {}
             };
 
+            // Inserción sin reescribir ni resetear la base de datos
             dbState.students[sId] = studentData;
             if (!dbState.groups[groupId]) dbState.groups[groupId] = { id: groupId, name: 'Grupo', students: [] };
             if (!Array.isArray(dbState.groups[groupId].students)) dbState.groups[groupId].students = [];
             dbState.groups[groupId].students.push(sId);
-            saveCache();
+            
+            persistDatabase();
             renderTeacherGroups();
 
             if (window.cloudDb && window.cloudOps) {
@@ -412,7 +465,7 @@
 
             Swal.fire({
                 icon: 'success',
-                title: '¡Registrado!',
+                title: '¡Alumno registrado!',
                 text: `${cleanName} fue dado de alta con éxito.`,
                 timer: 1500,
                 showConfirmButton: false
@@ -427,7 +480,6 @@
             const container = document.getElementById('qrcode-container');
             container.innerHTML = '';
 
-            // Enlace directo codificado
             const cleanUrl = window.location.origin + window.location.pathname;
             const targetUrl = `${cleanUrl}?student=${encodeURIComponent(student.id)}`;
 
@@ -447,10 +499,11 @@
 
         async function deleteStudent(groupId, studentId) {
             const res = await Swal.fire({
-                title: '¿Eliminar alumno?',
+                title: '¿Eliminar registro?',
+                text: 'Se borrará el alumno y su puntuación de forma permanente.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Eliminar',
+                confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             });
 
@@ -460,7 +513,7 @@
             if (dbState.groups[groupId]) {
                 dbState.groups[groupId].students = (dbState.groups[groupId].students || []).filter(id => id !== studentId);
             }
-            saveCache();
+            persistDatabase();
             renderTeacherGroups();
 
             if (window.cloudDb && window.cloudOps) {
@@ -481,7 +534,7 @@
 
             const keys = Object.keys(dbState.groups);
             if (keys.length === 0) {
-                container.innerHTML = `<div class="glass-card p-5 text-center text-slate-400 text-sm">No hay grupos creados. Agrega uno arriba.</div>`;
+                container.innerHTML = `<div class="glass-card p-5 text-center text-slate-400 text-sm">No hay grupos creados. Registra uno arriba.</div>`;
                 return;
             }
 
@@ -520,7 +573,7 @@
                                 <span>Registrar Alumno</span>
                             </button>
                         </div>
-                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún.</p>'}</div>
+                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún en este grupo.</p>'}</div>
                     </div>
                 `;
             });
@@ -555,7 +608,7 @@
                 : `<div class="grid grid-cols-2 gap-2"><button onclick="submitAns('E')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Evidencia</button><button onclick="submitAns('I')" class="p-3 bg-slate-800 hover:bg-amber-600 rounded-xl text-sm font-bold transition">Interpretación</button></div>`;
 
             container.innerHTML = `
-                <span class="text-xs text-indigo-400 font-bold uppercase">Pregunta ${idx + 1} de ${list.length}</span>
+                <span class="text-xs text-indigo-400 font-bold uppercase">Reactivo ${idx + 1} de ${list.length}</span>
                 <h4 class="text-xl font-bold text-white mb-4">${missionData[activeMissionKey].title}</h4>
                 <div class="glass-card p-5 rounded-2xl mb-4 text-center"><p class="text-base text-white">${item.text}</p></div>
                 ${btns}
@@ -583,7 +636,7 @@
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             
             dbState.students[currentUser.id] = currentUser;
-            saveCache();
+            persistDatabase();
 
             if (window.cloudDb && window.cloudOps) {
                 try {
@@ -596,11 +649,10 @@
 
             closeMissionModal();
             renderStudentDashboard();
-            Swal.fire('¡Reto Superado!', 'Puntuación actualizada.', 'success');
+            Swal.fire('¡Reto Superado!', 'Tu puntuación ha sido guardada.', 'success');
         }
 
         function closeMissionModal() { document.getElementById('mission-modal').classList.add('hidden'); }
-        function openTeacherModal() { document.getElementById('teacher-modal').classList.remove('hidden'); }
         function closeTeacherModal() { document.getElementById('teacher-modal').classList.add('hidden'); }
         function closeQrModal() { document.getElementById('qr-modal').classList.add('hidden'); }
         
