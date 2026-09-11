@@ -16,29 +16,40 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Conexión Firebase Firestore (Modular v10) -->
+    <!-- Conexión Firebase Firestore (Modular v10) con puente global robusto -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
-            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot 
+            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // =========================================================================
-        // REEMPLAZA CON TUS CLAVES REALES DE FIREBASE
+        // TUS CLAVES DE FIREBASE CONFIGURADAS
         // =========================================================================
         const firebaseConfig = {
-            apiKey: "TU_API_KEY_AQUI",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+          const firebaseConfig = {
+          apiKey: "AIzaSyDeb4oRwQtKR5l2Etr4FAryxCHnWhTs6T4",
+          authDomain: "televerso-educativo.firebaseapp.com",
+          projectId: "televerso-educativo",
+          storageBucket: "televerso-educativo.firebasestorage.app",
+          messagingSenderId: "274364376511",
+          appId: "1:274364376511:web:d7898bce2e5306b776ed0a",
+          measurementId: "G-W3V5YN3CE5"
+};
         };
 
-        const app = initializeApp(firebaseConfig);
-        window.cloudDb = getFirestore(app);
-        window.cloudOps = { collection, doc, setDoc, deleteDoc, onSnapshot };
-        window.dispatchEvent(new Event('firebase-ready'));
+        try {
+            const app = initializeApp(firebaseConfig);
+            const cloudDb = getFirestore(app);
+
+            // Exportación segura hacia el contexto global window
+            window.cloudDb = cloudDb;
+            window.cloudOps = { collection, doc, setDoc, deleteDoc, onSnapshot, getDocs };
+            window.firebaseLoaded = true;
+            window.dispatchEvent(new Event('firebase-ready'));
+        } catch (error) {
+            console.error("Error al inicializar Firebase:", error);
+        }
     </script>
 
     <style>
@@ -86,7 +97,7 @@
             </div>
             <div>
                 <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-300">TeleVerso Educativo</span>
-                <span class="block text-xs text-indigo-300/80 font-medium">Acceso QR Digital Directo</span>
+                <span class="block text-xs text-indigo-300/80 font-medium">Acceso QR Directo</span>
             </div>
         </div>
         <button onclick="openTeacherModal()" class="btn-glow px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2">
@@ -106,16 +117,15 @@
                 <h1 class="text-3xl sm:text-4xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
                     TeleVerso Educativo
                 </h1>
-                <p class="text-slate-300 text-sm mb-8">Escanea tu credencial o código QR para comenzar tus retos</p>
+                <p class="text-slate-300 text-sm mb-8">Escanea tu código QR para comenzar tus actividades</p>
                 
-                <!-- Caja informativa sin campos de texto -->
                 <div class="glass-card p-6 rounded-2xl mb-8 border border-white/10 flex flex-col items-center space-y-3">
                     <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-3xl">
                         <i class="fa-solid fa-qrcode"></i>
                     </div>
                     <h3 class="font-bold text-white text-base">Entrada Rápida</h3>
                     <p class="text-xs text-slate-400 max-w-xs leading-relaxed">
-                        Apunta la cámara de tu celular hacia tu código QR personal para abrir automáticamente tu sesión.
+                        Apunta con la cámara de tu celular a tu credencial QR para acceder automáticamente sin claves.
                     </p>
                 </div>
 
@@ -134,7 +144,7 @@
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Estudiante</span>
                     <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-extrabold text-white">¡Bienvenido!</h2>
-                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando...</p>
+                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando datos...</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center space-x-3 border-amber-500/30">
@@ -203,26 +213,26 @@
             </div>
             <div class="overflow-y-auto space-y-6">
                 <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
-                    <label class="block text-xs font-bold text-indigo-300 mb-2">Nuevo Grupo</label>
+                    <label class="block text-xs font-bold text-indigo-300 mb-2">Nuevo Grupo Escolar</label>
                     <div class="flex gap-2">
-                        <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm">
-                        <button onclick="saveNewGroupCloud()" class="px-5 py-2 bg-indigo-600 text-white font-bold rounded-xl text-sm">Crear Grupo</button>
+                        <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        <button onclick="saveNewGroupCloud()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Crear Grupo</button>
                     </div>
                 </div>
                 <div id="teacher-groups-container" class="space-y-4">
-                    <div class="text-center py-4 text-slate-400 text-sm">Cargando base de datos...</div>
+                    <div class="text-center py-4 text-slate-400 text-sm">Conectando con base de datos...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- VENTANA DEL QR: PURA IMAGEN SIN CLAVES -->
-    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center">
-            <h4 id="qr-student-title" class="text-xl font-bold text-white mb-2">Credencial Digital</h4>
-            <p class="text-slate-300 text-xs mb-4">Escanea con la cámara de cualquier teléfono para entrar directo.</p>
+    <!-- VENTANA DEL QR: PURA IMAGEN SIN CLAVES VISIBLES -->
+    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center border border-white/20">
+            <h4 id="qr-student-title" class="text-xl font-bold text-white mb-2">Credencial QR</h4>
+            <p class="text-slate-300 text-xs mb-4">Escanea con la cámara de tu celular para entrar directamente.</p>
             
-            <div class="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
+            <div class="bg-white p-4 rounded-2xl inline-block mb-5 shadow-2xl">
                 <div id="qrcode-container" class="flex justify-center items-center"></div>
             </div>
             
@@ -232,7 +242,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN SIN CLAVES -->
+    <!-- LÓGICA DE PROGRAMACIÓN Y MANEJO DE QR -->
     <script>
         const ACTIVE_STUDENT_STORAGE_KEY = "TELEVERSO_ACTIVE_STUDENT_ID";
         let dbState = { groups: {}, students: {} };
@@ -259,7 +269,9 @@
             }
         };
 
-        window.addEventListener('firebase-ready', () => {
+        // Verificador de preparación de Firebase
+        function initFirebaseSync() {
+            if (!window.cloudDb || !window.cloudOps) return;
             const { collection, onSnapshot } = window.cloudOps;
             
             // Sincronizar grupos
@@ -269,7 +281,7 @@
                 renderTeacherGroups();
             });
 
-            // Sincronizar estudiantes y ejecutar login automático inmediato
+            // Sincronizar alumnos
             onSnapshot(collection(window.cloudDb, "students"), (snap) => {
                 dbState.students = {};
                 snap.forEach(d => dbState.students[d.id] = d.data());
@@ -285,9 +297,12 @@
                     attemptAutoLogin();
                 }
             });
-        });
+        }
 
-        // Inicio de sesión directo sin contraseñas
+        window.addEventListener('firebase-ready', initFirebaseSync);
+        if (window.firebaseLoaded) initFirebaseSync();
+
+        // Autologin por parámetro de URL o sesión previa
         function attemptAutoLogin() {
             const urlParams = new URLSearchParams(window.location.search);
             const studentParam = urlParams.get('student');
@@ -305,11 +320,8 @@
         function logoutStudent() {
             currentUser = null;
             localStorage.removeItem(ACTIVE_STUDENT_STORAGE_KEY);
-            
-            // Limpiar parámetro de URL sin recargar
             const cleanUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
-            
             switchView('view-login');
         }
 
@@ -319,6 +331,179 @@
             const g = dbState.groups[currentUser.groupId];
             document.getElementById('student-group-info').innerText = `Grupo: ${g ? g.name : 'General'}`;
             document.getElementById('student-score-display').innerText = currentUser.score || 0;
+        }
+
+        // =========================================================================
+        // CREACIÓN DE ALUMNOS Y GENERACIÓN DE QR
+        // =========================================================================
+        async function promptAddStudentCloud(groupId) {
+            if (!window.cloudDb || !window.cloudOps) {
+                Swal.fire('Error', 'La base de datos todavía no se ha conectado. Revisa las claves de Firebase.', 'error');
+                return;
+            }
+
+            const { value: studentName } = await Swal.fire({
+                title: 'Registrar Nuevo Alumno',
+                input: 'text',
+                inputPlaceholder: 'Nombre completo del alumno',
+                showCancelButton: true,
+                confirmButtonText: 'Crear Alumno',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'glass-panel rounded-3xl text-white',
+                    confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl',
+                    cancelButton: 'bg-slate-800 font-bold px-5 py-2.5 rounded-xl'
+                }
+            });
+
+            if (studentName && studentName.trim()) {
+                const cleanName = studentName.trim();
+                // Genera identificador único interno sin prefijo visible
+                const uniqueId = 'id_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+                const { doc, setDoc } = window.cloudOps;
+
+                // 1. Guardar documento del estudiante en Firebase
+                await setDoc(doc(window.cloudDb, "students", uniqueId), {
+                    id: uniqueId,
+                    name: cleanName,
+                    groupId: groupId,
+                    score: 0,
+                    completedMissions: {}
+                });
+
+                // 2. Asociar estudiante al grupo correspondiente
+                const currentGroup = dbState.groups[groupId] || { id: groupId, name: 'Grupo', students: [] };
+                const updatedList = Array.isArray(currentGroup.students) ? [...currentGroup.students, uniqueId] : [uniqueId];
+                
+                await setDoc(doc(window.cloudDb, "groups", groupId), {
+                    ...currentGroup,
+                    students: updatedList
+                });
+
+                // Feedback exitoso
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Alumno creado!',
+                    text: `${cleanName} fue registrado exitosamente. Ya puedes generar su QR.`,
+                    timer: 1600,
+                    showConfirmButton: false
+                });
+            }
+        }
+
+        // Despliegue del código QR sin mostrar claves
+        function showStudentQr(studentId) {
+            const student = dbState.students[studentId];
+            if (!student) {
+                Swal.fire('Error', 'No se encontraron los datos del alumno.', 'error');
+                return;
+            }
+
+            document.getElementById('qr-student-title').innerText = student.name;
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = ''; // Limpiar cualquier QR generado antes
+
+            // Generar enlace directo limpio con el identificador único
+            const cleanUrl = window.location.origin + window.location.pathname;
+            const accessUrl = `${cleanUrl}?student=${encodeURIComponent(student.id)}`;
+
+            // Generación de QR
+            new QRCode(container, {
+                text: accessUrl,
+                width: 180,
+                height: 180,
+                colorDark: "#090d16",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qr-modal').classList.remove('hidden');
+        }
+
+        async function saveNewGroupCloud() {
+            const input = document.getElementById('new-group-name');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const gId = 'GRP-' + Date.now();
+            const { doc, setDoc } = window.cloudOps;
+            await setDoc(doc(window.cloudDb, "groups", gId), { id: gId, name: name, students: [] });
+            input.value = '';
+        }
+
+        async function deleteStudentCloud(groupId, studentId) {
+            const confirm = await Swal.fire({
+                title: '¿Eliminar alumno?',
+                text: 'Se borrará su cuenta y su progreso de forma permanente.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (confirm.isConfirmed) {
+                const { doc, setDoc, deleteDoc } = window.cloudOps;
+                await deleteDoc(doc(window.cloudDb, "students", studentId));
+                if (dbState.groups[groupId]) {
+                    const filtered = (dbState.groups[groupId].students || []).filter(id => id !== studentId);
+                    await setDoc(doc(window.cloudDb, "groups", groupId), {
+                        ...dbState.groups[groupId],
+                        students: filtered
+                    });
+                }
+            }
+        }
+
+        function renderTeacherGroups() {
+            const container = document.getElementById('teacher-groups-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const keys = Object.keys(dbState.groups);
+            if (keys.length === 0) {
+                container.innerHTML = `<div class="glass-card p-4 text-center text-slate-400 text-sm">No hay grupos registrados. Escribe un nombre arriba para crear el primero.</div>`;
+                return;
+            }
+
+            keys.forEach(k => {
+                const group = dbState.groups[k];
+                let studentsHtml = '';
+                (group.students || []).forEach(sId => {
+                    const s = dbState.students[sId];
+                    if (s) {
+                        studentsHtml += `
+                            <div class="flex justify-between items-center bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-sm">
+                                <span class="font-bold text-white text-base">${s.name}</span>
+                                <div class="flex gap-2">
+                                    <button onclick="showStudentQr('${s.id}')" class="px-3 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 shadow">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                        <span>Ver QR</span>
+                                    </button>
+                                    <button onclick="deleteStudentCloud('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+
+                container.innerHTML += `
+                    <div class="glass-card p-4 rounded-2xl space-y-3 border border-white/10">
+                        <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                            <h5 class="font-bold text-white text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+                                <span>${group.name}</span>
+                            </h5>
+                            <button onclick="promptAddStudentCloud('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Registrar Alumno</span>
+                            </button>
+                        </div>
+                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún en este grupo.</p>'}</div>
+                    </div>
+                `;
+            });
         }
 
         function switchFieldTab(t) {
@@ -383,127 +568,6 @@
             closeMissionModal();
             renderStudentDashboard();
             Swal.fire('¡Reto Superado!', 'Tus puntos se guardaron en la nube.', 'success');
-        }
-
-        // Operaciones de gestión docente
-        async function saveNewGroupCloud() {
-            const input = document.getElementById('new-group-name');
-            const name = input.value.trim();
-            if (!name) return;
-            const gId = 'GRP-' + Date.now();
-            const { doc, setDoc } = window.cloudOps;
-            await setDoc(doc(window.cloudDb, "groups", gId), { id: gId, name: name, students: [] });
-            input.value = '';
-        }
-
-        async function promptAddStudentCloud(groupId) {
-            Swal.fire({
-                title: 'Nombre del Alumno',
-                input: 'text',
-                inputPlaceholder: 'Nombre y apellido',
-                showCancelButton: true,
-                confirmButtonText: 'Crear Credencial QR'
-            }).then(async (res) => {
-                if (res.value && res.value.trim()) {
-                    // Genera identificador interno no visible
-                    const sId = 'ID-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-                    const { doc, setDoc } = window.cloudOps;
-
-                    await setDoc(doc(window.cloudDb, "students", sId), {
-                        id: sId,
-                        name: res.value.trim(),
-                        groupId: groupId,
-                        score: 0,
-                        completedMissions: {}
-                    });
-
-                    const grp = dbState.groups[groupId] || { students: [] };
-                    await setDoc(doc(window.cloudDb, "groups", groupId), {
-                        ...grp,
-                        students: [...(grp.students || []), sId]
-                    });
-                }
-            });
-        }
-
-        async function deleteStudentCloud(groupId, studentId) {
-            const { doc, setDoc, deleteDoc } = window.cloudOps;
-            await deleteDoc(doc(window.cloudDb, "students", studentId));
-            if (dbState.groups[groupId]) {
-                await setDoc(doc(window.cloudDb, "groups", groupId), {
-                    ...dbState.groups[groupId],
-                    students: dbState.groups[groupId].students.filter(id => id !== studentId)
-                });
-            }
-        }
-
-        function renderTeacherGroups() {
-            const container = document.getElementById('teacher-groups-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const keys = Object.keys(dbState.groups);
-            if (keys.length === 0) {
-                container.innerHTML = `<div class="glass-card p-4 text-center text-slate-400 text-sm">No hay grupos registrados. Crea uno arriba.</div>`;
-                return;
-            }
-
-            keys.forEach(k => {
-                const group = dbState.groups[k];
-                let studentsHtml = '';
-                (group.students || []).forEach(sId => {
-                    const s = dbState.students[sId];
-                    if (s) {
-                        studentsHtml += `
-                            <div class="flex justify-between items-center bg-slate-900/80 p-2.5 rounded-xl border border-slate-700/60 text-sm">
-                                <span class="font-bold text-white">${s.name}</span>
-                                <div class="flex gap-2">
-                                    <button onclick="showStudentQr('${s.id}')" class="px-3 py-1 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                        <i class="fa-solid fa-qrcode"></i>
-                                        <span>Ver QR</span>
-                                    </button>
-                                    <button onclick="deleteStudentCloud('${group.id}', '${s.id}')" class="px-2.5 py-1 bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 rounded-lg text-xs transition">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                container.innerHTML += `
-                    <div class="glass-card p-4 rounded-2xl space-y-3">
-                        <div class="flex justify-between items-center pb-2 border-b border-white/10">
-                            <h5 class="font-bold text-white">${group.name}</h5>
-                            <button onclick="promptAddStudentCloud('${group.id}')" class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-xs font-bold">+ Registrar Alumno</button>
-                        </div>
-                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic">Sin alumnos registrados.</p>'}</div>
-                    </div>
-                `;
-            });
-        }
-
-        // Generación del código QR limpio sin claves en pantalla
-        function showStudentQr(id) {
-            const s = dbState.students[id];
-            if (!s) return;
-            document.getElementById('qr-student-title').innerText = s.name;
-            const container = document.getElementById('qrcode-container');
-            container.innerHTML = '';
-
-            const cleanUrl = window.location.origin + window.location.pathname;
-            const accessUrl = `${cleanUrl}?student=${s.id}`;
-
-            new QRCode(container, {
-                text: accessUrl,
-                width: 170,
-                height: 170,
-                colorDark: "#090d16",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-
-            document.getElementById('qr-modal').classList.remove('hidden');
         }
 
         function closeMissionModal() { document.getElementById('mission-modal').classList.add('hidden'); }
