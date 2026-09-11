@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleVerso Educativo - Acceso QR Directo</title>
+    <title>TeleVerso Educativo</title>
     
-    <!-- Librerías de diseño e interactividad -->
+    <!-- Librerías de diseño e iconos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Utilidades -->
+    <!-- Librerías funcionales -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-    <!-- Conexión e inicialización de Firebase Firestore -->
+    <!-- Conexión a Firebase Firestore -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { 
@@ -24,15 +24,16 @@
         } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // =========================================================================
-        // REEMPLAZA CON TUS CLAVES COPIADAS DE TU PROYECTO
+        // COLOCA AQUÍ TUS CLAVES COPIADAS DE FIREBASE
         // =========================================================================
         const firebaseConfig = {
-            apiKey: "TU_API_KEY_AQUI",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyDeb4oRwQtKR5l2Etr4FAryxCHnWhTs6T4",
+         authDomain: "televerso-educativo.firebaseapp.com",
+          projectId: "televerso-educativo",
+          storageBucket: "televerso-educativo.firebasestorage.app",
+          messagingSenderId: "274364376511",
+          appId: "1:274364376511:web:d7898bce2e5306b776ed0a",
+          measurementId: "G-W3V5YN3CE5"
         };
 
         try {
@@ -42,9 +43,8 @@
             window.isFirebaseActive = true;
             window.dispatchEvent(new Event('firebase-ready'));
         } catch (error) {
-            console.error("Fallo al arrancar Firebase:", error);
+            console.error("Error al iniciar Firebase:", error);
             window.isFirebaseActive = false;
-            window.dispatchEvent(new Event('firebase-error'));
         }
     </script>
 
@@ -85,7 +85,7 @@
 </head>
 <body class="selection:bg-indigo-500 selection:text-white antialiased">
 
-    <!-- BARRA SUPERIOR CON INDICADOR DE ESTADO -->
+    <!-- BARRA SUPERIOR -->
     <header class="glass-panel sticky top-0 z-40 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-login')">
             <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
@@ -94,8 +94,8 @@
             <div>
                 <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-300">TeleVerso Educativo</span>
                 <div class="flex items-center space-x-2">
-                    <span id="connection-badge" class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span id="connection-text" class="text-[10px] text-slate-400 font-semibold">Conectando...</span>
+                    <span id="connection-badge" class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                    <span id="connection-text" class="text-[10px] text-emerald-400 font-semibold">Nube Conectada</span>
                 </div>
             </div>
         </div>
@@ -108,48 +108,53 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- PANTALLA 1: ACCESO POR QR -->
+        <!-- PANTALLA 1: PORTADA LIMPIA (SIN CAJAS DE ACCESO) -->
         <div id="view-login" class="flex flex-col items-center justify-center min-h-[78vh]">
             <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-lg text-center relative border border-white/15">
-                <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-3 cursor-pointer" title="Gira el cubo"></div>
+                <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-4 cursor-pointer" title="TeleVerso 3D"></div>
                 
-                <h1 class="text-3xl sm:text-4xl font-extrabold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+                <h1 class="text-3xl sm:text-4xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
                     TeleVerso Educativo
                 </h1>
-                <p class="text-slate-300 text-sm mb-8">Escanea tu credencial QR para entrar automáticamente</p>
+                <p class="text-slate-300 text-sm mb-8">Plataforma interactiva para Telesecundaria</p>
                 
-                <div class="glass-card p-6 rounded-2xl mb-8 border border-white/10 flex flex-col items-center space-y-3">
-                    <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-3xl">
-                        <i class="fa-solid fa-qrcode"></i>
-                    </div>
-                    <h3 class="font-bold text-white text-base">Acceso Directo</h3>
-                    <p class="text-xs text-slate-400 max-w-xs leading-relaxed">
-                        Abre la cámara de tu celular y apunta al código QR que te entregó tu docente.
-                    </p>
-                </div>
-
+                <!-- Resumen directo de los cuatro campos formativos -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-blue-500"><h4 class="text-xs font-bold text-white">Lenguajes</h4><span class="text-[10px] text-blue-300">Activo</span></div>
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-emerald-500"><h4 class="text-xs font-bold text-white">Saberes</h4></div>
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-amber-500"><h4 class="text-xs font-bold text-white">Ética y Soc.</h4><span class="text-[10px] text-amber-300">Activo</span></div>
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-purple-500"><h4 class="text-xs font-bold text-white">De lo Humano</h4></div>
+                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-blue-500">
+                        <i class="fa-solid fa-comments text-blue-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Lenguajes</h4>
+                        <span class="text-[10px] text-blue-300">Activo</span>
+                    </div>
+                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-emerald-500">
+                        <i class="fa-solid fa-atom text-emerald-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Saberes</h4>
+                    </div>
+                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-amber-500">
+                        <i class="fa-solid fa-landmark text-amber-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Ética y Soc.</h4>
+                        <span class="text-[10px] text-amber-300">Activo</span>
+                    </div>
+                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-purple-500">
+                        <i class="fa-solid fa-hands-holding-child text-purple-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">De lo Humano</h4>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- PANTALLA 2: PANEL DEL ALUMNO -->
+        <!-- PANTALLA 2: PANEL DEL ALUMNO (ENTRADA DIRECTA TRAS ESCANEO) -->
         <div id="view-student" class="hidden space-y-6">
             <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Estudiante</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Panel de Explorador</span>
                     <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-extrabold text-white">¡Bienvenido!</h2>
-                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando datos...</p>
+                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando datos del grupo...</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center space-x-3 border-amber-500/30">
                         <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
                         <div>
-                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntos</span>
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntuación</span>
                             <span id="student-score-display" class="text-xl font-black text-white">0</span>
                         </div>
                     </div>
@@ -160,32 +165,34 @@
                 </div>
             </div>
 
+            <!-- Botones de selección de campos -->
             <div class="flex overflow-x-auto space-x-3 pb-2">
-                <button onclick="switchFieldTab('lenguajes')" id="tab-btn-lenguajes" class="px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0">Lenguajes</button>
-                <button onclick="switchFieldTab('etica')" id="tab-btn-etica" class="px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0">Ética y Sociedades</button>
+                <button onclick="switchFieldTab('lenguajes')" id="tab-btn-lenguajes" class="px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition">Lenguajes</button>
+                <button onclick="switchFieldTab('etica')" id="tab-btn-etica" class="px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition">Ética y Sociedades</button>
             </div>
 
-            <!-- CONTENIDOS -->
+            <!-- CONTENIDO FORMATIVO: LENGUAJES -->
             <div id="tab-content-lenguajes" class="space-y-6">
                 <div class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500 max-w-xl">
                     <h4 class="text-lg font-bold text-white mb-2">Figuras Retóricas</h4>
-                    <p class="text-slate-300 text-xs mb-6">Identifica metáforas, hipérboles y personificaciones en textos comunitarios.</p>
-                    <button onclick="startMission('L1')" class="btn-glow w-full py-3 bg-blue-600 text-white font-bold rounded-xl text-sm">Iniciar Reto</button>
+                    <p class="text-slate-300 text-xs mb-6">Identifica metáforas, hipérboles y personificaciones en expresiones comunitarias.</p>
+                    <button onclick="startMission('L1')" class="btn-glow w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
 
+            <!-- CONTENIDO FORMATIVO: ÉTICA Y SOCIEDADES -->
             <div id="tab-content-etica" class="hidden space-y-6">
                 <div class="glass-card p-6 rounded-3xl border-t-2 border-t-amber-500 max-w-xl">
                     <h4 class="text-lg font-bold text-white mb-2">Evidencia vs Interpretación</h4>
-                    <p class="text-slate-300 text-xs mb-6">Distingue entre hechos empíricos y sesgos ideológicos en la historia.</p>
-                    <button onclick="startMission('R1')" class="btn-glow w-full py-3 bg-amber-600 text-white font-bold rounded-xl text-sm">Iniciar Reto</button>
+                    <p class="text-slate-300 text-xs mb-6">Distingue entre datos empíricos e interpretaciones en el registro histórico.</p>
+                    <button onclick="startMission('R1')" class="btn-glow w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- VENTANA DE RETOS -->
+    <!-- VENTANA MODAL PARA MISIONES -->
     <div id="mission-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 relative">
             <button onclick="closeMissionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
@@ -193,33 +200,33 @@
         </div>
     </div>
 
-    <!-- PANEL DOCENTE -->
+    <!-- VENTANA MODAL DEL PANEL DOCENTE -->
     <div id="teacher-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 relative max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
-                <h3 class="text-2xl font-black text-white"><i class="fa-solid fa-users-gear text-indigo-400 mr-2"></i>Gestión de Grupos y Credenciales</h3>
+                <h3 class="text-2xl font-black text-white"><i class="fa-solid fa-users-gear text-indigo-400 mr-2"></i>Gestión de Alumnos y Credenciales QR</h3>
                 <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="overflow-y-auto space-y-6">
                 <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
-                    <label class="block text-xs font-bold text-indigo-300 mb-2">Nuevo Grupo Escolar</label>
+                    <label class="block text-xs font-bold text-indigo-300 mb-2">Crear Grupo Escolar</label>
                     <div class="flex gap-2">
                         <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500">
                         <button onclick="saveNewGroup()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Crear Grupo</button>
                     </div>
                 </div>
                 <div id="teacher-groups-container" class="space-y-4">
-                    <div class="text-center py-4 text-slate-400 text-sm">Cargando...</div>
+                    <div class="text-center py-4 text-slate-400 text-sm">Cargando grupos...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE QR -->
+    <!-- MODAL DE LA CREDENCIAL QR -->
     <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center border border-white/20">
             <h4 id="qr-student-title" class="text-xl font-bold text-white mb-2">Credencial QR</h4>
-            <p class="text-slate-300 text-xs mb-4">Escanea con la cámara del celular para entrar directamente.</p>
+            <p class="text-slate-300 text-xs mb-4">Apunta con la cámara del celular para ingresar directamente.</p>
             
             <div class="bg-white p-4 rounded-2xl inline-block mb-5 shadow-2xl">
                 <div id="qrcode-container" class="flex justify-center items-center min-h-[180px] min-w-[180px]"></div>
@@ -231,7 +238,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN CON AUTORRECUPERACIÓN -->
+    <!-- LÓGICA DE PROGRAMACIÓN CON ENTRADA DIRECTA -->
     <script>
         const LOCAL_STORAGE_KEY = "TELEVERSO_CACHE_DATA";
         const ACTIVE_STUDENT_KEY = "TELEVERSO_ACTIVE_STUDENT_ID";
@@ -245,7 +252,7 @@
             'L1': {
                 title: "Figuras Retóricas",
                 statements: [
-                    { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la acción de murmurar al río.' },
+                    { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la acción humana de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
                     { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Una exageración poética.' }
                 ]
@@ -263,32 +270,13 @@
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dbState));
         }
 
-        // Actualizar indicador visual de conexión
-        function updateConnectionUI(status, msg) {
-            const badge = document.getElementById('connection-badge');
-            const text = document.getElementById('connection-text');
-            if (!badge || !text) return;
-
-            if (status === 'online') {
-                badge.className = "inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]";
-                text.innerText = "Nube Conectada";
-                text.className = "text-[10px] text-emerald-400 font-semibold";
-            } else if (status === 'error') {
-                badge.className = "inline-block w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e]";
-                text.innerText = "Error en Reglas Firestore (Modo Local)";
-                text.className = "text-[10px] text-rose-400 font-semibold";
-            } else {
-                badge.className = "inline-block w-2 h-2 rounded-full bg-amber-400";
-                text.innerText = msg || "Modo Local Activo";
-                text.className = "text-[10px] text-amber-400 font-semibold";
-            }
-        }
-
+        // =========================================================================
+        // SINCRONIZACIÓN Y ACCESO INMEDIATO POR URL
+        // =========================================================================
         function initSync() {
             if (!window.cloudDb || !window.cloudOps) {
-                updateConnectionUI('local', 'Modo Local');
                 renderTeacherGroups();
-                attemptAutoLogin();
+                processAutoLogin();
                 return;
             }
 
@@ -296,18 +284,13 @@
 
             // Escuchar grupos
             onSnapshot(collection(window.cloudDb, "groups"), (snap) => {
-                updateConnectionUI('online');
                 snap.forEach(d => { dbState.groups[d.id] = d.data(); });
                 saveCache();
                 renderTeacherGroups();
-            }, (err) => {
-                console.warn("Fallo de permisos en grupos:", err);
-                updateConnectionUI('error');
             });
 
-            // Escuchar alumnos
+            // Escuchar alumnos y verificar inicio de sesión al recibir datos
             onSnapshot(collection(window.cloudDb, "students"), (snap) => {
-                updateConnectionUI('online');
                 snap.forEach(d => { dbState.students[d.id] = d.data(); });
                 saveCache();
                 renderTeacherGroups();
@@ -316,19 +299,14 @@
                     currentUser = dbState.students[currentUser.id];
                     renderStudentDashboard();
                 }
-                attemptAutoLogin();
-            }, (err) => {
-                console.warn("Fallo de permisos en alumnos:", err);
-                updateConnectionUI('error');
+
+                // Evalúa inmediatamente si la URL tiene el parámetro ?student=
+                processAutoLogin();
             });
         }
 
-        window.addEventListener('firebase-ready', initSync);
-        window.addEventListener('firebase-error', () => updateConnectionUI('error'));
-        setTimeout(() => { if (!window.isFirebaseActive) initSync(); }, 1200);
-
-        // Autologin por URL o caché previa
-        function attemptAutoLogin() {
+        // Comprobación prioritaria para entrar directo
+        function processAutoLogin() {
             const urlParams = new URLSearchParams(window.location.search);
             const paramId = urlParams.get('student');
             const savedId = localStorage.getItem(ACTIVE_STUDENT_KEY);
@@ -345,8 +323,11 @@
         function logoutStudent() {
             currentUser = null;
             localStorage.removeItem(ACTIVE_STUDENT_KEY);
+            
+            // Retira el parámetro de la URL para que no vuelva a autologuearse al recargar
             const cleanUrl = window.location.origin + window.location.pathname;
             window.history.replaceState({}, document.title, cleanUrl);
+            
             switchView('view-login');
         }
 
@@ -359,7 +340,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE Y QR
+        // GESTIÓN DOCENTE Y GENERADOR DE QR
         // =========================================================================
         async function saveNewGroup() {
             const input = document.getElementById('new-group-name');
@@ -379,7 +360,7 @@
                     const { doc, setDoc } = window.cloudOps;
                     await setDoc(doc(window.cloudDb, "groups", gId), groupData);
                 } catch (e) {
-                    console.warn("Grupo guardado en caché local:", e);
+                    console.warn("Grupo guardado localmente:", e);
                 }
             }
         }
@@ -388,7 +369,7 @@
             const { value: studentName } = await Swal.fire({
                 title: 'Registrar Alumno',
                 input: 'text',
-                inputPlaceholder: 'Nombre completo',
+                inputPlaceholder: 'Nombre y apellido',
                 showCancelButton: true,
                 confirmButtonText: 'Registrar',
                 cancelButtonText: 'Cancelar',
@@ -412,7 +393,6 @@
                 completedMissions: {}
             };
 
-            // Guardar local
             dbState.students[sId] = studentData;
             if (!dbState.groups[groupId]) dbState.groups[groupId] = { id: groupId, name: 'Grupo', students: [] };
             if (!Array.isArray(dbState.groups[groupId].students)) dbState.groups[groupId].students = [];
@@ -420,14 +400,13 @@
             saveCache();
             renderTeacherGroups();
 
-            // Guardar en Firestore
             if (window.cloudDb && window.cloudOps) {
                 try {
                     const { doc, setDoc } = window.cloudOps;
                     await setDoc(doc(window.cloudDb, "students", sId), studentData);
                     await setDoc(doc(window.cloudDb, "groups", groupId), dbState.groups[groupId]);
                 } catch (err) {
-                    console.warn("Guardado localmente. Revisa las reglas en Firebase si deseas sincronizar en la nube:", err);
+                    console.warn("Alumno guardado localmente:", err);
                 }
             }
 
@@ -448,6 +427,7 @@
             const container = document.getElementById('qrcode-container');
             container.innerHTML = '';
 
+            // Enlace directo codificado
             const cleanUrl = window.location.origin + window.location.pathname;
             const targetUrl = `${cleanUrl}?student=${encodeURIComponent(student.id)}`;
 
@@ -519,7 +499,7 @@
                                         <i class="fa-solid fa-qrcode"></i>
                                         <span>Ver QR</span>
                                     </button>
-                                    <button onclick="deleteStudent('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                    <button onclick="deleteStudent('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -549,8 +529,8 @@
         function switchFieldTab(t) {
             document.getElementById('tab-content-lenguajes').classList.toggle('hidden', t !== 'lenguajes');
             document.getElementById('tab-content-etica').classList.toggle('hidden', t !== 'etica');
-            document.getElementById('tab-btn-lenguajes').className = t === 'lenguajes' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0";
-            document.getElementById('tab-btn-etica').className = t === 'etica' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-amber-600 text-white shadow-lg shrink-0" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0";
+            document.getElementById('tab-btn-lenguajes').className = t === 'lenguajes' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition";
+            document.getElementById('tab-btn-etica').className = t === 'etica' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-amber-600 text-white shadow-lg shrink-0 transition" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition";
         }
 
         function startMission(k) {
@@ -571,8 +551,8 @@
             }
             const item = list[idx];
             let btns = activeMissionKey === 'L1' 
-                ? `<div class="grid grid-cols-3 gap-2"><button onclick="submitAns('M')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold">Metáfora</button><button onclick="submitAns('H')" class="p-3 bg-slate-800 hover:bg-purple-600 rounded-xl text-sm font-bold">Hipérbole</button><button onclick="submitAns('P')" class="p-3 bg-slate-800 hover:bg-emerald-600 rounded-xl text-sm font-bold">Personificación</button></div>`
-                : `<div class="grid grid-cols-2 gap-2"><button onclick="submitAns('E')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold">Evidencia</button><button onclick="submitAns('I')" class="p-3 bg-slate-800 hover:bg-amber-600 rounded-xl text-sm font-bold">Interpretación</button></div>`;
+                ? `<div class="grid grid-cols-3 gap-2"><button onclick="submitAns('M')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Metáfora</button><button onclick="submitAns('H')" class="p-3 bg-slate-800 hover:bg-purple-600 rounded-xl text-sm font-bold transition">Hipérbole</button><button onclick="submitAns('P')" class="p-3 bg-slate-800 hover:bg-emerald-600 rounded-xl text-sm font-bold transition">Personificación</button></div>`
+                : `<div class="grid grid-cols-2 gap-2"><button onclick="submitAns('E')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Evidencia</button><button onclick="submitAns('I')" class="p-3 bg-slate-800 hover:bg-amber-600 rounded-xl text-sm font-bold transition">Interpretación</button></div>`;
 
             container.innerHTML = `
                 <span class="text-xs text-indigo-400 font-bold uppercase">Pregunta ${idx + 1} de ${list.length}</span>
@@ -623,11 +603,16 @@
         function openTeacherModal() { document.getElementById('teacher-modal').classList.remove('hidden'); }
         function closeTeacherModal() { document.getElementById('teacher-modal').classList.add('hidden'); }
         function closeQrModal() { document.getElementById('qr-modal').classList.add('hidden'); }
+        
         function switchView(v) {
             document.getElementById('view-login').classList.toggle('hidden', v !== 'view-login');
             document.getElementById('view-student').classList.toggle('hidden', v !== 'view-student');
         }
 
+        window.addEventListener('firebase-ready', initSync);
+        setTimeout(() => { if (!window.isFirebaseActive) initSync(); }, 1200);
+
+        // Renderizado del objeto 3D
         window.onload = () => {
             const c = document.getElementById('logo-3d-container');
             if (!c) return;
