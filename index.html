@@ -4,323 +4,405 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeleVerso Educativo - Plataforma Gamificada Multicampo</title>
+    
+    <!-- Librerías de Estilos y Fuentes -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Librerías de Funcionalidad -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Three.js for interactive 3D Cosmic Logo rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
+    <script>
+        // Configuración de extensión de Tailwind para colores y efectos personalizados
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
+        /* Fondo ambiental dinámico con gradiente radial y malla sutil */
         body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
-            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            background-image: 
+                radial-gradient(at 10% 15%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+                radial-gradient(at 90% 85%, rgba(168, 85, 247, 0.18) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(14, 165, 233, 0.10) 0px, transparent 60%);
+            background-attachment: fixed;
+            color: #f1f5f9;
             min-height: 100vh;
         }
+
+        /* Paneles Glassmorphism con bordes brillantes */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
         }
+
         .glass-card {
-            background: rgba(15, 23, 42, 0.65);
-            backdrop-filter: blur(12px);
+            background: rgba(30, 41, 59, 0.55);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(129, 140, 248, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -8px rgba(99, 102, 241, 0.35);
+        }
+
+        /* Botones con brillo interior y elevación suave */
+        .btn-glow {
+            position: relative;
+            overflow: hidden;
             transition: all 0.3s ease;
         }
-        .glass-card:hover {
-            border-color: rgba(99, 102, 241, 0.4);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
+        .btn-glow:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .floating {
-            animation: float 4s ease-in-out infinite;
-        }
-        /* Memorama Card Flip Styles */
+
+        /* Estilos del Memorama */
         .perspective-1000 { perspective: 1000px; }
-        .transform-style-3d { transform-style: preserve-3d; }
-        .backface-hidden { backface-visibility: hidden; }
-        .rotate-y-180 { transform: rotateY(180deg); }
     </style>
 </head>
-<body class="selection:bg-indigo-500 selection:text-white">
+<body class="selection:bg-indigo-500 selection:text-white antialiased">
 
-    <header class="glass-panel sticky top-0 z-50 px-6 py-4 border-b border-white/10 flex justify-between items-center shadow-lg">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-login')">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-cube text-white"></i>
+    <!-- BARRA SUPERIOR DE NAVEGACIÓN -->
+    <header class="glass-panel sticky top-0 z-40 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
+        <div class="flex items-center space-x-3 cursor-pointer group" onclick="switchView('view-login')">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition">
+                <i class="fa-solid fa-cube text-white text-lg"></i>
             </div>
             <div>
-                <span class="font-black text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-purple-300">TeleVerso Educativo</span>
-                <span class="block text-xs text-indigo-300 font-medium">NEM Telesecundaria 360°</span>
+                <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-300">TeleVerso Educativo</span>
+                <span class="block text-xs text-indigo-300/80 font-medium">NEM Telesecundaria 360°</span>
             </div>
         </div>
-        <div id="nav-user-info" class="flex items-center space-x-4">
-            <button onclick="openTeacherModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2 shadow-md">
-                <i class="fa-solid fa-chalkboard-user"></i>
+        <div id="nav-user-info" class="flex items-center space-x-3">
+            <button onclick="openTeacherModal()" class="btn-glow px-4 py-2.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2">
+                <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
                 <span>Panel Docente</span>
             </button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <div id="view-login" class="flex flex-col items-center justify-center min-h-[80vh] animate-fade-in">
-            <div class="glass-panel p-8 md:p-12 rounded-3xl w-full max-w-xl text-center relative overflow-hidden shadow-2xl">
-                <div class="absolute -top-32 -right-32 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- VISTA 1: INICIO DE SESIÓN -->
+        <div id="view-login" class="flex flex-col items-center justify-center min-h-[78vh]">
+            <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-xl text-center relative overflow-hidden border border-white/15">
                 
-                <!-- Interactive 3D Logo Container -->
-                <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-4 cursor-pointer filter drop-shadow-[0_0_25px_rgba(99,102,241,0.6)] transition-transform hover:scale-110" title="¡Gira el TeleVerso!"></div>
+                <!-- Efectos luminosos de fondo -->
+                <div class="absolute -top-24 -right-24 w-56 h-56 bg-indigo-500/25 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-56 h-56 bg-purple-500/25 rounded-full blur-3xl pointer-events-none"></div>
                 
-                <h1 class="text-3xl md:text-5xl font-black mb-2 text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-200 to-purple-300">TeleVerso Educativo</h1>
-                <p class="text-slate-300 mb-8 font-light text-sm md:text-base">El universo interactivo de los cuatro Campos Formativos de la NEM (Telesecundaria)</p>
+                <!-- Contenedor 3D Interactivo -->
+                <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-3 cursor-pointer filter drop-shadow-[0_0_20px_rgba(99,102,241,0.5)] transition-transform hover:scale-110" title="¡Haz clic y gira el TeleVerso!"></div>
                 
-                <div class="glass-card p-6 rounded-2xl mb-6 text-left">
+                <h1 class="text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+                    TeleVerso Educativo
+                </h1>
+                <p class="text-slate-300 text-sm sm:text-base font-normal mb-8 max-w-md mx-auto leading-relaxed">
+                    Plataforma interactiva para los cuatro Campos Formativos de la Nueva Escuela Mexicana
+                </p>
+                
+                <!-- Caja de Entrada con Código -->
+                <div class="glass-card p-6 rounded-2xl mb-8 text-left border border-white/10">
                     <label class="block text-xs font-bold uppercase tracking-wider text-indigo-300 mb-2">Ingresar con Código de Alumno</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="student-login-code" placeholder="Ej: ALUM-1234" class="w-full bg-slate-900/80 border border-slate-700 rounded-xl px-4 py-3 text-white uppercase font-mono tracking-widest focus:outline-none focus:border-indigo-500">
-                        <button onclick="manualStudentLogin()" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold rounded-xl shadow-lg transition transform active:scale-95 shrink-0">
+                    <div class="flex flex-col sm:flex-row gap-2.5">
+                        <input type="text" id="student-login-code" placeholder="Ej: ALUM-1234" class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-3 text-white uppercase font-mono tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition">
+                        <button onclick="manualStudentLogin()" class="btn-glow px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 font-bold text-white rounded-xl shadow-lg transition active:scale-95 shrink-0">
                             Entrar
                         </button>
                     </div>
-                    <p class="text-xs text-slate-400 mt-2">💡 O escanea tu código QR personal para acceso automático directo.</p>
+                    <p class="text-xs text-slate-400 mt-3 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-qrcode text-indigo-400"></i>
+                        <span>O escanea tu código QR personal para acceso directo.</span>
+                    </p>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-left">
-                    <div class="glass-card p-3 rounded-xl border-blue-500/30">
-                        <i class="fa-solid fa-comments text-blue-400 mb-1"></i>
+                <!-- Resumen de los 4 Campos Formativos -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+                    <div class="glass-card p-3.5 rounded-xl border-l-2 border-l-blue-500">
+                        <i class="fa-solid fa-comments text-blue-400 mb-1 text-sm"></i>
                         <h4 class="text-xs font-bold text-white">Lenguajes</h4>
                     </div>
-                    <div class="glass-card p-3 rounded-xl border-emerald-500/30">
-                        <i class="fa-solid fa-atom text-emerald-400 mb-1"></i>
-                        <h4 class="text-xs font-bold text-white">Saberes</h4>
+                    <div class="glass-card p-3.5 rounded-xl border-l-2 border-l-emerald-500">
+                        <i class="fa-solid fa-atom text-emerald-400 mb-1 text-sm"></i>
+                        <h4 class="text-xs font-bold text-white">Saberes y P.C.</h4>
                     </div>
-                    <div class="glass-card p-3 rounded-xl border-amber-500/50 bg-indigo-950/40">
-                        <i class="fa-solid fa-landmark text-amber-400 mb-1"></i>
+                    <div class="glass-card p-3.5 rounded-xl border-l-2 border-l-amber-500 bg-amber-500/10">
+                        <i class="fa-solid fa-landmark text-amber-400 mb-1 text-sm"></i>
                         <h4 class="text-xs font-bold text-white">Ética y Soc.</h4>
-                        <span class="text-[10px] text-amber-300 block">PPA 1 Activo</span>
+                        <span class="text-[10px] text-amber-300 font-semibold">PPA 1 Activo</span>
                     </div>
-                    <div class="glass-card p-3 rounded-xl border-purple-500/30">
-                        <i class="fa-solid fa-hands-holding-child text-purple-400 mb-1"></i>
+                    <div class="glass-card p-3.5 rounded-xl border-l-2 border-l-purple-500">
+                        <i class="fa-solid fa-hands-holding-child text-purple-400 mb-1 text-sm"></i>
                         <h4 class="text-xs font-bold text-white">De lo Humano</h4>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- VISTA 2: PANEL DEL ESTUDIANTE -->
         <div id="view-student" class="hidden space-y-6">
+            
+            <!-- Cabecera de bienvenida del alumno -->
             <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Panel de Explorador</span>
-                    <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-black text-white">¡Bienvenido, Estudiante!</h2>
-                    <p id="student-group-info" class="text-slate-300 text-sm">Grupo: Cargando...</p>
+                    <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-extrabold text-white">¡Bienvenido!</h2>
+                    <p id="student-group-info" class="text-slate-300 text-sm mt-0.5">Cargando datos...</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <div class="glass-card px-4 py-2 rounded-2xl flex items-center space-x-2">
-                        <i class="fa-solid fa-star text-amber-400"></i>
+                    <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center space-x-3 border-amber-500/30">
+                        <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
                         <div>
-                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntos</span>
-                            <span id="student-score-display" class="text-lg font-black text-white">0</span>
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold tracking-wider">Puntuación</span>
+                            <span id="student-score-display" class="text-xl font-black text-white">0</span>
                         </div>
                     </div>
-                    <button onclick="logoutStudent()" class="px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl font-semibold text-sm transition">
-                        Salir
+                    <button onclick="logoutStudent()" class="px-4 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl font-semibold text-sm transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Salir</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CAMPO FORMATIVO TABS -->
-            <div class="flex overflow-x-auto space-x-2 pb-2">
-                <button onclick="switchFieldTab('etica')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg flex items-center space-x-2 shrink-0">
+            <!-- Pestañas de Campos Formativos -->
+            <div class="flex overflow-x-auto space-x-3 pb-2 scrollbar-none">
+                <button onclick="switchFieldTab('etica')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center space-x-2 shrink-0 transition">
                     <i class="fa-solid fa-landmark"></i>
                     <span>Ética, Naturaleza y Sociedades (PPA 1)</span>
                 </button>
-                <button onclick="switchFieldTab('lenguajes')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0">
+                <button onclick="switchFieldTab('lenguajes')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0 transition">
                     <i class="fa-solid fa-comments"></i>
-                    <span>Lenguajes (Próximamente)</span>
+                    <span>Lenguajes</span>
                 </button>
-                <button onclick="switchFieldTab('saberes')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0">
+                <button onclick="switchFieldTab('saberes')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0 transition">
                     <i class="fa-solid fa-atom"></i>
                     <span>Saberes y Pensamiento C.</span>
                 </button>
-                <button onclick="switchFieldTab('humano')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0">
+                <button onclick="switchFieldTab('humano')" class="field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0 transition">
                     <i class="fa-solid fa-hands-holding-child"></i>
                     <span>De lo Humano y lo Comunitario</span>
                 </button>
             </div>
 
-            <!-- FIELD CONTENT: ETICA & SOCIEDADES (HUELLAS DE HUMANIDAD) -->
+            <!-- CONTENIDO DEL CAMPO FORMATIVO: ÉTICA Y SOCIEDADES -->
             <div id="tab-content-etica" class="space-y-6">
-                <div class="glass-panel p-6 rounded-3xl border-l-4 border-l-indigo-500">
-                    <h3 class="text-xl font-black text-white mb-2">Huellas de Humanidad: Memoria, agua e igualdad</h3>
-                    <p class="text-slate-300 text-sm">Completa los 5 retos interactivos avanzados (con mecánicas dinámicas de clasificación, memorama, conexión, simulador y trivia) para obtener tus insignias.</p>
+                <div class="glass-panel p-6 rounded-3xl border-l-4 border-l-indigo-500 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white mb-1">Huellas de Humanidad: Memoria, agua e igualdad</h3>
+                        <p class="text-slate-300 text-sm max-w-2xl">Supera los 5 retos para desbloquear tus insignias y consolidar el aprendizaje del proyecto.</p>
+                    </div>
                 </div>
 
+                <!-- Grilla de Tarjetas de Retos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- RETO 1: CLASIFICACIÓN -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-blue-500/20">
+                    
+                    <!-- RETO 1 -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-blue-500">
                         <div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-lg border border-blue-500/30">Clasificación R1</span>
+                                <span class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-lg border border-blue-500/30">Reto 1 • Clasificación</span>
                                 <i id="badge-r1" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Detectives de afirmaciones</h4>
-                            <p class="text-slate-300 text-xs mb-4">Clasifica 15 enunciados entre evidencia observable, interpretación y propuesta de acción.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Clasifica 15 enunciados entre evidencia empírica observable, interpretaciones y propuestas de acción.</p>
                         </div>
-                        <button onclick="startMission('R1')" class="w-full py-3 bg-blue-600 hover:bg-blue-500 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-tags"></i><span>Iniciar Clasificación</span>
+                        <button onclick="startMission('R1')" class="btn-glow w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-tags"></i>
+                            <span>Iniciar Reto</span>
                         </button>
                     </div>
 
-                    <!-- RETO 2: MEMORAMA -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-purple-500/20">
+                    <!-- RETO 2 -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-purple-500">
                         <div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-lg border border-purple-500/30">Memorama R2</span>
+                                <span class="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-lg border border-purple-500/30">Reto 2 • Memorama</span>
                                 <i id="badge-r2" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Mitos del pasado</h4>
-                            <p class="text-slate-300 text-xs mb-4">Encuentra las parejas de conceptos sobre réplicas, herramientas líticas y evolución histórica.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Empareja conceptos teóricos sobre industria lítica, hominización y revolución neolítica.</p>
                         </div>
-                        <button onclick="startMission('R2')" class="w-full py-3 bg-purple-600 hover:bg-purple-500 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-brain"></i><span>Jugar Memorama</span>
+                        <button onclick="startMission('R2')" class="btn-glow w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-brain"></i>
+                            <span>Jugar Memorama</span>
                         </button>
                     </div>
 
-                    <!-- RETO 3: CONEXIÓN -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-emerald-500/20">
+                    <!-- RETO 3 -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-emerald-500">
                         <div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30">Conexión R3</span>
+                                <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30">Reto 3 • Conexión</span>
                                 <i id="badge-r3" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Ríos y civilizaciones</h4>
-                            <p class="text-slate-300 text-xs mb-4">Conecta correctamente las civilizaciones fluviales (Egipto, China, Mesopotamia, Indo) con sus ríos.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Vincula civilizaciones fluviales históricas (Egipto, Mesopotamia, China e Indo) con sus cuencas.</p>
                         </div>
-                        <button onclick="startMission('R3')" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-diagram-project"></i><span>Conectar Ríos</span>
+                        <button onclick="startMission('R3')" class="btn-glow w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-water"></i>
+                            <span>Conectar Ríos</span>
                         </button>
                     </div>
 
-                    <!-- RETO 4: SIMULADOR DE CASOS -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-amber-500/20">
+                    <!-- RETO 4 -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-amber-500">
                         <div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-lg border border-amber-500/30">Simulador R4</span>
+                                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-lg border border-amber-500/30">Reto 4 • Casos Reales</span>
                                 <i id="badge-r4" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Detecta la barrera</h4>
-                            <p class="text-slate-300 text-xs mb-4">Analiza 6 casos escolares y elige acciones concretas frente a brechas y exclusión.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Analiza situaciones escolares complejas y selecciona soluciones basadas en justicia y diseño universal.</p>
                         </div>
-                        <button onclick="startMission('R4')" class="w-full py-3 bg-amber-600 hover:bg-amber-500 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-shield-halved"></i><span>Abrir Simulador</span>
+                        <button onclick="startMission('R4')" class="btn-glow w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                            <span>Abrir Simulador</span>
                         </button>
                     </div>
 
-                    <!-- RETO 5: TRIVIA INTEGRADORA -->
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-rose-500/20">
+                    <!-- RETO 5 -->
+                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-rose-500">
                         <div>
                             <div class="flex justify-between items-start mb-4">
-                                <span class="px-3 py-1 bg-rose-500/20 text-rose-300 text-xs font-bold rounded-lg border border-rose-500/30">Trivia R5</span>
+                                <span class="px-3 py-1 bg-rose-500/20 text-rose-300 text-xs font-bold rounded-lg border border-rose-500/30">Reto 5 • Trivia Síntesis</span>
                                 <i id="badge-r5" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Pasaporte del visitante</h4>
-                            <p class="text-slate-300 text-xs mb-4">Integra las tres salas de la galería: memoria, agua e igualdad en un test interactivo.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Demuestra tu dominio integrando el análisis del pasado, el agua comunitaria y la equidad.</p>
                         </div>
-                        <button onclick="startMission('R5')" class="w-full py-3 bg-rose-600 hover:bg-rose-500 font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-passport"></i><span>Iniciar Trivia</span>
+                        <button onclick="startMission('R5')" class="btn-glow w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-sm transition shadow-lg flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-passport"></i>
+                            <span>Iniciar Test</span>
                         </button>
                     </div>
+
                 </div>
             </div>
 
-            <!-- PLACEHOLDERS FOR OTHER TABS -->
+            <!-- CONTENIDO DE OTROS CAMPOS -->
             <div id="tab-content-other" class="hidden glass-panel p-12 rounded-3xl text-center space-y-4">
-                <i class="fa-solid fa-person-digging text-4xl text-indigo-400"></i>
-                <h3 class="text-2xl font-bold text-white">Módulos en Desarrollo</h3>
-                <p class="text-slate-300">Pronto se agregarán misiones gamificadas para este campo formativo de la NEM.</p>
+                <div class="w-16 h-16 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white">Módulo en Desarrollo</h3>
+                <p class="text-slate-300 max-w-md mx-auto text-sm">Próximamente se integrarán las actividades gamificadas correspondientes a este campo formativo de la NEM.</p>
             </div>
         </div>
 
     </main>
 
-    <div id="mission-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeMissionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-xl">
+    <!-- VENTANA MODAL PARA MISIONES / RETOS -->
+    <div id="mission-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 relative max-h-[92vh] overflow-y-auto border border-white/20">
+            <button onclick="closeMissionModal()" class="absolute top-6 right-6 w-9 h-9 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <div id="mission-content">
-                <!-- Dynamic game engine injected via JS -->
+                <!-- Contenido dinámico inyectado por JS -->
             </div>
         </div>
     </div>
 
-    <div id="teacher-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-5xl rounded-3xl p-6 md:p-8 relative max-h-[92vh] flex flex-col">
+    <!-- VENTANA MODAL PARA PANEL DOCENTE -->
+    <div id="teacher-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 sm:p-8 relative max-h-[92vh] flex flex-col border border-white/20">
             <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
                 <div>
                     <h3 class="text-2xl font-black text-white flex items-center space-x-2">
                         <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
                         <span>Panel de Gestión Docente</span>
                     </h3>
-                    <p class="text-slate-300 text-sm">Crea grupos de alumnos, agrega estudiantes y genera sus códigos QR personales para acceso rápido.</p>
+                    <p class="text-slate-300 text-sm mt-0.5">Administra tus grupos y genera códigos de acceso para los estudiantes.</p>
                 </div>
-                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-2xl p-2">
+                <button onclick="closeTeacherModal()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
-            <!-- TEACHER DASHBOARD CONTENT -->
-            <div class="overflow-y-auto space-y-6 pr-2">
-                <!-- SECTION: CREATE GROUP -->
-                <div class="glass-card p-6 rounded-2xl border-indigo-500/30">
-                    <h4 class="text-base font-bold text-white mb-3 flex items-center space-x-2">
-                        <i class="fa-solid fa-user-group text-indigo-400"></i>
-                        <span>1. Crear un Nuevo Grupo escolar</span>
+            <div class="overflow-y-auto space-y-6 pr-1">
+                <!-- 1. Crear Grupo -->
+                <div class="glass-card p-6 rounded-2xl border border-indigo-500/20">
+                    <h4 class="text-sm font-bold text-white mb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-plus-circle text-indigo-400"></i>
+                        <span>1. Crear un Nuevo Grupo</span>
                     </h4>
                     <div class="flex flex-col sm:flex-row gap-3">
                         <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 text-sm">
-                        <button onclick="saveNewGroup()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 font-bold rounded-xl text-sm transition flex items-center justify-center space-x-2 shadow-lg">
-                            <i class="fa-solid fa-plus"></i>
+                        <button onclick="saveNewGroup()" class="btn-glow px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-folder-plus"></i>
                             <span>Crear Grupo</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- SECTION: GROUPS & STUDENTS LIST -->
+                <!-- 2. Lista de Grupos -->
                 <div class="space-y-4">
-                    <h4 class="text-base font-bold text-white flex items-center space-x-2">
-                        <i class="fa-solid fa-list-check text-indigo-400"></i>
-                        <span>2. Grupos y Alumnos Registrados</span>
+                    <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-users text-indigo-400"></i>
+                        <span>2. Grupos y Estudiantes Registrados</span>
                     </h4>
                     <div id="teacher-groups-container" class="space-y-4">
-                        <!-- Populated dynamically -->
+                        <!-- Generado dinámicamente -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="qr-modal" class="fixed inset-0 z-60 bg-black/90 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-3xl p-6 text-center relative shadow-2xl">
+    <!-- VENTANA MODAL PARA CÓDIGO QR -->
+    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center relative border border-white/20">
             <h4 id="qr-student-title" class="text-xl font-bold text-white mb-1">Código QR del Alumno</h4>
-            <p class="text-slate-300 text-xs mb-4">Escanea este código con cualquier celular para iniciar sesión automáticamente sin contraseñas.</p>
-            <div class="bg-white p-5 rounded-2xl inline-block mb-4 shadow-inner">
+            <p class="text-slate-300 text-xs mb-5">Escanea este código con la cámara para ingresar sin escribir contraseña.</p>
+            
+            <div class="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
                 <div id="qrcode-container" class="flex justify-center items-center"></div>
             </div>
-            <p id="qr-student-code-text" class="font-mono font-bold text-indigo-300 text-sm mb-6 bg-slate-900/80 py-2 px-4 rounded-xl border border-slate-700 inline-block"></p>
-            <button onclick="closeQrModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 font-bold rounded-xl text-sm transition">Cerrar Ventana</button>
+            
+            <div>
+                <p id="qr-student-code-text" class="font-mono font-bold text-indigo-300 text-sm mb-5 bg-slate-900 py-2 px-4 rounded-xl border border-slate-700 inline-block"></p>
+            </div>
+            <button onclick="closeQrModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">
+                Cerrar Ventana
+            </button>
         </div>
     </div>
 
+    <!-- CÓDIGO LÓGICO Y CONTROLADORES -->
     <script>
         const STORAGE_KEY = "TELEVERSO_DB_V5";
         let db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {
@@ -329,23 +411,20 @@
         };
 
         let currentUser = null;
-
-        // MISSION STATE VARIABLES
         let activeMissionKey = null;
         let gameSessionState = {};
 
-        // COMPREHENSIVE & RIGOROUS ACADEMIC DATA FOR THE 5 CHALLENGES (3RD GRADE SECONDARY / NEM)
         const missionData = {
             'R1': {
-                title: "Reto R1: Epistemología y Crítica de Fuentes (Detectives Avanzados)",
-                desc: "Analiza 15 enunciados historiográficos y arqueológicos complejos. Distingue rigurosamente entre evidencia empírica contrastada, interpretaciones especulativas con sesgo y propuestas de acción estructural.",
+                title: "Reto R1: Epistemología y Crítica de Fuentes",
+                desc: "Analiza 15 enunciados historiográficos y arqueológicos. Distingue rigurosamente entre evidencia empírica contrastada, interpretaciones especulativas y propuestas de acción.",
                 statements: [
-                    { id: 1, text: `"El análisis traceológico de los filos líticos muestra estrías de desgaste compatibles con el procesamiento de pieles y corte de gramíneas."`, cat: 'E', exp: 'Riguroso: Describe datos empíricos observables mediante análisis microscópico de huellas de uso.' },
-                    { id: 2, text: `"El hallazgo de figurillas femeninas con atributos hiperbolizados demuestra de forma incuestionable la existencia de un matriarcado global en el Paleolítico."`, cat: 'I', exp: 'Especulativo/Sesgado: Atribución sociopolítica universal generalizada a partir de un registro material aislado.' },
-                    { id: 3, text: `"Establecer un protocolo rotativo de coevaluación con rúbricas de accesibilidad para erradicar la división sexual del trabajo en las prácticas de laboratorio escolar."`, cat: 'P', exp: 'Propuesta de Acción Estructural: Modifica las condiciones organizativas y de género en la práctica cotidiana.' },
+                    { id: 1, text: `"El análisis traceológico de los filos líticos muestra estrías de desgaste compatibles con el procesamiento de pieles y corte de gramíneas."`, cat: 'E', exp: 'Evidencia Empírica: Describe datos observables mediante análisis microscópico de huellas de uso.' },
+                    { id: 2, text: `"El hallazgo de figurillas femeninas con atributos hiperbolizados demuestra de forma incuestionable la existencia de un matriarcado global en el Paleolítico."`, cat: 'I', exp: 'Interpretación Especulativa: Atribución sociopolítica universal generalizada a partir de un registro material aislado.' },
+                    { id: 3, text: `"Establecer un protocolo rotativo de coevaluación con rúbricas de accesibilidad para erradicar la división sexual del trabajo en las prácticas escolares."`, cat: 'P', exp: 'Propuesta de Acción Estructural: Modifica las condiciones organizativas en la práctica cotidiana.' },
                     { id: 4, text: `"La datación por carbono-14 realizada en los carbones asociados al estrato inferior sitúa el contexto arqueológico entre el 8500 y el 8100 a. C."`, cat: 'E', exp: 'Evidencia Empírica: Aporta cronología absoluta respaldada por método científico documentado.' },
                     { id: 5, text: `"Las sociedades cazadoras-recolectoras vivían en un estado de perpetua violencia y precariedad extrema hasta que la agricultura las civilizó."`, cat: 'I', exp: 'Interpretación Teleológica: Refleja un sesgo evolucionista lineal desacreditado por la antropología moderna.' },
-                    { id: 6, text: `"Los restos arqueobotánicos recuperados en los silos indican el consumo predominante de variedades domesticadas de zea mays."`, cat: 'E', exp: 'Evidencia Empírica: Datos botánicos directos procedentes de contextos de almacenamiento.' },
+                    { id: 6, text: `"Los restos arqueobotánicos recuperados en los silos indican el consumo predominante de variedades domesticadas de maíz."`, cat: 'E', exp: 'Evidencia Empírica: Datos botánicos directos procedentes de contextos de almacenamiento.' },
                     { id: 7, text: `"Las diferencias de ajuar funerario en las tumbas demuestran que las jerarquías sociales eran de origen estrictamente biológico y natural."`, cat: 'I', exp: 'Interpretación Ideológica: Naturaliza construcciones sociales de desigualdad mediante el registro funerario.' },
                     { id: 8, text: `"Rediseñar la ruta de evacuación y los soportes visuales de la galería incorporando macrotipos y código Braille validado con la comunidad."`, cat: 'P', exp: 'Propuesta de Acción Inclusiva: Atiende directamente una barrera física y sensorial verificable.' },
                     { id: 9, text: `"El registro estratigráfico muestra una inversión en el orden de los depósitos, sugiriendo una alteración post-deposicional por actividad hídrica."`, cat: 'E', exp: 'Evidencia Estratigráfica: Describe la disposición física observable y su perturbación natural.' },
@@ -359,118 +438,86 @@
             },
             'R2': {
                 title: "Reto R2: Memorama Histórico-Antropológico",
-                desc: "Relaciona con rigor conceptual los términos teóricos de la hominización, la revolución neolítica y la crítica historiográfica con sus definiciones especializadas.",
+                desc: "Relaciona los conceptos teóricos de la hominización y la revolución neolítica con sus definiciones precisas.",
                 pairs: [
                     { id: 1, type: 'concept', text: "Estratigrafía Arqueológica", matchId: 101 },
                     { id: 101, type: 'def', text: "Estudio de la superposición de capas terrestres para establecer cronología relativa", matchId: 1 },
-                    
                     { id: 2, type: 'concept', text: "Revolución Neolítica", matchId: 102 },
                     { id: 102, type: 'def', text: "Transición socioeconómica hacia la domesticación de plantas, animales y sedentarismo", matchId: 2 },
-                    
                     { id: 3, type: 'concept', text: "Sesgo Androcéntrico", matchId: 103 },
                     { id: 103, type: 'def', text: "Distorsión historiográfica que universaliza la experiencia masculina ignorando a las mujeres", matchId: 3 },
-                    
                     { id: 4, type: 'concept', text: "Industria Lítica", matchId: 104 },
                     { id: 104, type: 'def', text: "Conjunto de herramientas de piedra tallada que evidencia procesos cognitivos y técnicos", matchId: 4 },
-                    
                     { id: 5, type: 'concept', text: "Excedente Agrícola", matchId: 105 },
-                    { id: 105, type: 'def', text: "Producción de alimentos por encima de la subsistencia, base de la división social del trabajo", matchId: 5 },
-                    
+                    { id: 105, type: 'def', text: "Producción de alimentos por encima de la subsistencia, base de la división del trabajo", matchId: 5 },
                     { id: 6, type: 'concept', text: "Epistemología Histórica", matchId: 106 },
                     { id: 106, type: 'def', text: "Análisis crítico sobre cómo se construye el conocimiento del pasado a partir de fuentes", matchId: 6 }
                 ]
             },
             'R3': {
                 title: "Reto R3: Sistemas Hidro-Sociales y Civilizaciones Fluviales",
-                desc: "Vincula rigurosamente cada civilización originaria con su cuenca fluvial y su innovación socio-técnica de gestión hídrica.",
+                desc: "Vincula cada civilización originaria con su cuenca fluvial correspondiente.",
                 items: [
                     { civ: "Mesopotamia", river: "Ríos Tigris y Éufrates", exp: "Construcción de complejos sistemas de diques, canales de regadío y regulación de crecidas impredecibles." },
                     { civ: "Egipto", river: "Río Nilo", exp: "Aprovechamiento de la crecida estacional previsible, cuencas de inundación y nilómetros fiscales." },
-                    { civ: "China antigua", river: "Ríos Huang He y Yangtsé", exp: "Obras hidráulicas monumentales de contención de avenidas, canales de transporte y terrazas agrícolas." },
-                    { civ: "Valle del Indo", river: "Río Indo", exp: "Planificación urbana avanzada con sistemas integrados de saneamiento, drenaje subterráneo y baños públicos." }
+                    { civ: "China antigua", river: "Ríos Huang He y Yangtsé", exp: "Obras hidráulicas de contención de avenidas, canales navegables y terrazas agrícolas." },
+                    { civ: "Valle del Indo", river: "Río Indo", exp: "Planificación urbana avanzada con sistemas subterráneos de saneamiento y drenaje." }
                 ]
             },
             'R4': {
-                title: "Reto R4: Simulador de Interseccionalidad y Justicia Escolar",
-                desc: "Analiza escenarios complejos de convivencia escolar marcados por barreras sistémicas, asimetrías de poder y exclusión. Selecciona soluciones de transformación estructural.",
+                title: "Reto R4: Simulador de Casos e Inclusión Escolar",
+                desc: "Analiza escenarios escolares marcados por barreras sistémicas y selecciona soluciones basadas en equidad.",
                 cases: [
                     { 
-                        title: "Caso 1: División Sexual del Trabajo Científico",
-                        desc: "En los equipos de investigación del laboratorio, sistemáticamente se asigna la manipulación de instrumentos técnicos a los varones y la redacción de informes o limpieza a las alumnas.",
+                        title: "Caso 1: División de tareas en el aula",
+                        desc: "En los equipos de laboratorio se asigna sistemáticamente el uso de instrumentos a los varones y la limpieza o redacción de notas a las alumnas.",
                         options: [
-                            { text: "A) Dejar que los equipos se organicen libremente bajo la premisa de que cada quien elige lo que prefiere.", correct: false },
-                            { text: "B) Establecer roles rotativos obligatorios basados en criterios de equidad y formación técnica integral para todo el alumnado.", correct: true, exp: "¡Correcto! Desmantela la división sexual del trabajo y garantiza el desarrollo de habilidades sin sesgos de género." },
-                            { text: "C) Asignar tareas administrativas a los varones como castigo por los estereotipos.", correct: false }
+                            { text: "A) Dejar que cada equipo se organice libremente según su preferencia personal.", correct: false },
+                            { text: "B) Establecer roles rotativos equitativos donde todos los alumnos desarrollen todas las habilidades.", correct: true, exp: "¡Correcto! Desmantela estereotipos de género y garantiza aprendizaje integral." },
+                            { text: "C) Asignar tareas administrativas solo a los varones a modo de sanción.", correct: false }
                         ]
                     },
                     { 
-                        title: "Caso 2: Accesibilidad Universal vs. Adaptación Reactiva",
-                        desc: "Para la presentación de la galería escolar, el estrado principal solo cuenta con acceso por escalinatas, impidiendo la participación activa de un estudiante usuario de silla de ruedas.",
+                        title: "Caso 2: Accesibilidad física",
+                        desc: "El auditorio para la galería del proyecto solo cuenta con escalinatas empinadas, impidiendo el paso a estudiantes con movilidad reducida.",
                         options: [
-                            { text: "A) Trasladar toda la exposición al pasillo exterior sin importar la logística ni la integración general.", correct: false },
-                            { text: "B) Diseñar una ruta única y un nivel de presentación accesible universalmente, coconstruido con el estudiante afectado.", correct: true, exp: "¡Correcto! Aplica el principio de diseño universal y participación con autonomía." },
-                            { text: "C) Eximir al alumno de la exposición oral argumentando dificultades técnicas.", correct: false }
+                            { text: "A) Trasladar el evento a un pasillo improvisado sin acondicionar.", correct: false },
+                            { text: "B) Diseñar una ruta de acceso universal e integrada coconstruida con la comunidad escolar.", correct: true, exp: "¡Correcto! Aplica los principios del diseño universal y autonomía." },
+                            { text: "C) Eximir a los estudiantes afectados de asistir a la presentación.", correct: false }
                         ]
                     },
                     { 
-                        title: "Caso 3: Justicia Epistémica y Lingüística",
-                        desc: "Un estudiante expone su investigación en su lengua materna originaria y parte del grupo descalifica su intervención por 'no ajustarse al estándar formal castellano'.",
+                        title: "Caso 3: Diversidad lingüística y cultural",
+                        desc: "Un estudiante expone en su lengua originaria materna y algunos compañeros se burlan argumentando que 'no es el idioma estándar'.",
                         options: [
-                            { text: "A) Solicitar que traduzca de inmediato al español sin permitir la expresión en su lengua.", correct: false },
-                            { text: "B) Validar la intervención, propiciar la traducción colaborativa con apoyo de hablantes y analizar la riqueza de la pluriculturalidad.", correct: true, exp: "¡Correcto! Reconoce la interculturalidad crítica y combate la injusticia epistémica." },
-                            { text: "C) Prohibir el uso de lenguas distintas al español en futuras exposiciones para evitar tensiones.", correct: false }
-                        ]
-                    },
-                    { 
-                        title: "Caso 4: Brecha Digital y Equidad en el Aprendizaje",
-                        desc: "Una actividad de investigación requiere recursos digitales en línea, pero tres estudiantes de la comunidad no cuentan con conectividad ni dispositivos móviles en sus hogares.",
-                        options: [
-                            { text: "A) Sancionar a los alumnos por no cumplir con el insumo tecnológico requerido.", correct: false },
-                            { text: "B) Proveer fuentes impresas equivalentes, equipos escolares compartidos y estrategias offline con idénticos criterios de evaluación.", correct: true, exp: "¡Correcto! Garantiza que la condición socioeconómica o tecnológica no determine el derecho a aprender." },
-                            { text: "C) Suprimir el uso de tecnologías para todo el grupo de forma permanente.", correct: false }
+                            { text: "A) Exigirle que solo use español estándar para evitar desacuerdos.", correct: false },
+                            { text: "B) Validar su participación, promover la traducción colaborativa y reflexionar sobre la pluriculturalidad.", correct: true, exp: "¡Correcto! Promueve la interculturalidad crítica y el respeto mutuo." },
+                            { text: "C) Suspender futuras presentaciones grupales.", correct: false }
                         ]
                     }
                 ]
             },
             'R5': {
-                title: "Reto R5: Pasaporte Epistemológico e Integrador",
-                desc: "Responde las cuestiones de síntesis avanzada sobre la articulación entre la memoria material, la gestión ecosistémica del agua y la construcción democrática de la igualdad.",
+                title: "Reto R5: Pasaporte del Visitante (Síntesis Integradora)",
+                desc: "Demuestra la articulación entre la memoria material, la gestión del agua y la convivencia pacífica.",
                 questions: [
                     { 
-                        text: "1. ¿Cuál es el fundamento metodológico que articula las tres salas de la galería (pasado, agua y convivencia)?",
+                        text: "1. ¿Cuál es el hilo conductor entre las salas de la galería escolar (pasado, agua y derechos)?",
                         options: [
-                            { t: "A) La clasificación estética de objetos según su valor económico en el mercado.", correct: false },
-                            { t: "B) La comprensión material de cómo las sociedades resuelven necesidades, gestionan recursos colectivos y pactan normas de justicia.", correct: true },
-                            { t: "C) La memorización cronológica de fechas y nombres de monarcas antiguos.", correct: false }
+                            { t: "A) La memorización exacta de fechas y nombres de reyes antiguos.", correct: false },
+                            { t: "B) La comprensión de cómo las comunidades resuelven necesidades básicas y pactan acuerdos justos.", correct: true },
+                            { t: "C) La clasificación monetaria de piezas arqueológicas.", correct: false }
                         ],
-                        exp: "Integra la dimensión material, ecológica y sociopolítica de la experiencia humana."
+                        exp: "Integra la dimensión ecológica, material y sociopolítica de los grupos humanos."
                     },
                     { 
-                        text: "2. ¿Cómo influyó la gestión del agua en la estructuración de las primeras civilizaciones fluviales?",
+                        text: "2. ¿Cómo influyó la gestión hídrica en las civilizaciones fluviales?",
                         options: [
-                            { t: "A) Generó sociedades pacíficas donde las decisiones se tomaban por consenso absoluto sin autoridad.", correct: false },
-                            { t: "B) Exigió obras hidráulicas complejas que propiciaron la división social, la cooperación organizada y la centralización política.", correct: true },
-                            { t: "C) Fue un factor irrelevante frente al desarrollo del comercio marítimo.", correct: false }
+                            { t: "A) Exigió obras hidráulicas comunitarias que fortalecieron la organización colectiva.", correct: true },
+                            { t: "B) Fue un recurso secundario sin impacto en la organización social.", correct: false },
+                            { t: "C) Eliminó por completo los conflictos entre comunidades vecinas.", correct: false }
                         ],
-                        exp: "Demuestra la relación dialéctica entre entorno natural, tecnología y organización social."
-                    },
-                    { 
-                        text: "3. ¿Por qué es crucial distinguir estrictamente entre evidencia observable e interpretación en el análisis histórico?",
-                        options: [
-                            { t: "A) Para evitar proyectar prejuicios modernos o especulaciones infundadas sobre el registro material del pasado.", correct: true },
-                            { t: "B) Para asegurar que todas las fuentes arqueológicas tengan una única fecha exacta.", correct: false },
-                            { t: "C) Para eliminar por completo la imaginación en las expresiones artísticas escolares.", correct: false }
-                        ],
-                        exp: "Garantiza el rigor científico y el pensamiento crítico frente a relatos dogmáticos."
-                    },
-                    { 
-                        text: "4. ¿Qué característica distingue a una acción verdaderamente transformadora frente a una barrera de desigualdad?",
-                        options: [
-                            { t: "A) Redactar un lema motivacional sin responsables ni plazos de ejecución.", correct: false },
-                            { t: "B) Modificar las condiciones organizativas, materiales o de acceso con indicadores de seguimiento verificables.", correct: true },
-                            { t: "C) Ignorar el conflicto y suponer que la buena voluntad resuelve las asimetrías.", correct: false }
-                        ],
-                        exp: "Convierte la reflexión ética en un compromiso práctico y auditable."
+                        exp: "La tecnología hidráulica demandó acuerdos, leyes y planificación territorial conjunta."
                     }
                 ]
             }
@@ -480,10 +527,8 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
         }
 
-        // AUTO-LOGIN ON WINDOW LOAD
         window.onload = () => {
             init3DLogo();
-
             const urlParams = new URLSearchParams(window.location.search);
             const studentParam = urlParams.get('student');
             if (studentParam) {
@@ -497,11 +542,10 @@
             }
         };
 
-        // THREE.JS 3D COSMIC CRYSTAL LOGO
+        // Renderizado 3D de cristal cósmico con Three.js
         function init3DLogo() {
             const container = document.getElementById('logo-3d-container');
-            if (!container) return;
-            if (container.children.length > 0) return;
+            if (!container || container.children.length > 0) return;
 
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
@@ -513,25 +557,25 @@
             const geometry = new THREE.IcosahedronGeometry(1.2, 0);
             const material = new THREE.MeshStandardMaterial({
                 color: 0x818cf8,
-                roughness: 0.1,
-                metalness: 0.9,
-                emissive: 0x4f46e5,
-                emissiveIntensity: 0.5
+                roughness: 0.15,
+                metalness: 0.85,
+                emissive: 0x4338ca,
+                emissiveIntensity: 0.45
             });
             const coreMesh = new THREE.Mesh(geometry, material);
             scene.add(coreMesh);
 
-            const wireGeometry = new THREE.IcosahedronGeometry(1.5, 0);
+            const wireGeometry = new THREE.IcosahedronGeometry(1.45, 0);
             const wireMaterial = new THREE.MeshBasicMaterial({
                 color: 0xc084fc,
                 wireframe: true,
                 transparent: true,
-                opacity: 0.5
+                opacity: 0.4
             });
             const wireMesh = new THREE.Mesh(wireGeometry, wireMaterial);
             scene.add(wireMesh);
 
-            const pointLight = new THREE.PointLight(0xffffff, 3, 50);
+            const pointLight = new THREE.PointLight(0xffffff, 2.5, 50);
             pointLight.position.set(5, 5, 5);
             scene.add(pointLight);
 
@@ -541,7 +585,7 @@
             camera.position.z = 3.2;
 
             let rotSpeed = 0.01;
-            container.addEventListener('mouseenter', () => rotSpeed = 0.04);
+            container.addEventListener('mouseenter', () => rotSpeed = 0.035);
             container.addEventListener('mouseleave', () => rotSpeed = 0.01);
 
             function animate3D() {
@@ -564,7 +608,12 @@
         function manualStudentLogin() {
             const codeInput = document.getElementById('student-login-code').value.trim().toUpperCase();
             if (!codeInput) {
-                Swal.fire('Atención', 'Ingresa tu código de alumno.', 'warning');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Campo vacío',
+                    text: 'Por favor, ingresa tu código de alumno.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
+                });
                 return;
             }
             db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
@@ -575,12 +624,18 @@
                 Swal.fire({
                     icon: 'success',
                     title: `¡Hola, ${currentUser.name}!`,
-                    text: 'Sesión iniciada correctamente.',
-                    timer: 1500,
-                    showConfirmButton: false
+                    text: 'Acceso correcto al TeleVerso.',
+                    timer: 1400,
+                    showConfirmButton: false,
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 });
             } else {
-                Swal.fire('Error', 'Código de alumno no encontrado. Pídelo a tu docente en el panel docente.', 'error');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Código no encontrado',
+                    text: 'Verifica que el código sea correcto o solicítalo en el Panel Docente.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
+                });
             }
         }
 
@@ -615,25 +670,22 @@
             const otherContent = document.getElementById('tab-content-other');
             const tabs = document.querySelectorAll('.field-tab');
             
-            tabs.forEach(t => t.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0");
+            tabs.forEach(t => t.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800/80 text-slate-300 hover:bg-slate-700 shrink-0 transition");
 
             if (tab === 'etica') {
                 eticaContent.classList.remove('hidden');
                 otherContent.classList.add('hidden');
-                event.currentTarget.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg flex items-center space-x-2 shrink-0";
+                event.currentTarget.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center space-x-2 shrink-0 transition";
             } else {
                 eticaContent.classList.add('hidden');
                 otherContent.classList.remove('hidden');
-                event.currentTarget.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg flex items-center space-x-2 shrink-0";
+                event.currentTarget.className = "field-tab px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 flex items-center space-x-2 shrink-0 transition";
             }
         }
 
-        // MISSION DISPATCHER & GAME ENGINES
         function startMission(missionId) {
             activeMissionKey = missionId;
-            const modal = document.getElementById('mission-modal');
-            modal.classList.remove('hidden');
-
+            document.getElementById('mission-modal').classList.remove('hidden');
             if (missionId === 'R1') initGameR1();
             if (missionId === 'R2') initGameR2();
             if (missionId === 'R3') initGameR3();
@@ -645,15 +697,11 @@
             document.getElementById('mission-modal').classList.add('hidden');
         }
 
-        // ==========================================
-        // GAME ENGINE R1: CLASIFICACIÓN DE TARJETAS
-        // ==========================================
+        // MOTOR R1: CLASIFICACIÓN
         function initGameR1() {
             const m = missionData['R1'];
-            // Shuffle statements
             gameSessionState.r1List = [...m.statements].sort(() => Math.random() - 0.5);
             gameSessionState.r1Idx = 0;
-            gameSessionState.r1Correct = 0;
             renderR1Card();
         }
 
@@ -663,52 +711,48 @@
             const content = document.getElementById('mission-content');
 
             if (idx >= list.length) {
-                completeActiveMission(`¡Excelente! Has clasificado correctamente ${gameSessionState.r1Correct} de ${list.length} enunciados.`);
+                completeActiveMission("¡Gran trabajo! Has clasificado correctamente las fuentes de información histórica.");
                 return;
             }
 
             const item = list[idx];
             content.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-3">
                     <span class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-lg border border-blue-500/30">Enunciado ${idx + 1} de ${list.length}</span>
-                    <span class="text-xs text-slate-400 font-mono">Reto R1 - Clasificación</span>
+                    <span class="text-xs text-slate-400 font-mono">Reto R1</span>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">Detectives de afirmaciones</h3>
-                <p class="text-slate-300 text-xs mb-6">Elige la categoría correcta para el siguiente enunciado:</p>
-                <div class="glass-card p-6 rounded-2xl mb-6 border-blue-500/30 text-center">
-                    <p class="font-bold text-white text-lg">${item.text}</p>
+                <h3 class="text-2xl font-bold text-white mb-2">Detectives de afirmaciones</h3>
+                <p class="text-slate-300 text-xs mb-6 leading-relaxed">Determina a qué categoría corresponde la siguiente afirmación:</p>
+                <div class="glass-card p-6 rounded-2xl mb-6 border border-blue-500/30 text-center">
+                    <p class="font-semibold text-white text-base sm:text-lg leading-relaxed">${item.text}</p>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <button onclick="submitR1Answer('E')" class="p-4 bg-slate-800 hover:bg-blue-600 border border-slate-700 hover:border-blue-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
+                    <button onclick="submitR1Answer('E')" class="p-4 bg-slate-800/90 hover:bg-blue-600/80 border border-slate-700 hover:border-blue-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
                         <i class="fa-solid fa-eye text-blue-400 block mb-1 text-lg"></i>
-                        <span>A) Evidencia observable (E)</span>
+                        <span>Evidencia Observable</span>
                     </button>
-                    <button onclick="submitR1Answer('I')" class="p-4 bg-slate-800 hover:bg-purple-600 border border-slate-700 hover:border-purple-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
+                    <button onclick="submitR1Answer('I')" class="p-4 bg-slate-800/90 hover:bg-purple-600/80 border border-slate-700 hover:border-purple-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
                         <i class="fa-solid fa-lightbulb text-purple-400 block mb-1 text-lg"></i>
-                        <span>B) Interpretación (I)</span>
+                        <span>Interpretación</span>
                     </button>
-                    <button onclick="submitR1Answer('P')" class="p-4 bg-slate-800 hover:bg-emerald-600 border border-slate-700 hover:border-emerald-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
-                        <i class="fa-solid fa-person-running text-emerald-400 block mb-1 text-lg"></i>
-                        <span>C) Propuesta de acción (P)</span>
+                    <button onclick="submitR1Answer('P')" class="p-4 bg-slate-800/90 hover:bg-emerald-600/80 border border-slate-700 hover:border-emerald-400 rounded-xl font-bold text-sm transition text-center shadow-lg">
+                        <i class="fa-solid fa-person-walking text-emerald-400 block mb-1 text-lg"></i>
+                        <span>Propuesta de Acción</span>
                     </button>
                 </div>
             `;
         }
 
         function submitR1Answer(choice) {
-            const list = gameSessionState.r1List;
-            const idx = gameSessionState.r1Idx;
-            const item = list[idx];
-
+            const item = gameSessionState.r1List[gameSessionState.r1Idx];
             if (choice === item.cat) {
-                gameSessionState.r1Correct++;
                 Swal.fire({
                     icon: 'success',
                     title: '¡Correcto!',
                     text: item.exp,
-                    timer: 1500,
+                    timer: 1400,
                     showConfirmButton: false,
-                    customClass: { popup: 'glass-panel rounded-3xl' }
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 }).then(() => {
                     gameSessionState.r1Idx++;
                     renderR1Card();
@@ -716,10 +760,10 @@
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'A revisar',
-                    text: `Incorrecto. ${item.exp}`,
+                    title: 'Reflexión',
+                    text: item.exp,
                     confirmButtonText: 'Continuar',
-                    customClass: { popup: 'glass-panel rounded-3xl', confirmButton: 'bg-blue-600 font-bold px-5 py-2.5 rounded-xl' }
+                    customClass: { popup: 'glass-panel rounded-3xl text-white', confirmButton: 'bg-blue-600 font-bold px-5 py-2.5 rounded-xl' }
                 }).then(() => {
                     gameSessionState.r1Idx++;
                     renderR1Card();
@@ -727,9 +771,7 @@
             }
         }
 
-        // ==========================================
-        // GAME ENGINE R2: MEMORAMA DE PAREJAS
-        // ==========================================
+        // MOTOR R2: MEMORAMA
         function initGameR2() {
             const m = missionData['R2'];
             gameSessionState.r2Cards = [...m.pairs].sort(() => Math.random() - 0.5);
@@ -741,10 +783,8 @@
         function renderR2Board() {
             const cards = gameSessionState.r2Cards;
             const content = document.getElementById('mission-content');
-            const isFinished = gameSessionState.r2Matched.length === cards.length;
-
-            if (isFinished) {
-                completeActiveMission("¡Increíble! Has completado el memorama relacionando todos los conceptos arqueológicos.");
+            if (gameSessionState.r2Matched.length === cards.length) {
+                completeActiveMission("¡Memorama superado con éxito! Has vinculado todos los conceptos arqueológicos.");
                 return;
             }
 
@@ -754,54 +794,49 @@
                 const isMatched = gameSessionState.r2Matched.includes(idx);
 
                 gridHtml += `
-                    <div onclick="flipR2Card(${idx})" class="h-32 glass-card rounded-2xl p-4 flex items-center justify-center text-center cursor-pointer transition transform hover:scale-105 select-none ${isMatched ? 'opacity-40 border-emerald-500 bg-emerald-950/20 pointer-events-none' : ''}">
-                        ${isFlipped ? `<span class="text-xs font-bold text-white">${card.text}</span>` : `<i class="fa-solid fa-cube text-3xl text-indigo-400"></i>`}
+                    <div onclick="flipR2Card(${idx})" class="h-28 glass-card rounded-2xl p-3 flex items-center justify-center text-center cursor-pointer transition transform hover:scale-105 select-none ${isMatched ? 'opacity-40 border-emerald-500 bg-emerald-950/30 pointer-events-none' : ''}">
+                        ${isFlipped ? `<span class="text-xs font-bold text-white">${card.text}</span>` : `<i class="fa-solid fa-cube text-2xl text-indigo-400/80"></i>`}
                     </div>
                 `;
             });
 
             content.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <span class="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-lg border border-purple-500/30">Memorama Histórico</span>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs font-bold rounded-lg border border-purple-500/30">Memorama</span>
                     <span class="text-xs text-slate-400 font-mono">Parejas: ${gameSessionState.r2Matched.length / 2} / ${cards.length / 2}</span>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">Mitos del pasado</h3>
-                <p class="text-slate-300 text-xs mb-6">Voltea las tarjetas para encontrar los conceptos y sus definiciones correspondientes.</p>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <h3 class="text-2xl font-bold text-white mb-2">Mitos del pasado</h3>
+                <p class="text-slate-300 text-xs mb-6">Encuentra los pares relacionando el concepto histórico con su significado correspondiente.</p>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     ${gridHtml}
                 </div>
             `;
         }
 
         function flipR2Card(idx) {
-            if (gameSessionState.r2Flipped.length >= 2) return;
-            if (gameSessionState.r2Flipped.includes(idx)) return;
-            if (gameSessionState.r2Matched.includes(idx)) return;
-
+            if (gameSessionState.r2Flipped.length >= 2 || gameSessionState.r2Flipped.includes(idx) || gameSessionState.r2Matched.includes(idx)) return;
             gameSessionState.r2Flipped.push(idx);
             renderR2Board();
 
             if (gameSessionState.r2Flipped.length === 2) {
-                const [firstIdx, secondIdx] = gameSessionState.r2Flipped;
-                const card1 = gameSessionState.r2Cards[firstIdx];
-                const card2 = gameSessionState.r2Cards[secondIdx];
+                const [idx1, idx2] = gameSessionState.r2Flipped;
+                const c1 = gameSessionState.r2Cards[idx1];
+                const c2 = gameSessionState.r2Cards[idx2];
 
-                if (card1.matchId === card2.id) {
-                    gameSessionState.r2Matched.push(firstIdx, secondIdx);
+                if (c1.matchId === c2.id) {
+                    gameSessionState.r2Matched.push(idx1, idx2);
                     gameSessionState.r2Flipped = [];
-                    setTimeout(renderR2Board, 400);
+                    setTimeout(renderR2Board, 300);
                 } else {
                     setTimeout(() => {
                         gameSessionState.r2Flipped = [];
                         renderR2Board();
-                    }, 900);
+                    }, 800);
                 }
             }
         }
 
-        // ==========================================
-        // GAME ENGINE R3: CONEXIÓN DE RÍOS Y CIVILIZACIONES
-        // ==========================================
+        // MOTOR R3: CONEXIÓN DE RÍOS
         function initGameR3() {
             const m = missionData['R3'];
             gameSessionState.r3Civs = [...m.items].sort(() => Math.random() - 0.5);
@@ -817,43 +852,41 @@
             const matchedCount = Object.keys(gameSessionState.r3Matches).length;
 
             if (matchedCount === m.items.length) {
-                completeActiveMission("¡Excelente conexión! Has vinculado correctamente todas las civilizaciones con sus ríos.");
+                completeActiveMission("¡Conexión completada! Dominas las cuencas de las primeras civilizaciones.");
                 return;
             }
 
             let civsHtml = '';
-            gameSessionState.r3Civs.forEach((item, idx) => {
+            gameSessionState.r3Civs.forEach(item => {
                 const isMatched = gameSessionState.r3Matches[item.civ];
                 const isSelected = gameSessionState.r3SelectedCiv === item.civ;
-
                 civsHtml += `
-                    <button ${isMatched ? 'disabled' : ''} onclick="selectR3Civ('${item.civ}')" class="w-full p-4 glass-card rounded-xl font-bold text-sm text-left flex justify-between items-center transition ${isMatched ? 'opacity-40 border-emerald-500 bg-emerald-950/20' : (isSelected ? 'border-emerald-400 bg-emerald-900/30' : 'hover:border-emerald-500')}">
+                    <button ${isMatched ? 'disabled' : ''} onclick="selectR3Civ('${item.civ}')" class="w-full p-4 glass-card rounded-xl font-bold text-sm text-left flex justify-between items-center transition ${isMatched ? 'opacity-40 border-emerald-500 bg-emerald-950/20' : (isSelected ? 'border-emerald-400 bg-emerald-900/30 ring-2 ring-emerald-500' : 'hover:border-emerald-500')}">
                         <span><i class="fa-solid fa-landmark text-emerald-400 mr-2"></i> ${item.civ}</span>
-                        ${isMatched ? '<i class="fa-solid fa-check text-emerald-400"></i>' : (isSelected ? '<span class="text-xs text-emerald-300">Seleccionado</span>' : '')}
-                    </button>
-                `;
-            });
-
-            let riversHtml = '';
-            gameSessionState.r3Rivers.forEach((river, idx) => {
-                const isMatched = Object.values(gameSessionState.r3Matches).includes(river);
-
-                riversHtml += `
-                    <button ${isMatched ? 'disabled' : ''} onclick="selectR3River('${river}')" class="w-full p-4 glass-card rounded-xl font-bold text-sm text-left flex justify-between items-center transition ${isMatched ? 'opacity-40 border-emerald-500 bg-emerald-950/20' : 'hover:border-emerald-500'}">
-                        <span><i class="fa-solid fa-water text-blue-400 mr-2"></i> ${river}</span>
                         ${isMatched ? '<i class="fa-solid fa-check text-emerald-400"></i>' : ''}
                     </button>
                 `;
             });
 
+            let riversHtml = '';
+            gameSessionState.r3Rivers.forEach(river => {
+                const isMatched = Object.values(gameSessionState.r3Matches).includes(river);
+                riversHtml += `
+                    <button ${isMatched ? 'disabled' : ''} onclick="selectR3River('${river}')" class="w-full p-4 glass-card rounded-xl font-bold text-sm text-left flex justify-between items-center transition ${isMatched ? 'opacity-40 border-blue-500 bg-blue-950/20' : 'hover:border-blue-500'}">
+                        <span><i class="fa-solid fa-water text-blue-400 mr-2"></i> ${river}</span>
+                        ${isMatched ? '<i class="fa-solid fa-check text-blue-400"></i>' : ''}
+                    </button>
+                `;
+            });
+
             content.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30">Conexión Fluvial</span>
-                    <span class="text-xs text-slate-400 font-mono">Conectados: ${matchedCount} / ${m.items.length}</span>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30">Relación Fluvial</span>
+                    <span class="text-xs text-slate-400 font-mono">Conexiones: ${matchedCount} / ${m.items.length}</span>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">Ríos y civilizaciones</h3>
-                <p class="text-slate-300 text-xs mb-6">Selecciona primero una civilización de la izquierda y luego su río correspondiente en la derecha.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 class="text-2xl font-bold text-white mb-2">Ríos y civilizaciones</h3>
+                <p class="text-slate-300 text-xs mb-6">Selecciona una civilización a la izquierda y luego toca su sistema fluvial correspondiente a la derecha.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div class="space-y-3">
                         <h5 class="text-xs font-bold uppercase tracking-wider text-emerald-400">Civilizaciones</h5>
                         ${civsHtml}
@@ -873,43 +906,35 @@
 
         function selectR3River(river) {
             if (!gameSessionState.r3SelectedCiv) {
-                Swal.fire('Atención', 'Primero selecciona una civilización.', 'warning');
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Selecciona una civilización',
+                    text: 'Primero debes hacer clic en una civilización de la izquierda.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
+                });
                 return;
             }
-
             const civ = gameSessionState.r3SelectedCiv;
-            const m = missionData['R3'];
-            const correctItem = m.items.find(i => i.civ === civ);
+            const correctItem = missionData['R3'].items.find(i => i.civ === civ);
 
             if (correctItem.river === river) {
                 gameSessionState.r3Matches[civ] = river;
                 gameSessionState.r3SelectedCiv = null;
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Conexión correcta!',
-                    text: correctItem.exp,
-                    timer: 1400,
-                    showConfirmButton: false,
-                    customClass: { popup: 'glass-panel rounded-3xl' }
-                }).then(renderR3Board);
+                renderR3Board();
             } else {
                 gameSessionState.r3SelectedCiv = null;
                 Swal.fire({
                     icon: 'error',
-                    title: 'Incorrecto',
-                    text: 'Ese río no corresponde a la civilización seleccionada. Inténtalo de nuevo.',
-                    confirmButtonText: 'Entendido',
-                    customClass: { popup: 'glass-panel rounded-3xl', confirmButton: 'bg-emerald-600 font-bold px-5 py-2.5 rounded-xl' }
+                    title: 'No corresponde',
+                    text: 'Ese río no pertenece a la civilización seleccionada.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 }).then(renderR3Board);
             }
         }
 
-        // ==========================================
-        // GAME ENGINE R4: SIMULADOR DE CASOS
-        // ==========================================
+        // MOTOR R4: SIMULADOR DE CASOS
         function initGameR4() {
-            const m = missionData['R4'];
-            gameSessionState.r4Cases = [...m.cases].sort(() => Math.random() - 0.5);
+            gameSessionState.r4Cases = [...missionData['R4'].cases].sort(() => Math.random() - 0.5);
             gameSessionState.r4Idx = 0;
             renderR4Case();
         }
@@ -920,26 +945,24 @@
             const content = document.getElementById('mission-content');
 
             if (idx >= cases.length) {
-                completeActiveMission("¡Excelente análisis! Has superado todos los escenarios del simulador de inclusión.");
+                completeActiveMission("¡Simulador superado! Has propuesto soluciones basadas en equidad.");
                 return;
             }
 
             const c = cases[idx];
             let optionsHtml = '';
-            // Shuffle options
-            const shuffledOpts = [...c.options].sort(() => Math.random() - 0.5);
-            shuffledOpts.forEach((opt, oIdx) => {
-                optionsHtml += `<button onclick="submitR4Option(${opt.correct}, '${opt.exp || ''}')" class="w-full text-left p-4 rounded-xl glass-card hover:border-amber-500 font-semibold text-sm transition">${opt.text}</button>`;
+            c.options.forEach(opt => {
+                optionsHtml += `<button onclick="submitR4Option(${opt.correct}, '${opt.exp || ''}')" class="w-full text-left p-4 rounded-xl glass-card hover:border-amber-400 font-medium text-sm transition leading-relaxed">${opt.text}</button>`;
             });
 
             content.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-3">
                     <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-lg border border-amber-500/30">Caso ${idx + 1} de ${cases.length}</span>
-                    <span class="text-xs text-slate-400 font-mono">Simulador R4</span>
+                    <span class="text-xs text-slate-400 font-mono">Reto R4</span>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">${c.title}</h3>
-                <div class="glass-card p-5 rounded-2xl mb-6 border-amber-500/30">
-                    <p class="font-bold text-white text-base">${c.desc}</p>
+                <h3 class="text-2xl font-bold text-white mb-2">${c.title}</h3>
+                <div class="glass-card p-5 rounded-2xl mb-6 border border-amber-500/30">
+                    <p class="font-normal text-white text-base leading-relaxed">${c.desc}</p>
                 </div>
                 <div class="space-y-3">
                     ${optionsHtml}
@@ -947,36 +970,32 @@
             `;
         }
 
-        function submitR4Option(isCorrect, expText) {
+        function submitR4Option(isCorrect, exp) {
             if (isCorrect) {
                 Swal.fire({
                     icon: 'success',
-                    title: '¡Acción Acertada!',
-                    text: expText,
-                    timer: 1600,
+                    title: '¡Acción transformadora!',
+                    text: exp,
+                    timer: 1500,
                     showConfirmButton: false,
-                    customClass: { popup: 'glass-panel rounded-3xl' }
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 }).then(() => {
                     gameSessionState.r4Idx++;
                     renderR4Case();
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'Revisa la estrategia',
-                    text: 'Esa opción mantiene la barrera o exclusión. Intenta con una alternativa que proponga equidad real.',
-                    confirmButtonText: 'Intentar de nuevo',
-                    customClass: { popup: 'glass-panel rounded-3xl', confirmButton: 'bg-amber-600 font-bold px-5 py-2.5 rounded-xl' }
+                    icon: 'warning',
+                    title: 'Revisa la alternativa',
+                    text: 'Esa opción mantiene o acentúa la barrera de exclusión. Selecciona una alternativa justa.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 });
             }
         }
 
-        // ==========================================
-        // GAME ENGINE R5: TRIVIA INTEGRADORA
-        // ==========================================
+        // MOTOR R5: TRIVIA INTEGRADORA
         function initGameR5() {
-            const m = missionData['R5'];
-            gameSessionState.r5Questions = [...m.questions].sort(() => Math.random() - 0.5);
+            gameSessionState.r5Questions = [...missionData['R5'].questions].sort(() => Math.random() - 0.5);
             gameSessionState.r5Idx = 0;
             renderR5Question();
         }
@@ -987,25 +1006,24 @@
             const content = document.getElementById('mission-content');
 
             if (idx >= questions.length) {
-                completeActiveMission("¡Felicidades! Has completado el Pasaporte del Visitante y conectado todas las salas.");
+                completeActiveMission("¡Pasaporte del visitante completado! Excelente integración de los saberes.");
                 return;
             }
 
             const q = questions[idx];
             let optionsHtml = '';
-            const shuffledOpts = [...q.options].sort(() => Math.random() - 0.5);
-            shuffledOpts.forEach(opt => {
-                optionsHtml += `<button onclick="submitR5Option(${opt.correct}, '${q.exp}')" class="w-full text-left p-4 rounded-xl glass-card hover:border-rose-500 font-semibold text-sm transition">${opt.t}</button>`;
+            q.options.forEach(opt => {
+                optionsHtml += `<button onclick="submitR5Option(${opt.correct}, '${q.exp}')" class="w-full text-left p-4 rounded-xl glass-card hover:border-rose-400 font-medium text-sm transition leading-relaxed">${opt.t}</button>`;
             });
 
             content.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-3">
                     <span class="px-3 py-1 bg-rose-500/20 text-rose-300 text-xs font-bold rounded-lg border border-rose-500/30">Pregunta ${idx + 1} de ${questions.length}</span>
-                    <span class="text-xs text-slate-400 font-mono">Pasaporte R5</span>
+                    <span class="text-xs text-slate-400 font-mono">Reto R5</span>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">Pasaporte del visitante</h3>
-                <div class="glass-card p-5 rounded-2xl mb-6 border-rose-500/30">
-                    <p class="font-bold text-white text-base">${q.text}</p>
+                <h3 class="text-2xl font-bold text-white mb-2">Pasaporte del visitante</h3>
+                <div class="glass-card p-5 rounded-2xl mb-6 border border-rose-500/30">
+                    <p class="font-normal text-white text-base leading-relaxed">${q.text}</p>
                 </div>
                 <div class="space-y-3">
                     ${optionsHtml}
@@ -1013,26 +1031,26 @@
             `;
         }
 
-        function submitR5Option(isCorrect, expText) {
+        function submitR5Option(isCorrect, exp) {
             if (isCorrect) {
                 Swal.fire({
                     icon: 'success',
                     title: '¡Correcto!',
-                    text: expText,
-                    timer: 1600,
+                    text: exp,
+                    timer: 1500,
                     showConfirmButton: false,
-                    customClass: { popup: 'glass-panel rounded-3xl' }
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
                 }).then(() => {
                     gameSessionState.r5Idx++;
                     renderR5Question();
                 });
             } else {
                 Swal.fire({
-                    icon: 'error',
-                    title: 'A revisar',
-                    text: `Incorrecto. ${expText}`,
-                    confirmButtonText: 'Continuar',
-                    customClass: { popup: 'glass-panel rounded-3xl', confirmButton: 'bg-rose-600 font-bold px-5 py-2.5 rounded-xl' }
+                    icon: 'info',
+                    title: 'Punto a considerar',
+                    text: exp,
+                    confirmButtonText: 'Siguiente',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white', confirmButton: 'bg-rose-600 font-bold px-5 py-2.5 rounded-xl' }
                 }).then(() => {
                     gameSessionState.r5Idx++;
                     renderR5Question();
@@ -1040,16 +1058,14 @@
             }
         }
 
-        // GENERAL COMPLETION HANDLER
         function completeActiveMission(successMessage) {
             if (!currentUser.completedMissions) currentUser.completedMissions = {};
-            
-            const isFirstTime = !currentUser.completedMissions[activeMissionKey];
+            const isFirst = !currentUser.completedMissions[activeMissionKey];
             currentUser.completedMissions[activeMissionKey] = true;
-            
-            if (isFirstTime) {
-                currentUser.score = (currentUser.score || 0) + 40;
-                confetti({ particleCount: 130, spread: 90, origin: { y: 0.6 } });
+
+            if (isFirst) {
+                currentUser.score = (currentUser.score || 0) + 50;
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
             }
 
             db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
@@ -1061,14 +1077,14 @@
 
             Swal.fire({
                 icon: 'success',
-                title: '¡Misión Superada! 🌟',
+                title: '¡Reto Completado! 🌟',
                 text: successMessage,
-                confirmButtonText: '¡Excelente!',
-                customClass: { popup: 'glass-panel rounded-3xl', confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl' }
+                confirmButtonText: 'Continuar',
+                customClass: { popup: 'glass-panel rounded-3xl text-white', confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl' }
             });
         }
 
-        // TEACHER DASHBOARD LOGIC
+        // PANEL DE CONTROL DOCENTE
         function openTeacherModal() {
             document.getElementById('teacher-modal').classList.remove('hidden');
             renderTeacherGroups();
@@ -1081,7 +1097,7 @@
             const input = document.getElementById('new-group-name');
             const name = input.value.trim();
             if (!name) {
-                Swal.fire('Atención', 'Ingresa el nombre del grupo.', 'warning');
+                Swal.fire({ icon: 'warning', title: 'Atención', text: 'Escribe el nombre del grupo.', customClass: { popup: 'glass-panel rounded-3xl text-white' } });
                 return;
             }
             const gId = 'GRP-' + Math.floor(1000 + Math.random() * 9000);
@@ -1090,13 +1106,6 @@
             saveDb();
             input.value = '';
             renderTeacherGroups();
-            Swal.fire({
-                icon: 'success',
-                title: 'Grupo creado',
-                text: `El grupo "${name}" se creó con éxito.`,
-                timer: 1200,
-                showConfirmButton: false
-            });
         }
 
         function renderTeacherGroups() {
@@ -1107,9 +1116,9 @@
             const groupKeys = Object.keys(db.groups);
             if (groupKeys.length === 0) {
                 container.innerHTML = `
-                    <div class="glass-card p-8 rounded-2xl text-center text-slate-400">
-                        <i class="fa-solid fa-folder-open text-3xl mb-2 text-indigo-400/60"></i>
-                        <p class="text-sm">No hay grupos creados todavía. Usa el formulario de arriba para crear tu primer grupo.</p>
+                    <div class="glass-card p-6 rounded-2xl text-center text-slate-400">
+                        <i class="fa-solid fa-folder-open text-2xl mb-2 text-indigo-400/60"></i>
+                        <p class="text-sm">Aún no has registrado ningún grupo. Añade uno arriba.</p>
                     </div>`;
                 return;
             }
@@ -1117,24 +1126,23 @@
             groupKeys.forEach(gKey => {
                 const group = db.groups[gKey];
                 let studentsHtml = '';
-                
+
                 (group.students || []).forEach(sId => {
                     const student = db.students[sId];
                     if (student) {
                         studentsHtml += `
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/70 p-3.5 rounded-xl border border-slate-700/60 gap-3">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/80 p-3.5 rounded-xl border border-slate-700/60 gap-3">
                                 <div>
                                     <span class="font-bold text-white text-sm block">${student.name}</span>
-                                    <span class="text-xs font-mono text-indigo-300">ID: ${student.id} | Puntos: ${student.score || 0}</span>
+                                    <span class="text-xs font-mono text-indigo-300">Código: ${student.id} | Puntos: ${student.score || 0}</span>
                                 </div>
-                                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                                    <button onclick="showStudentQr('${student.id}')" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 rounded-lg text-xs font-bold border border-indigo-500/30 transition flex items-center space-x-1.5">
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="showStudentQr('${student.id}')" class="px-3 py-1.5 bg-indigo-600/30 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold border border-indigo-500/30 transition flex items-center space-x-1">
                                         <i class="fa-solid fa-qrcode"></i>
                                         <span>QR</span>
                                     </button>
-                                    <button onclick="deleteStudent('${group.id}', '${student.id}')" class="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                    <button onclick="deleteStudent('${group.id}', '${student.id}')" class="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500 text-rose-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
                                         <i class="fa-solid fa-trash"></i>
-                                        <span>Eliminar</span>
                                     </button>
                                 </div>
                             </div>
@@ -1143,27 +1151,27 @@
                 });
 
                 container.innerHTML += `
-                    <div class="glass-card p-5 md:p-6 rounded-2xl space-y-4 border border-white/5">
+                    <div class="glass-card p-5 sm:p-6 rounded-2xl space-y-4 border border-white/10">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-white/10">
                             <div>
-                                <h5 class="text-lg font-black text-white flex items-center space-x-2">
+                                <h5 class="text-lg font-bold text-white flex items-center space-x-2">
                                     <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
                                     <span>${group.name}</span>
                                 </h5>
-                                <span class="text-xs text-slate-400 font-mono">Código de grupo: ${group.id}</span>
+                                <span class="text-xs text-slate-400 font-mono">ID de Grupo: ${group.id}</span>
                             </div>
-                            <div class="flex items-center space-x-2 w-full sm:w-auto">
-                                <button onclick="promptAddStudent('${group.id}')" class="flex-1 sm:flex-none px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-xs font-bold rounded-xl transition shadow-md flex items-center justify-center space-x-1.5">
+                            <div class="flex items-center space-x-2">
+                                <button onclick="promptAddStudent('${group.id}')" class="btn-glow px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl transition flex items-center space-x-1.5">
                                     <i class="fa-solid fa-user-plus"></i>
                                     <span>Añadir Alumno</span>
                                 </button>
-                                <button onclick="deleteGroup('${group.id}')" class="px-3 py-2 bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 rounded-xl text-xs transition" title="Eliminar Grupo">
+                                <button onclick="deleteGroup('${group.id}')" class="px-3 py-2 bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 rounded-xl text-xs transition" title="Eliminar Grupo">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="space-y-2.5">
-                            ${studentsHtml || '<p class="text-xs text-slate-500 italic py-2">Sin alumnos registrados en este grupo. Haz clic en "Añadir Alumno".</p>'}
+                            ${studentsHtml || '<p class="text-xs text-slate-400 italic">No hay alumnos registrados en este grupo.</p>'}
                         </div>
                     </div>
                 `;
@@ -1172,17 +1180,14 @@
 
         function promptAddStudent(groupId) {
             Swal.fire({
-                title: 'Registrar Alumno',
+                title: 'Registrar Estudiante',
                 input: 'text',
-                inputPlaceholder: 'Nombre completo del alumno',
-                inputAttributes: {
-                    autocapitalize: 'words'
-                },
+                inputPlaceholder: 'Nombre y apellido',
                 showCancelButton: true,
-                confirmButtonText: 'Registrar Alumno',
+                confirmButtonText: 'Registrar',
                 cancelButtonText: 'Cancelar',
                 customClass: {
-                    popup: 'glass-panel rounded-3xl',
+                    popup: 'glass-panel rounded-3xl text-white',
                     confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl',
                     cancelButton: 'bg-slate-800 font-bold px-5 py-2.5 rounded-xl'
                 }
@@ -1190,10 +1195,8 @@
                 if (result.value) {
                     const studentName = result.value.trim();
                     if (!studentName) return;
-                    
                     const sId = 'ALUM-' + Math.floor(1000 + Math.random() * 9000);
                     db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
-                    
                     db.students[sId] = {
                         id: sId,
                         name: studentName,
@@ -1205,66 +1208,36 @@
                     db.groups[groupId].students.push(sId);
                     saveDb();
                     renderTeacherGroups();
-                    
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Alumno registrado!',
-                        text: `${studentName} fue agregado al grupo correctamente.`,
-                        timer: 1500,
-                        showConfirmButton: false
-                    });
                 }
             });
         }
 
         function deleteStudent(groupId, studentId) {
-            Swal.fire({
-                title: '¿Eliminar alumno?',
-                text: "Se borrará su progreso e insignias guardadas.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
-                    if (db.groups[groupId]) {
-                        db.groups[groupId].students = db.groups[groupId].students.filter(id => id !== studentId);
-                    }
-                    delete db.students[studentId];
-                    saveDb();
-                    renderTeacherGroups();
-                }
-            });
+            db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
+            if (db.groups[groupId]) {
+                db.groups[groupId].students = db.groups[groupId].students.filter(id => id !== studentId);
+            }
+            delete db.students[studentId];
+            saveDb();
+            renderTeacherGroups();
         }
 
         function deleteGroup(groupId) {
-            Swal.fire({
-                title: '¿Eliminar grupo?',
-                text: "Se eliminarán también todos los alumnos inscritos en este grupo.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar grupo',
-                cancelButtonText: 'Cancelar'
-            }).then((res) => {
-                if (res.isConfirmed) {
-                    db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
-                    (db.groups[groupId].students || []).forEach(sId => delete db.students[sId]);
-                    delete db.groups[groupId];
-                    saveDb();
-                    renderTeacherGroups();
-                }
-            });
+            db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
+            (db.groups[groupId].students || []).forEach(sId => delete db.students[sId]);
+            delete db.groups[groupId];
+            saveDb();
+            renderTeacherGroups();
         }
 
         function showStudentQr(studentId) {
             db = JSON.parse(localStorage.getItem(STORAGE_KEY)) || db;
             const student = db.students[studentId];
             if (!student) return;
-            
-            document.getElementById('qr-student-title').innerText = `Código QR de ${student.name}`;
-            document.getElementById('qr-student-code-text').innerText = `ID: ${student.id}`;
-            
+
+            document.getElementById('qr-student-title').innerText = `QR: ${student.name}`;
+            document.getElementById('qr-student-code-text').innerText = student.id;
+
             const container = document.getElementById('qrcode-container');
             container.innerHTML = '';
 
@@ -1274,9 +1247,9 @@
 
             new QRCode(container, {
                 text: targetUrl,
-                width: 170,
-                height: 170,
-                colorDark: "#0f172a",
+                width: 160,
+                height: 160,
+                colorDark: "#090d16",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
