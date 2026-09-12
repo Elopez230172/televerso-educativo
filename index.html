@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TeleVerso Educativo - Conexión Nube</title>
     
-    <!-- Librerías de diseño visual -->
+    <!-- Librerías de diseño visual e iconos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    <!-- SDK Directo y Estable de Firebase Firestore -->
+    <!-- SDK Directo de Firebase Firestore -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -39,9 +39,9 @@
                 firebase.initializeApp(firebaseConfig);
             }
             db = firebase.firestore();
-            console.log("Conectado con éxito a Firebase Firestore en televerso-educativo.");
+            console.log("Conectado con éxito a Firebase Firestore.");
         } catch (err) {
-            console.error("Aviso: No se pudo conectar a Firebase:", err);
+            console.error("Error al conectar Firebase:", err);
         }
     </script>
 
@@ -83,7 +83,7 @@
             </div>
             <div>
                 <span class="font-extrabold text-base sm:text-lg tracking-tight text-white block">TeleVerso Educativo</span>
-                <span class="text-[11px] text-indigo-300 font-medium block -mt-1">Sincronización en la Nube</span>
+                <span class="text-[11px] text-indigo-300 font-medium block -mt-1">Sincronización y Analítica en la Nube</span>
             </div>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
@@ -103,7 +103,7 @@
                 </div>
                 <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">Portal de Aprendizaje</h1>
                 <p class="text-slate-300 text-sm sm:text-base mb-8 max-w-md mx-auto leading-relaxed">
-                    Escanea tu credencial o código QR asignado para ingresar directamente a tus misiones. Tus puntos se guardan automáticamente en la nube.
+                    Escanea tu credencial o código QR asignado para ingresar directamente a tus retos. Tus avances se registran en tiempo real.
                 </p>
                 <div class="grid grid-cols-2 gap-3 text-left">
                     <div class="glass-card p-3.5 rounded-xl border-l-2 border-l-blue-500">
@@ -156,7 +156,6 @@
             <!-- Contenido de Lenguajes -->
             <div id="tab-content-lenguajes" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Reto L1 -->
                     <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-blue-500">
                         <div>
                             <div class="flex justify-between items-center mb-4">
@@ -164,12 +163,11 @@
                                 <i id="badge-l1" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Figuras Retóricas en Comunidad</h4>
-                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Identifica metáforas, hipérboles y personificaciones en textos y expresiones orales comunitarias.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Identifica metáforas, hipérboles y personificaciones en expresiones comunitarias.</p>
                         </div>
                         <button onclick="launchMission('L1')" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                     </div>
 
-                    <!-- Reto L2 -->
                     <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-indigo-500">
                         <div>
                             <div class="flex justify-between items-center mb-4">
@@ -177,7 +175,7 @@
                                 <i id="badge-l2" class="fa-solid fa-lock text-slate-500 text-lg"></i>
                             </div>
                             <h4 class="text-lg font-bold text-white mb-2">Argumentos vs Opiniones</h4>
-                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Distingue entre argumentos fundamentados en datos verificables y opiniones subjetivas.</p>
+                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Distingue entre argumentos fundamentados con datos verificables y opiniones subjetivas.</p>
                         </div>
                         <button onclick="launchMission('L2')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                     </div>
@@ -187,7 +185,6 @@
             <!-- Contenido de Ética -->
             <div id="tab-content-etica" class="hidden space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Reto R1 -->
                     <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-amber-500">
                         <div>
                             <div class="flex justify-between items-center mb-4">
@@ -213,16 +210,16 @@
         </div>
     </div>
 
-    <!-- MODAL PANEL DOCENTE -->
+    <!-- PANEL DOCENTE -->
     <div id="modal-teacher" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 sm:p-8 relative max-h-[92vh] flex flex-col border border-white/20">
+        <div class="glass-panel w-full max-w-5xl rounded-3xl p-6 sm:p-8 relative max-h-[92vh] flex flex-col border border-white/20">
             <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
                 <div>
                     <h3 class="text-2xl font-black text-white flex items-center space-x-2">
                         <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
                         <span>Panel Docente (Control en la Nube)</span>
                     </h3>
-                    <p class="text-slate-400 text-xs mt-0.5">Gestión de grupos y credenciales QR sincronizadas con Firebase</p>
+                    <p class="text-slate-400 text-xs mt-0.5">Gestión de grupos, eliminación y analítica completa de desempeño</p>
                 </div>
                 <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -237,9 +234,55 @@
                 </div>
 
                 <div class="space-y-4">
-                    <h4 class="text-sm font-bold text-white">Alumnos Registrados y Puntuaciones Actualizadas</h4>
+                    <h4 class="text-sm font-bold text-white">Grupos y Estudiantes Registrados</h4>
                     <div id="teacher-groups-container" class="space-y-4">
                         <div class="text-center py-6 text-slate-400 text-sm">Conectando con la base de datos...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ESTADÍSTICAS Y EXPEDIENTE DEL ALUMNO -->
+    <div id="modal-student-stats" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 relative max-h-[90vh] flex flex-col border border-white/20">
+            <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-4">
+                <div>
+                    <h4 id="stats-student-name" class="text-2xl font-black text-white">Expediente del Alumno</h4>
+                    <p id="stats-student-meta" class="text-xs text-indigo-300 font-mono mt-0.5">Grupo | ID</p>
+                </div>
+                <button onclick="closeStatsModal()" class="text-slate-400 hover:text-white text-2xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="overflow-y-auto space-y-6 pr-1">
+                <!-- Tarjetas de métricas clave -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="glass-card p-3.5 rounded-2xl text-center border-amber-500/20">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Puntos Totales</span>
+                        <span id="stats-total-score" class="text-2xl font-black text-amber-400">0</span>
+                    </div>
+                    <div class="glass-card p-3.5 rounded-2xl text-center border-emerald-500/20">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Total Aciertos</span>
+                        <span id="stats-total-hits" class="text-2xl font-black text-emerald-400">0</span>
+                    </div>
+                    <div class="glass-card p-3.5 rounded-2xl text-center border-rose-500/20">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Total Errores</span>
+                        <span id="stats-total-errors" class="text-2xl font-black text-rose-400">0</span>
+                    </div>
+                    <div class="glass-card p-3.5 rounded-2xl text-center border-blue-500/20">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Efectividad</span>
+                        <span id="stats-efficiency" class="text-2xl font-black text-blue-400">0%</span>
+                    </div>
+                </div>
+
+                <!-- Historial desglosado de reactivos -->
+                <div>
+                    <h5 class="text-sm font-bold text-white mb-3 flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check text-indigo-400"></i>
+                        <span>Registro Detallado de Respuestas por Misión</span>
+                    </h5>
+                    <div id="stats-history-container" class="space-y-3">
+                        <div class="text-center py-6 text-slate-500 text-xs italic">Aún no hay respuestas registradas para este estudiante.</div>
                     </div>
                 </div>
             </div>
@@ -262,7 +305,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN CON FIRESTORE EN TIEMPO REAL -->
+    <!-- LÓGICA DE PROGRAMACIÓN CON ANALÍTICA EN TIEMPO REAL -->
     <script>
         const TEACHER_PIN = "1234";
         let localState = { groups: {}, students: {} };
@@ -275,9 +318,9 @@
             'L1': {
                 title: "Figuras Retóricas en Comunidad",
                 statements: [
-                    { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la cualidad humana de murmurar al río.' },
+                    { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la cualidad de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
-                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, cat: 'H', exp: 'Hipérbole: Una exageración poética de la cantidad de llanto.' }
+                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, cat: 'H', exp: 'Hipérbole: Exageración poética de la cantidad de llanto.' }
                 ]
             },
             'L2': {
@@ -296,23 +339,22 @@
             }
         };
 
-        // Escucha en tiempo real de Firestore
+        // Sincronización en tiempo real de Firestore
         window.addEventListener('DOMContentLoaded', () => {
             if (!db) return;
 
-            // Sincronizar grupos
+            // Escuchar grupos
             db.collection("groups").onSnapshot(snapshot => {
                 localState.groups = {};
                 snapshot.forEach(doc => { localState.groups[doc.id] = doc.data(); });
                 renderTeacherGroups();
             });
 
-            // Sincronizar estudiantes
+            // Escuchar estudiantes
             db.collection("students").onSnapshot(snapshot => {
                 localState.students = {};
                 snapshot.forEach(doc => { localState.students[doc.id] = doc.data(); });
                 
-                // Actualizar puntuación en vivo si el estudiante tiene la vista abierta
                 if (activeStudent && localState.students[activeStudent.id]) {
                     activeStudent = localState.students[activeStudent.id];
                     renderStudentDashboard();
@@ -322,7 +364,6 @@
             });
         });
 
-        // Lectura de URL directa ?s=TOKEN
         function checkUrlLogin() {
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get('s');
@@ -371,13 +412,16 @@
         }
 
         // =========================================================================
-        // MOTOR DE MISIONES Y GUARDADO EN FIRESTORE
+        // MOTOR DE MISIONES CON REGISTRO DETALLADO DE ACIERTOS Y ERRORES
         // =========================================================================
         function launchMission(missionKey) {
             activeMissionKey = missionKey;
             document.getElementById('modal-mission').classList.remove('hidden');
             missionGameState.list = [...missionCatalog[missionKey].statements].sort(() => Math.random() - 0.5);
             missionGameState.idx = 0;
+            missionGameState.sessionHits = 0;
+            missionGameState.sessionErrors = 0;
+            missionGameState.details = [];
             renderMissionQuestion();
         }
 
@@ -428,6 +472,23 @@
         function submitAnswer(choice) {
             const item = missionGameState.list[missionGameState.idx];
             const ok = choice === item.cat;
+
+            if (ok) {
+                missionGameState.sessionHits++;
+            } else {
+                missionGameState.sessionErrors++;
+            }
+
+            // Registrar detalle pedagógico
+            missionGameState.details.push({
+                statement: item.text,
+                selectedCategory: choice,
+                expectedCategory: item.cat,
+                isCorrect: ok,
+                explanation: item.exp,
+                timestamp: new Date().toISOString()
+            });
+
             Swal.fire({
                 icon: ok ? 'success' : 'info',
                 title: ok ? '¡Correcto!' : 'Reflexiona',
@@ -443,6 +504,8 @@
 
         async function saveMissionCompleteCloud() {
             if (!activeStudent.completed) activeStudent.completed = {};
+            if (!activeStudent.history) activeStudent.history = {};
+
             const isFirstTime = !activeStudent.completed[activeMissionKey];
             activeStudent.completed[activeMissionKey] = true;
 
@@ -451,7 +514,20 @@
                 confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
             }
 
-            // Escritura directa a Firestore
+            // Actualizar métricas acumuladas
+            activeStudent.totalHits = (activeStudent.totalHits || 0) + missionGameState.sessionHits;
+            activeStudent.totalErrors = (activeStudent.totalErrors || 0) + missionGameState.sessionErrors;
+            
+            // Guardar historial por reto
+            activeStudent.history[activeMissionKey] = {
+                missionTitle: missionCatalog[activeMissionKey].title,
+                hits: missionGameState.sessionHits,
+                errors: missionGameState.sessionErrors,
+                completedAt: new Date().toLocaleString(),
+                details: missionGameState.details
+            };
+
+            // Guardar directamente en Firestore
             if (db) {
                 await db.collection("students").doc(activeStudent.id).set(activeStudent);
             }
@@ -461,7 +537,7 @@
             Swal.fire({
                 icon: 'success',
                 title: '¡Reto Completado!',
-                text: 'Tus puntos se sincronizaron con la base de datos en la nube.',
+                text: 'Tus respuestas y estadísticas se guardaron en la nube.',
                 customClass: { popup: 'glass-panel rounded-3xl text-white' }
             });
         }
@@ -471,7 +547,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE Y CÓDIGOS QR
+        // GESTIÓN DOCENTE: GRUPOS, EXPEDIENTES Y CÓDIGOS QR
         // =========================================================================
         async function requestTeacherLogin() {
             const { value: pin } = await Swal.fire({
@@ -509,6 +585,32 @@
             input.value = '';
         }
 
+        // Eliminar un grupo escolar y sus alumnos vinculados
+        async function removeGroupCloud(groupId, groupName) {
+            const confirm = await Swal.fire({
+                title: `¿Eliminar ${groupName}?`,
+                text: 'Esta acción borrará el grupo y a todos los alumnos vinculados a él de forma permanente en la nube.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar grupo',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#e11d48'
+            });
+
+            if (confirm.isConfirmed && db) {
+                const group = localState.groups[groupId];
+                if (group && Array.isArray(group.students)) {
+                    // Borrar alumnos de la colección
+                    for (const sId of group.students) {
+                        await db.collection("students").doc(sId).delete();
+                    }
+                }
+                // Borrar documento del grupo
+                await db.collection("groups").doc(groupId).delete();
+                Swal.fire('Grupo Eliminado', `${groupName} ha sido eliminado correctamente.`, 'success');
+            }
+        }
+
         async function addStudentCloud(groupId) {
             const { value: name } = await Swal.fire({
                 title: 'Registrar Estudiante en la Nube',
@@ -527,7 +629,10 @@
                 name: name.trim(),
                 groupId: groupId,
                 score: 0,
-                completed: {}
+                totalHits: 0,
+                totalErrors: 0,
+                completed: {},
+                history: {}
             };
 
             if (db) {
@@ -543,7 +648,7 @@
         async function removeStudentCloud(groupId, studentId) {
             const confirm = await Swal.fire({
                 title: '¿Eliminar alumno?',
-                text: 'Se borrará su cuenta de la nube permanentemente.',
+                text: 'Se borrará su expediente completo de la nube.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, borrar',
@@ -569,7 +674,7 @@
 
             const keys = Object.keys(localState.groups);
             if (keys.length === 0) {
-                container.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-sm">No hay grupos en la nube. Crea uno arriba.</div>`;
+                container.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-sm">No hay grupos registrados en la nube. Crea uno arriba.</div>`;
                 return;
             }
 
@@ -581,16 +686,19 @@
                     const s = localState.students[sId];
                     if (s) {
                         studentsHtml += `
-                            <div class="flex justify-between items-center bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-sm">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-sm gap-2">
                                 <div>
                                     <span class="font-bold text-white text-base">${s.name}</span>
                                     <span class="ml-2 px-2.5 py-0.5 bg-amber-500/20 text-amber-300 font-mono text-xs font-bold rounded-lg border border-amber-500/30">${s.score || 0} pts</span>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="displayStudentQr('${s.id}')" class="px-3 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                        <i class="fa-solid fa-qrcode"></i><span>Ver QR</span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button onclick="viewStudentStats('${s.id}')" class="px-2.5 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-blue-500/30">
+                                        <i class="fa-solid fa-chart-pie"></i><span>Expediente</span>
                                     </button>
-                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                    <button onclick="displayStudentQr('${s.id}')" class="px-2.5 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                        <i class="fa-solid fa-qrcode"></i><span>QR</span>
+                                    </button>
+                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -601,14 +709,93 @@
                 container.innerHTML += `
                     <div class="glass-card p-5 rounded-2xl space-y-3 border border-white/10">
                         <div class="flex justify-between items-center pb-2 border-b border-white/10">
-                            <h5 class="font-bold text-white text-base">${group.name}</h5>
-                            <button onclick="addStudentCloud('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                <i class="fa-solid fa-user-plus"></i><span>Registrar Alumno</span>
-                            </button>
+                            <h5 class="font-bold text-white text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-users text-indigo-400"></i>
+                                <span>${group.name}</span>
+                            </h5>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="addStudentCloud('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                    <i class="fa-solid fa-user-plus"></i><span>+ Alumno</span>
+                                </button>
+                                <button onclick="removeGroupCloud('${group.id}', '${group.name}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-rose-500/30" title="Eliminar Grupo">
+                                    <i class="fa-solid fa-folder-minus"></i><span>Borrar Grupo</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún en este grupo.</p>'}</div>
                     </div>`;
             });
+        }
+
+        // =========================================================================
+        // EXPEDIENTE ANALÍTICO Y ESTADÍSTICAS DEL ALUMNO
+        // =========================================================================
+        function viewStudentStats(studentId) {
+            const student = localState.students[studentId];
+            if (!student) return;
+
+            const group = localState.groups[student.groupId];
+            document.getElementById('stats-student-name').innerText = student.name;
+            document.getElementById('stats-student-meta').innerText = `Grupo: ${group ? group.name : 'General'} | ID: ${student.id}`;
+
+            const hits = student.totalHits || 0;
+            const errors = student.totalErrors || 0;
+            const total = hits + errors;
+            const efficiency = total > 0 ? Math.round((hits / total) * 100) : 0;
+
+            document.getElementById('stats-total-score').innerText = student.score || 0;
+            document.getElementById('stats-total-hits').innerText = hits;
+            document.getElementById('stats-total-errors').innerText = errors;
+            document.getElementById('stats-efficiency').innerText = `${efficiency}%`;
+
+            // Construir desglose detallado de respuestas
+            const historyContainer = document.getElementById('stats-history-container');
+            historyContainer.innerHTML = '';
+
+            const historyKeys = Object.keys(student.history || {});
+            if (historyKeys.length === 0) {
+                historyContainer.innerHTML = `<div class="text-center py-6 text-slate-500 text-xs italic">Aún no hay respuestas registradas para este estudiante.</div>`;
+            } else {
+                historyKeys.forEach(mKey => {
+                    const session = student.history[mKey];
+                    let detailsListHtml = '';
+
+                    (session.details || []).forEach((d, i) => {
+                        detailsListHtml += `
+                            <div class="p-2.5 rounded-xl text-xs ${d.isCorrect ? 'bg-emerald-950/20 border border-emerald-500/30' : 'bg-rose-950/20 border border-rose-500/30'} space-y-1">
+                                <div class="flex justify-between font-bold">
+                                    <span class="text-white">Reactivo ${i + 1}</span>
+                                    <span class="${d.isCorrect ? 'text-emerald-400' : 'text-rose-400'}">${d.isCorrect ? 'Acierto ✓' : 'Error ✗'}</span>
+                                </div>
+                                <p class="text-slate-300 italic">${d.statement}</p>
+                                <p class="text-[11px] text-slate-400">Explicación: ${d.explanation}</p>
+                            </div>
+                        `;
+                    });
+
+                    historyContainer.innerHTML += `
+                        <div class="glass-card p-4 rounded-2xl space-y-2 border border-white/10">
+                            <div class="flex justify-between items-center pb-2 border-b border-white/10">
+                                <div>
+                                    <span class="font-bold text-white text-sm">${session.missionTitle}</span>
+                                    <span class="block text-[10px] text-slate-400">${session.completedAt}</span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-emerald-400 font-bold mr-2">${session.hits} aciertos</span>
+                                    <span class="text-xs text-rose-400 font-bold">${session.errors} errores</span>
+                                </div>
+                            </div>
+                            <div class="space-y-2 pt-1">${detailsListHtml}</div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('modal-student-stats').classList.remove('hidden');
+        }
+
+        function closeStatsModal() {
+            document.getElementById('modal-student-stats').classList.add('hidden');
         }
 
         function displayStudentQr(studentId) {
