@@ -317,7 +317,7 @@
                 statements: [
                     { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la cualidad de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
-                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, cat: 'H', exp: 'Hipérbole: Exageración poética de la cantidad de llanto.' }
+                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Exageración poética de la cantidad de llanto.' }
                 ]
             },
             'L2': {
@@ -337,13 +337,16 @@
         };
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (!db) return;
+            if (!db) {
+                console.warn("Firestore no está disponible.");
+                return;
+            }
 
             db.collection("groups").onSnapshot(snapshot => {
                 localState.groups = {};
                 snapshot.forEach(doc => { localState.groups[doc.id] = doc.data(); });
                 renderTeacherGroups();
-            });
+            }, err => console.error("Error al escuchar grupos:", err));
 
             db.collection("students").onSnapshot(snapshot => {
                 localState.students = {};
@@ -355,7 +358,7 @@
                 }
                 renderTeacherGroups();
                 checkUrlLogin();
-            });
+            }, err => console.error("Error al escuchar alumnos:", err));
         });
 
         function checkUrlLogin() {
@@ -534,7 +537,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE: ELIMINACIÓN DE GRUPOS EN LOTE
+        // GESTIÓN DOCENTE: ELIMINACIÓN DIRECTA Y TOLERANTE A FALLOS
         // =========================================================================
         async function requestTeacherLogin() {
             const { value: pin } = await Swal.fire({
@@ -567,73 +570,77 @@
             const groupData = { id: gId, name: name, students: [] };
 
             if (db) {
-                await db.collection("groups").doc(gId).set(groupData);
+                try {
+                    await db.collection("groups").doc(gId).set(groupData);
+                    input.value = '';
+                } catch (e) {
+                    Swal.fire('Error al crear', e.message, 'error');
+                }
             }
-            input.value = '';
         }
 
-        // Eliminar grupo de forma atómica con batch write
+        // ESTRATEGIA DIRECTA: Eliminación tolerante a fallos sin bloqueos
         async function removeGroupCloud(groupId) {
             const group = localState.groups[groupId];
             const groupName = group ? group.name : 'este grupo';
 
-            const confirm = await Swal.fire({
+            const result = await Swal.fire({
                 title: `¿Eliminar ${groupName}?`,
-                text: 'Se borrará el grupo y todos los alumnos registrados en él de forma permanente en la nube.',
+                text: 'Se eliminará el grupo y todos los alumnos asignados.',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'Sí, eliminar grupo',
+                confirmButtonText: 'Sí, borrar definitivamente',
                 cancelButtonText: 'Cancelar',
                 confirmButtonColor: '#e11d48'
             });
 
-            if (!confirm.isConfirmed) return;
+            if (!result.isConfirmed) return;
 
             if (!db) {
-                Swal.fire('Error', 'No hay conexión con la base de datos de Firebase.', 'error');
+                Swal.fire('Error', 'No hay conexión activa con Firebase.', 'error');
                 return;
             }
 
             try {
                 Swal.fire({
-                    title: 'Eliminando grupo...',
-                    text: 'Borrando registros en la base de datos.',
+                    title: 'Borrando...',
+                    text: 'Eliminando grupo en Firestore.',
                     allowOutsideClick: false,
                     didOpen: () => Swal.showLoading()
                 });
 
-                const batch = db.batch();
-
-                // 1. Borrar alumnos vinculados
-                if (group && Array.isArray(group.students)) {
-                    group.students.forEach(studentId => {
-                        const studentRef = db.collection("students").doc(studentId);
-                        batch.delete(studentRef);
+                // 1. Eliminar alumnos asociados en paralelo
+                if (group && Array.isArray(group.students) && group.students.length > 0) {
+                    const deletePromises = group.students.map(sId => {
+                        return db.collection("students").doc(sId).delete().catch(err => {
+                            console.warn("Alumno ya no existía:", sId, err);
+                        });
                     });
+                    await Promise.all(deletePromises);
                 }
 
-                // 2. Borrar documento del grupo
-                const groupRef = db.collection("groups").doc(groupId);
-                batch.delete(groupRef);
+                // 2. Eliminar el documento del grupo directamente
+                await db.collection("groups").doc(groupId).delete();
 
-                // Ejecutar transacción atómica
-                await batch.commit();
-
-                // Limpieza local inmediata
+                // 3. Forzar actualización visual inmediata
                 delete localState.groups[groupId];
                 renderTeacherGroups();
 
                 Swal.fire({
                     icon: 'success',
-                    title: 'Grupo Eliminado',
-                    text: `El grupo ${groupName} fue borrado correctamente.`,
-                    timer: 1600,
+                    title: 'Grupo Borrado',
+                    text: `El grupo fue eliminado correctamente de la base de datos.`,
+                    timer: 1500,
                     showConfirmButton: false
                 });
 
-            } catch (err) {
-                console.error("Error al eliminar grupo en Firestore:", err);
-                Swal.fire('Error al eliminar', 'Firebase rechazó la operación: ' + (err.message || err), 'error');
+            } catch (error) {
+                console.error("Error al borrar grupo:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Fallo al eliminar en Firestore',
+                    text: error.message || 'Verifica las reglas de seguridad en Firebase Console.'
+                });
             }
         }
 
@@ -662,12 +669,16 @@
             };
 
             if (db) {
-                await db.collection("students").doc(sId).set(studentData);
-                const currentGroup = localState.groups[groupId] || { id: groupId, name: 'Grupo', students: [] };
-                await db.collection("groups").doc(groupId).set({
-                    ...currentGroup,
-                    students: [...(currentGroup.students || []), sId]
-                });
+                try {
+                    await db.collection("students").doc(sId).set(studentData);
+                    const currentGroup = localState.groups[groupId] || { id: groupId, name: 'Grupo', students: [] };
+                    await db.collection("groups").doc(groupId).set({
+                        ...currentGroup,
+                        students: [...(currentGroup.students || []), sId]
+                    });
+                } catch (e) {
+                    Swal.fire('Error al registrar alumno', e.message, 'error');
+                }
             }
         }
 
@@ -682,13 +693,17 @@
             });
 
             if (confirm.isConfirmed && db) {
-                await db.collection("students").doc(studentId).delete();
-                if (localState.groups[groupId]) {
-                    const filtered = (localState.groups[groupId].students || []).filter(id => id !== studentId);
-                    await db.collection("groups").doc(groupId).set({
-                        ...localState.groups[groupId],
-                        students: filtered
-                    });
+                try {
+                    await db.collection("students").doc(studentId).delete();
+                    if (localState.groups[groupId]) {
+                        const filtered = (localState.groups[groupId].students || []).filter(id => id !== studentId);
+                        await db.collection("groups").doc(groupId).set({
+                            ...localState.groups[groupId],
+                            students: filtered
+                        });
+                    }
+                } catch (e) {
+                    Swal.fire('Error al borrar alumno', e.message, 'error');
                 }
             }
         }
@@ -724,7 +739,7 @@
                                     <button onclick="displayStudentQr('${s.id}')" class="px-2.5 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
                                         <i class="fa-solid fa-qrcode"></i><span>QR</span>
                                     </button>
-                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -733,7 +748,7 @@
                 });
 
                 container.innerHTML += `
-                    <div class="glass-card p-5 rounded-2xl space-y-3 border border-white/10">
+                    <div class="glass-card p-5 rounded-2xl space-y-3 border border-white/10" id="card-group-${group.id}">
                         <div class="flex justify-between items-center pb-2 border-b border-white/10">
                             <h5 class="font-bold text-white text-base flex items-center space-x-2">
                                 <i class="fa-solid fa-users text-indigo-400"></i>
