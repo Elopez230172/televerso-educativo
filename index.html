@@ -3,464 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleVerso Educativo - Gamificación Telesecundaria</title>
+    <title>TeleVerso Educativo</title>
     
-    <!-- Librería de diseño visual -->
+    <!-- Librerías de diseño e interactividad -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Utilidades para alertas, confeti y códigos QR -->
+    <!-- Librerías de utilidades -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Conexión a Firebase Firestore con manejo seguro de errores -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // =========================================================================
+        // REEMPLAZA CON TUS CLAVES REALES DE FIREBASE
+        // =========================================================================
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY_AQUI",
+            authDomain: "TU_PROYECTO.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROYECTO.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            window.cloudDb = getFirestore(app);
+            window.cloudOps = { collection, doc, setDoc, deleteDoc, onSnapshot };
+            window.isFirebaseActive = true;
+            window.dispatchEvent(new Event('firebase-ready'));
+        } catch (error) {
+            console.error("Fallo de inicialización Firebase:", error);
+            window.isFirebaseActive = false;
+            window.dispatchEvent(new Event('firebase-fallback'));
+        }
+    </script>
 
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0b0f19;
+            background-color: #090d16;
             background-image: 
-                radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-                radial-gradient(at 85% 85%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+                radial-gradient(at 10% 15%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+                radial-gradient(at 90% 85%, rgba(168, 85, 247, 0.18) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(14, 165, 233, 0.10) 0px, transparent 60%);
             background-attachment: fixed;
             color: #f1f5f9;
             min-height: 100vh;
         }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
         }
         .glass-card {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
+            background: rgba(30, 41, 59, 0.55);
+            backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease;
         }
         .glass-card:hover {
-            border-color: rgba(99, 102, 241, 0.4);
-            transform: translateY(-2px);
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(129, 140, 248, 0.5);
+            transform: translateY(-4px);
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+            transform: translateY(-1px);
         }
     </style>
 </head>
-<body class="antialiased selection:bg-indigo-500 selection:text-white">
+<body class="selection:bg-indigo-500 selection:text-white antialiased">
 
     <!-- BARRA SUPERIOR -->
-    <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-graduation-cap text-white text-lg"></i>
+    <header class="glass-panel sticky top-0 z-40 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('view-login')">
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-cube text-white text-lg"></i>
             </div>
             <div>
-                <span class="font-extrabold text-base sm:text-lg tracking-tight text-white block">TeleVerso Educativo</span>
-                <span class="text-[11px] text-indigo-300 font-medium block -mt-1">NEM Telesecundaria 360°</span>
+                <span class="font-extrabold text-lg tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-100 to-indigo-300">TeleVerso Educativo</span>
+                <div class="flex items-center space-x-2">
+                    <span id="connection-badge" class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+                    <span id="connection-text" class="text-[10px] text-emerald-400 font-semibold">Sistema Activo</span>
+                </div>
             </div>
         </div>
-        <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
+        <button onclick="promptTeacherAccess()" class="btn-glow px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-200 font-semibold text-sm border border-indigo-500/30 transition flex items-center space-x-2">
             <i class="fa-solid fa-lock text-indigo-400"></i>
-            <span>Acceso Docente</span>
+            <span>Panel Docente</span>
         </button>
     </header>
 
-    <!-- ÁREA PRINCIPAL -->
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL (INICIO) -->
-        <div id="view-home" class="flex flex-col items-center justify-center min-h-[70vh]">
-            <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-xl text-center border border-white/10 shadow-2xl">
-                <div class="w-20 h-20 rounded-3xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-6 text-3xl border border-indigo-500/30 shadow-inner">
-                    <i class="fa-solid fa-qrcode"></i>
-                </div>
-                <h1 class="text-3xl sm:text-4xl font-extrabold text-white mb-3 tracking-tight">Portal de Aprendizaje</h1>
-                <p class="text-slate-300 text-sm sm:text-base mb-8 max-w-md mx-auto leading-relaxed">
-                    Escanea tu credencial o código QR personal entregado por tu docente para entrar directamente a tus misiones.
-                </p>
+        <!-- PANTALLA 1: PORTADA -->
+        <div id="view-login" class="flex flex-col items-center justify-center min-h-[78vh]">
+            <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-lg text-center relative border border-white/15">
+                <div id="logo-3d-container" class="w-32 h-32 mx-auto mb-4 cursor-pointer" title="TeleVerso 3D"></div>
+                
+                <h1 class="text-3xl sm:text-4xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">
+                    TeleVerso Educativo
+                </h1>
+                <p class="text-slate-300 text-sm mb-8">Escanea tu credencial QR personal para entrar directamente a tus actividades.</p>
+                
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
                     <div class="glass-card p-3 rounded-xl border-l-2 border-l-blue-500">
-                        <span class="text-xs font-bold text-white block">Lenguajes</span>
-                        <span class="text-[10px] text-blue-400 font-semibold">PPA 1</span>
+                        <i class="fa-solid fa-comments text-blue-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Lenguajes</h4>
+                        <span class="text-[10px] text-blue-300">Activo</span>
                     </div>
                     <div class="glass-card p-3 rounded-xl border-l-2 border-l-emerald-500">
-                        <span class="text-xs font-bold text-white block">Saberes</span>
-                        <span class="text-[10px] text-emerald-400 font-semibold">PPA 1</span>
+                        <i class="fa-solid fa-atom text-emerald-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Saberes</h4>
                     </div>
                     <div class="glass-card p-3 rounded-xl border-l-2 border-l-amber-500">
-                        <span class="text-xs font-bold text-white block">Ética y Soc.</span>
-                        <span class="text-[10px] text-amber-400 font-semibold">PPA 1</span>
+                        <i class="fa-solid fa-landmark text-amber-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">Ética y Soc.</h4>
+                        <span class="text-[10px] text-amber-300">Activo</span>
                     </div>
                     <div class="glass-card p-3 rounded-xl border-l-2 border-l-purple-500">
-                        <span class="text-xs font-bold text-white block">De lo Humano</span>
-                        <span class="text-[10px] text-purple-400 font-semibold">PPA 1</span>
+                        <i class="fa-solid fa-hands-holding-child text-purple-400 mb-1 text-xs"></i>
+                        <h4 class="text-xs font-bold text-white">De lo Humano</h4>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 2. TABLERO PRIVADO DEL ESTUDIANTE -->
+        <!-- PANTALLA 2: PANEL DEL ALUMNO (AISLADO) -->
         <div id="view-student" class="hidden space-y-6">
-            <!-- Encabezado del alumno -->
-            <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Estudiante</span>
-                    <h2 id="student-name-display" class="text-2xl sm:text-3xl font-extrabold text-white">Nombre del Estudiante</h2>
-                    <p id="student-group-display" class="text-slate-300 text-sm mt-0.5">Grupo: Telesecundaria</p>
+                    <span class="text-xs font-bold uppercase tracking-wider text-indigo-400">Expediente Personal del Estudiante</span>
+                    <h2 id="student-welcome-name" class="text-2xl md:text-3xl font-extrabold text-white">¡Bienvenido!</h2>
+                    <p id="student-group-info" class="text-slate-300 text-sm">Cargando...</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <div class="glass-card px-5 py-2.5 rounded-2xl flex items-center space-x-3 border-amber-500/30">
                         <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
                         <div>
-                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntos</span>
+                            <span class="block text-[10px] text-slate-400 uppercase font-bold">Puntos Acumulados</span>
                             <span id="student-score-display" class="text-xl font-black text-white">0</span>
                         </div>
                     </div>
-                    <button onclick="logoutStudent()" class="px-4 py-2.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl font-semibold text-sm transition flex items-center space-x-1.5">
+                    <button onclick="logoutStudent()" class="px-4 py-2.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-xl font-semibold text-sm transition flex items-center space-x-1.5">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span>Salir</span>
+                        <span>Cerrar Sesión</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Navegación de Campos Formativos -->
-            <div class="flex overflow-x-auto space-x-2 pb-2">
-                <button onclick="switchTab('etica')" id="tab-btn-etica" class="px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shrink-0 transition flex items-center space-x-2">
-                    <i class="fa-solid fa-landmark"></i>
-                    <span>Ética, Nat. y Sociedades</span>
-                </button>
-                <button onclick="switchTab('lenguajes')" id="tab-btn-lenguajes" class="px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0 transition flex items-center space-x-2">
-                    <i class="fa-solid fa-comments"></i>
-                    <span>Lenguajes</span>
-                </button>
+            <div class="flex overflow-x-auto space-x-3 pb-2">
+                <button onclick="switchFieldTab('lenguajes')" id="tab-btn-lenguajes" class="px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition">Lenguajes</button>
+                <button onclick="switchFieldTab('etica')" id="tab-btn-etica" class="px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition">Ética y Sociedades</button>
             </div>
 
-            <!-- Misiones de Ética -->
-            <div id="tab-content-etica" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-amber-500">
-                        <div>
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="px-3 py-1 bg-amber-500/20 text-amber-300 text-xs font-bold rounded-lg border border-amber-500/30">Reto 1 • Fuentes Históricas</span>
-                                <i id="badge-r1" class="fa-solid fa-lock text-slate-500 text-lg"></i>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2">Evidencia vs Interpretación</h4>
-                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Distingue entre hechos empíricos observables e interpretaciones teóricas sobre la historia.</p>
-                        </div>
-                        <button onclick="launchMission('R1')" class="w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-play"></i><span>Comenzar Reto</span>
-                        </button>
-                    </div>
+            <!-- CONTENIDOS -->
+            <div id="tab-content-lenguajes" class="space-y-6">
+                <div class="glass-card p-6 rounded-3xl border-t-2 border-t-blue-500 max-w-xl">
+                    <h4 class="text-lg font-bold text-white mb-2">Figuras Retóricas</h4>
+                    <p class="text-slate-300 text-xs mb-6">Identifica metáforas, hipérboles y personificaciones en textos comunitarios.</p>
+                    <button onclick="startMission('L1')" class="btn-glow w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
 
-            <!-- Misiones de Lenguajes -->
-            <div id="tab-content-lenguajes" class="hidden space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-6 rounded-3xl flex flex-col justify-between border-t-2 border-t-blue-500">
-                        <div>
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-bold rounded-lg border border-blue-500/30">Reto 2 • Literatura Comunitaria</span>
-                                <i id="badge-l1" class="fa-solid fa-lock text-slate-500 text-lg"></i>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2">Figuras Retóricas</h4>
-                            <p class="text-slate-300 text-xs mb-6 leading-relaxed">Identifica metáforas, hipérboles y personificaciones en textos orales y escritos de la comunidad.</p>
-                        </div>
-                        <button onclick="launchMission('L1')" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-sm transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-play"></i><span>Comenzar Reto</span>
-                        </button>
-                    </div>
+            <div id="tab-content-etica" class="hidden space-y-6">
+                <div class="glass-card p-6 rounded-3xl border-t-2 border-t-amber-500 max-w-xl">
+                    <h4 class="text-lg font-bold text-white mb-2">Evidencia vs Interpretación</h4>
+                    <p class="text-slate-300 text-xs mb-6">Distingue entre hechos empíricos y sesgos ideológicos en la historia.</p>
+                    <button onclick="startMission('R1')" class="btn-glow w-full py-3 bg-amber-600 hover:bg-amber-500 text-white font-bold rounded-xl text-sm transition">Iniciar Reto</button>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- VENTANA DE MISIÓN INTERACTIVA -->
-    <div id="modal-mission" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 relative border border-white/15">
-            <button onclick="closeMissionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white text-xl">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div id="mission-content-area"></div>
+    <!-- VENTANA DE RETOS -->
+    <div id="mission-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 sm:p-8 relative">
+            <button onclick="closeMissionModal()" class="absolute top-6 right-6 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <div id="mission-content"></div>
         </div>
     </div>
 
-    <!-- PANEL DOCENTE (PROTEGIDO) -->
-    <div id="modal-teacher" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 sm:p-8 relative max-h-[92vh] flex flex-col border border-white/20">
+    <!-- VENTANA DEL PANEL DOCENTE (PROTEGIDA POR PIN) -->
+    <div id="teacher-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 sm:p-8 relative max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6">
                 <div>
                     <h3 class="text-2xl font-black text-white flex items-center space-x-2">
                         <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
                         <span>Panel de Administración Docente</span>
                     </h3>
-                    <p class="text-slate-400 text-xs mt-0.5">Control de grupos y generación de credenciales con código QR</p>
+                    <p class="text-xs text-slate-400 mt-1">Gestión de grupos y credenciales QR individuales</p>
                 </div>
-                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-2xl">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <button onclick="closeTeacherModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
-            <div class="overflow-y-auto space-y-6 pr-1">
-                <!-- Crear grupo -->
+            <div class="overflow-y-auto space-y-6">
                 <div class="glass-card p-5 rounded-2xl border border-indigo-500/20">
-                    <label class="block text-xs font-bold text-indigo-300 mb-2">Crear Nuevo Grupo Escolar</label>
+                    <label class="block text-xs font-bold text-indigo-300 mb-2">Crear Nuevo Grupo</label>
                     <div class="flex gap-2">
-                        <input type="text" id="input-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500">
-                        <button onclick="createGroup()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Crear Grupo</button>
+                        <input type="text" id="new-group-name" placeholder="Ej. 3°A Telesecundaria" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2 text-white text-sm focus:outline-none focus:border-indigo-500">
+                        <button onclick="saveNewGroup()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition">Crear Grupo</button>
                     </div>
                 </div>
-
-                <!-- Lista de grupos y alumnos -->
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h4 class="text-sm font-bold text-white">Grupos Registrados</h4>
-                        <div class="flex space-x-2">
-                            <button onclick="exportDatabase()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-300 border border-slate-700 transition">
-                                <i class="fa-solid fa-download mr-1"></i>Respaldar Datos
-                            </button>
-                            <button onclick="importDatabase()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg text-slate-300 border border-slate-700 transition">
-                                <i class="fa-solid fa-upload mr-1"></i>Restaurar
-                            </button>
-                        </div>
-                    </div>
-                    <div id="teacher-groups-container" class="space-y-4"></div>
+                <div id="teacher-groups-container" class="space-y-4">
+                    <div class="text-center py-4 text-slate-400 text-sm">Cargando grupos...</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE LA CREDENCIAL QR -->
-    <div id="modal-qr" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <!-- VENTANA DE LA CREDENCIAL QR -->
+    <div id="qr-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-sm rounded-3xl p-6 text-center border border-white/20">
-            <h4 id="qr-modal-title" class="text-xl font-bold text-white mb-1">Credencial de Acceso</h4>
-            <p class="text-slate-300 text-xs mb-4">Apunta con la cámara de tu celular para ingresar directo.</p>
+            <h4 id="qr-student-title" class="text-xl font-bold text-white mb-2">Credencial QR</h4>
+            <p class="text-slate-300 text-xs mb-4">Escanea con la cámara para ingresar directamente.</p>
             
-            <div class="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
-                <div id="qr-canvas-container" class="flex justify-center items-center min-h-[170px] min-w-[170px]"></div>
+            <div class="bg-white p-4 rounded-2xl inline-block mb-5 shadow-2xl">
+                <div id="qrcode-container" class="flex justify-center items-center min-h-[180px] min-w-[180px]"></div>
             </div>
-
+            
             <button onclick="closeQrModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-sm transition">
-                Cerrar Ventana
+                Cerrar
             </button>
         </div>
     </div>
 
-    <!-- LÓGICA DE CONTROL JAVASCRIPT -->
+    <!-- LÓGICA DE PROGRAMACIÓN -->
     <script>
-        // Clave de seguridad del docente
-        const TEACHER_ACCESS_PIN = "1234";
-        
-        // Base de datos local inmutable (nunca se sobreescribe)
-        const DB_STORAGE_KEY = "TELEVERSO_DATA_MASTER_V1";
-        const SESSION_STORAGE_KEY = "TELEVERSO_CURRENT_STUDENT_TOKEN";
+        const TEACHER_PIN = "1234"; 
+        const PERMANENT_STORAGE_KEY = "TELEVERSO_PERMANENT_DB";
+        const ACTIVE_STUDENT_KEY = "TELEVERSO_ACTIVE_STUDENT_ID";
 
-        let appData = JSON.parse(localStorage.getItem(DB_STORAGE_KEY)) || {
-            groups: {},
-            students: {}
-        };
+        let dbState = JSON.parse(localStorage.getItem(PERMANENT_STORAGE_KEY)) || { groups: {}, students: {} };
+        let currentUser = null;
+        let activeMissionKey = null;
+        let gameSessionState = {};
 
-        let currentActiveStudent = null;
-        let activeMission = null;
-        let missionGameState = {};
-
-        // Banco de preguntas y retos educativos
-        const missionCatalog = {
-            'R1': {
-                title: "Evidencia Observable vs Interpretación Histórica",
-                items: [
-                    { text: `"El análisis de los filos líticos muestra desgaste por corte de gramíneas."`, type: 'E', reason: "Evidencia Observable: Es un dato empírico comprobado con microscopio." },
-                    { text: `"Las sociedades cazadoras-recolectoras vivían en violencia perpetua hasta la agricultura."`, type: 'I', reason: "Interpretación Especulativa: Es un sesgo ideológico no sustentado en el registro fósil." },
-                    { text: `"Se encontraron restos arqueobotánicos de maíz domesticado en los silos inferiores."`, type: 'E', reason: "Evidencia Observable: Registro material directo en el estrato." },
-                    { text: `"La posición del ajuar funerario demuestra que los gobernantes eran considerados deidades vivientes."`, type: 'I', reason: "Interpretación Simbólica: Asigna significados espirituales a un objeto material." }
+        const missionData = {
+            'L1': {
+                title: "Figuras Retóricas",
+                statements: [
+                    { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la acción humana de murmurar al río.' },
+                    { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
+                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Exageración poética del llanto.' }
                 ]
             },
-            'L1': {
-                title: "Laboratorio de Figuras Retóricas",
-                items: [
-                    { text: `"El río murmura secretos antiguos entre las piedras del cañón."`, type: 'P', reason: "Personificación: Atribuye la cualidad humana de murmurar a un río." },
-                    { text: `"Sus ojos eran dos luceros alumbrando el camino del campo."`, type: 'M', reason: "Metáfora: Establece una relación de identidad directa sin nexos comparativos." },
-                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, type: 'H', reason: "Hipérbole: Una exageración poética de la cantidad de llanto." }
+            'R1': {
+                title: "Evidencia vs Interpretación",
+                statements: [
+                    { text: `"Los filos líticos muestran estrías por corte de gramíneas."`, cat: 'E', exp: 'Evidencia Observable: Registro empírico con microscopio.' },
+                    { text: `"Las sociedades cazadoras vivían en perpetuo salvajismo."`, cat: 'I', exp: 'Interpretación Especulativa: Sesgo teleológico desacreditado.' }
                 ]
             }
         };
 
-        function saveDatabase() {
-            localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(appData));
+        function persistDatabase() {
+            localStorage.setItem(PERMANENT_STORAGE_KEY, JSON.stringify(dbState));
         }
 
-        // =========================================================================
-        // ARRANQUE Y LECTURA INMEDIATA DE LA URL (?s=TOKEN)
-        // =========================================================================
-        window.addEventListener('DOMContentLoaded', () => {
-            checkStudentAccessFromUrl();
-        });
-
-        function checkStudentAccessFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const token = urlParams.get('s') || localStorage.getItem(SESSION_STORAGE_KEY);
-
-            if (token && appData.students[token]) {
-                currentActiveStudent = appData.students[token];
-                localStorage.setItem(SESSION_STORAGE_KEY, token);
-                renderStudentView();
-                switchView('view-student');
-            } else {
-                switchView('view-home');
-            }
-        }
-
-        function switchView(viewId) {
-            document.getElementById('view-home').classList.toggle('hidden', viewId !== 'view-home');
-            document.getElementById('view-student').classList.toggle('hidden', viewId !== 'view-student');
-        }
-
-        function navigateHome() {
-            if (currentActiveStudent) {
-                switchView('view-student');
-            } else {
-                switchView('view-home');
-            }
-        }
-
-        function logoutStudent() {
-            currentActiveStudent = null;
-            localStorage.removeItem(SESSION_STORAGE_KEY);
-            const cleanUrl = window.location.origin + window.location.pathname;
-            window.history.replaceState({}, document.title, cleanUrl);
-            switchView('view-home');
-        }
-
-        function renderStudentView() {
-            if (!currentActiveStudent) return;
-            document.getElementById('student-name-display').innerText = currentActiveStudent.name;
-            const grp = appData.groups[currentActiveStudent.groupId];
-            document.getElementById('student-group-display').innerText = `Grupo: ${grp ? grp.name : 'General'}`;
-            document.getElementById('student-score-display').innerText = currentActiveStudent.score || 0;
-
-            // Actualizar insignias ganadas
-            const comp = currentActiveStudent.completed || {};
-            document.getElementById('badge-r1').className = comp['R1'] ? "fa-solid fa-circle-check text-emerald-400 text-lg" : "fa-solid fa-lock text-slate-500 text-lg";
-            document.getElementById('badge-l1').className = comp['L1'] ? "fa-solid fa-circle-check text-emerald-400 text-lg" : "fa-solid fa-lock text-slate-500 text-lg";
-        }
-
-        function switchTab(tab) {
-            document.getElementById('tab-content-etica').classList.toggle('hidden', tab !== 'etica');
-            document.getElementById('tab-content-lenguajes').classList.toggle('hidden', tab !== 'lenguajes');
-            
-            document.getElementById('tab-btn-etica').className = tab === 'etica' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shrink-0 transition flex items-center space-x-2" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0 transition flex items-center space-x-2";
-            document.getElementById('tab-btn-lenguajes').className = tab === 'lenguajes' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition flex items-center space-x-2" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0 transition flex items-center space-x-2";
-        }
-
-        // =========================================================================
-        // MOTOR DE MISIONES Y EVALUACIÓN
-        // =========================================================================
-        function launchMission(missionId) {
-            activeMission = missionId;
-            const modal = document.getElementById('modal-mission');
-            modal.classList.remove('hidden');
-
-            const m = missionCatalog[missionId];
-            missionGameState.list = [...m.items].sort(() => Math.random() - 0.5);
-            missionGameState.index = 0;
-            renderMissionQuestion();
-        }
-
-        function renderMissionQuestion() {
-            const list = missionGameState.list;
-            const idx = missionGameState.index;
-            const container = document.getElementById('mission-content-area');
-
-            if (idx >= list.length) {
-                finishMission();
-                return;
-            }
-
-            const current = list[idx];
-            let buttonHtml = '';
-
-            if (activeMission === 'R1') {
-                buttonHtml = `
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <button onclick="submitAnswer('E')" class="p-4 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Evidencia Observable</button>
-                        <button onclick="submitAnswer('I')" class="p-4 bg-slate-800 hover:bg-amber-600 rounded-xl text-sm font-bold transition">Interpretación Teórica</button>
-                    </div>
-                `;
-            } else {
-                buttonHtml = `
-                    <div class="grid grid-cols-3 gap-2">
-                        <button onclick="submitAnswer('M')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-xs sm:text-sm font-bold transition">Metáfora</button>
-                        <button onclick="submitAnswer('H')" class="p-3 bg-slate-800 hover:bg-purple-600 rounded-xl text-xs sm:text-sm font-bold transition">Hipérbole</button>
-                        <button onclick="submitAnswer('P')" class="p-3 bg-slate-800 hover:bg-emerald-600 rounded-xl text-xs sm:text-sm font-bold transition">Personificación</button>
-                    </div>
-                `;
-            }
-
-            container.innerHTML = `
-                <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider">Pregunta ${idx + 1} de ${list.length}</span>
-                <h4 class="text-xl font-bold text-white mb-4">${missionCatalog[activeMission].title}</h4>
-                <div class="glass-card p-6 rounded-2xl mb-6 text-center border border-white/10">
-                    <p class="text-base sm:text-lg font-medium text-white">${current.text}</p>
-                </div>
-                ${buttonHtml}
-            `;
-        }
-
-        function submitAnswer(choice) {
-            const item = missionGameState.list[missionGameState.index];
-            const isCorrect = choice === item.type;
-
-            Swal.fire({
-                icon: isCorrect ? 'success' : 'info',
-                title: isCorrect ? '¡Correcto!' : 'Reflexiona',
-                text: item.reason,
-                timer: 1500,
-                showConfirmButton: false,
-                customClass: { popup: 'glass-panel rounded-3xl text-white' }
-            }).then(() => {
-                missionGameState.index++;
-                renderMissionQuestion();
-            });
-        }
-
-        function finishMission() {
-            if (!currentActiveStudent.completed) currentActiveStudent.completed = {};
-            const isFirstTime = !currentActiveStudent.completed[activeMission];
-            currentActiveStudent.completed[activeMission] = true;
-
-            if (isFirstTime) {
-                currentActiveStudent.score = (currentActiveStudent.score || 0) + 50;
-                confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
-            }
-
-            appData.students[currentActiveStudent.id] = currentActiveStudent;
-            saveDatabase();
-
-            closeMissionModal();
-            renderStudentView();
-
-            Swal.fire({
-                icon: 'success',
-                title: '¡Misión Superada!',
-                text: 'Tus puntos e insignia han quedado guardados en tu credencial.',
-                customClass: { popup: 'glass-panel rounded-3xl text-white' }
-            });
-        }
-
-        function closeMissionModal() {
-            document.getElementById('modal-mission').classList.add('hidden');
-        }
-
-        // =========================================================================
-        // PANEL DOCENTE Y GESTIÓN DE CÓDIGOS QR
-        // =========================================================================
-        async function requestTeacherLogin() {
-            const { value: pin } = await Swal.fire({
-                title: 'Acceso Docente',
+        // Acceso protegido con PIN para el docente
+        async function promptTeacherAccess() {
+            const { value: enteredPin } = await Swal.fire({
+                title: 'Acceso Restringido para Docentes',
                 input: 'password',
-                inputLabel: 'Introduce tu PIN de maestro',
-                inputPlaceholder: 'PIN',
+                inputLabel: 'Ingresa tu PIN de seguridad',
+                inputPlaceholder: 'PIN docente',
+                inputAttributes: {
+                    maxlength: 10,
+                    autocapitalize: 'off',
+                    autocorrect: 'off'
+                },
                 showCancelButton: true,
-                confirmButtonText: 'Entrar',
+                confirmButtonText: 'Verificar e Ingresar',
                 cancelButtonText: 'Cancelar',
                 customClass: {
                     popup: 'glass-panel rounded-3xl text-white',
@@ -469,86 +296,241 @@
                 }
             });
 
-            if (pin === TEACHER_ACCESS_PIN) {
-                document.getElementById('modal-teacher').classList.remove('hidden');
+            if (enteredPin === TEACHER_PIN) {
+                document.getElementById('teacher-modal').classList.remove('hidden');
                 renderTeacherGroups();
-            } else if (pin !== undefined) {
-                Swal.fire({ icon: 'error', title: 'PIN incorrecto', text: 'Verifica tu clave de acceso.' });
+            } else if (enteredPin !== undefined) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Acceso Denegado',
+                    text: 'El PIN ingresado es incorrecto.',
+                    customClass: { popup: 'glass-panel rounded-3xl text-white' }
+                });
             }
         }
 
-        function closeTeacherModal() {
-            document.getElementById('modal-teacher').classList.add('hidden');
+        // Sincronización continua de datos
+        function initSync() {
+            if (!window.cloudDb || !window.cloudOps) {
+                renderTeacherGroups();
+                processAutoLogin();
+                return;
+            }
+
+            const { collection, onSnapshot } = window.cloudOps;
+
+            onSnapshot(collection(window.cloudDb, "groups"), (snap) => {
+                snap.forEach(d => { dbState.groups[d.id] = d.data(); });
+                persistDatabase();
+                renderTeacherGroups();
+            }, (err) => console.warn("Modo local grupos:", err));
+
+            onSnapshot(collection(window.cloudDb, "students"), (snap) => {
+                snap.forEach(d => { dbState.students[d.id] = d.data(); });
+                persistDatabase();
+                renderTeacherGroups();
+                
+                if (currentUser && dbState.students[currentUser.id]) {
+                    currentUser = dbState.students[currentUser.id];
+                    renderStudentDashboard();
+                }
+
+                processAutoLogin();
+            }, (err) => console.warn("Modo local alumnos:", err));
         }
 
-        function createGroup() {
-            const input = document.getElementById('input-group-name');
+        // Entrada directa al escanear QR
+        function processAutoLogin() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentParam = urlParams.get('student');
+            const savedId = localStorage.getItem(ACTIVE_STUDENT_KEY);
+            const targetId = (studentParam || savedId || "").trim();
+
+            if (targetId && dbState.students[targetId]) {
+                currentUser = dbState.students[targetId];
+                localStorage.setItem(ACTIVE_STUDENT_KEY, currentUser.id);
+                renderStudentDashboard();
+                switchView('view-student');
+            } else {
+                switchView('view-login');
+            }
+        }
+
+        function logoutStudent() {
+            currentUser = null;
+            localStorage.removeItem(ACTIVE_STUDENT_KEY);
+            const cleanUrl = window.location.origin + window.location.pathname;
+            window.history.replaceState({}, document.title, cleanUrl);
+            switchView('view-login');
+        }
+
+        function renderStudentDashboard() {
+            if (!currentUser) return;
+            document.getElementById('student-welcome-name').innerText = `¡Hola, ${currentUser.name}!`;
+            const g = dbState.groups[currentUser.groupId];
+            document.getElementById('student-group-info').innerText = `Grupo: ${g ? g.name : 'General'}`;
+            document.getElementById('student-score-display').innerText = currentUser.score || 0;
+        }
+
+        async function saveNewGroup() {
+            const input = document.getElementById('new-group-name');
             const name = input.value.trim();
             if (!name) return;
 
-            const groupId = 'GRP_' + Date.now();
-            appData.groups[groupId] = { id: groupId, name: name, students: [] };
-            saveDatabase();
-            input.value = '';
+            const gId = 'GRP-' + Date.now();
+            const groupData = { id: gId, name: name, students: [] };
+
+            dbState.groups[gId] = groupData;
+            persistDatabase();
             renderTeacherGroups();
+            input.value = '';
+
+            if (window.cloudDb && window.cloudOps) {
+                try {
+                    const { doc, setDoc } = window.cloudOps;
+                    await setDoc(doc(window.cloudDb, "groups", gId), groupData);
+                } catch (e) {
+                    console.warn("Guardado local:", e);
+                }
+            }
         }
 
-        async function addStudent(groupId) {
-            const { value: name } = await Swal.fire({
-                title: 'Registrar Estudiante',
+        async function promptAddStudent(groupId) {
+            const { value: studentName } = await Swal.fire({
+                title: 'Registrar Nuevo Estudiante',
                 input: 'text',
                 inputPlaceholder: 'Nombre y apellido',
                 showCancelButton: true,
-                confirmButtonText: 'Crear',
+                confirmButtonText: 'Registrar Alumno',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'glass-panel rounded-3xl text-white',
+                    confirmButton: 'bg-indigo-600 font-bold px-5 py-2.5 rounded-xl',
+                    cancelButton: 'bg-slate-800 font-bold px-5 py-2.5 rounded-xl'
+                }
+            });
+
+            if (!studentName || !studentName.trim()) return;
+
+            const cleanName = studentName.trim();
+            const sId = 'id_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+
+            const studentData = {
+                id: sId,
+                name: cleanName,
+                groupId: groupId,
+                score: 0,
+                completedMissions: {}
+            };
+
+            dbState.students[sId] = studentData;
+            if (!dbState.groups[groupId]) dbState.groups[groupId] = { id: groupId, name: 'Grupo', students: [] };
+            if (!Array.isArray(dbState.groups[groupId].students)) dbState.groups[groupId].students = [];
+            dbState.groups[groupId].students.push(sId);
+            
+            persistDatabase();
+            renderTeacherGroups();
+
+            if (window.cloudDb && window.cloudOps) {
+                try {
+                    const { doc, setDoc } = window.cloudOps;
+                    await setDoc(doc(window.cloudDb, "students", sId), studentData);
+                    await setDoc(doc(window.cloudDb, "groups", groupId), dbState.groups[groupId]);
+                } catch (err) {
+                    console.warn("Guardado local:", err);
+                }
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Alumno registrado!',
+                text: `${cleanName} fue dado de alta con éxito.`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+
+        function showStudentQr(studentId) {
+            const student = dbState.students[studentId];
+            if (!student) return;
+
+            document.getElementById('qr-student-title').innerText = student.name;
+            const container = document.getElementById('qrcode-container');
+            container.innerHTML = '';
+
+            const cleanUrl = window.location.origin + window.location.pathname;
+            const targetUrl = `${cleanUrl}?student=${encodeURIComponent(student.id)}`;
+
+            document.getElementById('qr-modal').classList.remove('hidden');
+
+            setTimeout(() => {
+                new QRCode(container, {
+                    text: targetUrl,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#090d16",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }, 50);
+        }
+
+        async function deleteStudent(groupId, studentId) {
+            const res = await Swal.fire({
+                title: '¿Eliminar registro?',
+                text: 'Se borrará el alumno y su puntuación de forma permanente.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             });
 
-            if (!name || !name.trim()) return;
+            if (!res.isConfirmed) return;
 
-            // Generar identificador cifrado único para el QR
-            const studentId = 'STU_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-            
-            const studentObj = {
-                id: studentId,
-                name: name.trim(),
-                groupId: groupId,
-                score: 0,
-                completed: {}
-            };
-
-            appData.students[studentId] = studentObj;
-            if (!appData.groups[groupId].students) appData.groups[groupId].students = [];
-            appData.groups[groupId].students.push(studentId);
-
-            saveDatabase();
+            delete dbState.students[studentId];
+            if (dbState.groups[groupId]) {
+                dbState.groups[groupId].students = (dbState.groups[groupId].students || []).filter(id => id !== studentId);
+            }
+            persistDatabase();
             renderTeacherGroups();
+
+            if (window.cloudDb && window.cloudOps) {
+                try {
+                    const { doc, setDoc, deleteDoc } = window.cloudOps;
+                    await deleteDoc(doc(window.cloudDb, "students", studentId));
+                    await setDoc(doc(window.cloudDb, "groups", groupId), dbState.groups[groupId]);
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
         }
 
         function renderTeacherGroups() {
             const container = document.getElementById('teacher-groups-container');
+            if (!container) return;
             container.innerHTML = '';
 
-            const keys = Object.keys(appData.groups);
+            const keys = Object.keys(dbState.groups);
             if (keys.length === 0) {
-                container.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-sm">No has creado ningún grupo aún. Escribe el nombre arriba para empezar.</div>`;
+                container.innerHTML = `<div class="glass-card p-5 text-center text-slate-400 text-sm">No hay grupos creados. Registra uno arriba.</div>`;
                 return;
             }
 
             keys.forEach(k => {
-                const group = appData.groups[k];
+                const group = dbState.groups[k];
                 let studentsHtml = '';
-
                 (group.students || []).forEach(sId => {
-                    const s = appData.students[sId];
+                    const s = dbState.students[sId];
                     if (s) {
                         studentsHtml += `
                             <div class="flex justify-between items-center bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-sm">
-                                <span class="font-bold text-white">${s.name}</span>
+                                <span class="font-bold text-white text-base">${s.name}</span>
                                 <div class="flex gap-2">
-                                    <button onclick="displayStudentQr('${s.id}')" class="px-3 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                        <i class="fa-solid fa-qrcode"></i><span>Ver QR</span>
+                                    <button onclick="showStudentQr('${s.id}')" class="px-3 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1.5 shadow">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                        <span>Ver QR</span>
                                     </button>
-                                    <button onclick="removeStudent('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                    <button onclick="deleteStudent('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 text-rose-300 hover:bg-rose-500/40 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
@@ -560,93 +542,134 @@
                 container.innerHTML += `
                     <div class="glass-card p-5 rounded-2xl space-y-3 border border-white/10">
                         <div class="flex justify-between items-center pb-2 border-b border-white/10">
-                            <h5 class="font-bold text-white text-base">${group.name}</h5>
-                            <button onclick="addStudent('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                <i class="fa-solid fa-user-plus"></i><span>Registrar Alumno</span>
+                            <h5 class="font-bold text-white text-base flex items-center space-x-2">
+                                <i class="fa-solid fa-graduation-cap text-indigo-400"></i>
+                                <span>${group.name}</span>
+                            </h5>
+                            <button onclick="promptAddStudent('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-user-plus"></i>
+                                <span>Registrar Alumno</span>
                             </button>
                         </div>
-                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados en este grupo.</p>'}</div>
+                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún en este grupo.</p>'}</div>
                     </div>
                 `;
             });
         }
 
-        function displayStudentQr(studentId) {
-            const student = appData.students[studentId];
-            if (!student) return;
-
-            document.getElementById('qr-modal-title').innerText = student.name;
-            const container = document.getElementById('qr-canvas-container');
-            container.innerHTML = '';
-
-            // Construir enlace directo con parámetro de token
-            const cleanUrl = window.location.origin + window.location.pathname;
-            const directAccessUrl = `${cleanUrl}?s=${encodeURIComponent(student.id)}`;
-
-            document.getElementById('modal-qr').classList.remove('hidden');
-
-            setTimeout(() => {
-                new QRCode(container, {
-                    text: directAccessUrl,
-                    width: 170,
-                    height: 170,
-                    colorDark: "#090d16",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }, 50);
+        function switchFieldTab(t) {
+            document.getElementById('tab-content-lenguajes').classList.toggle('hidden', t !== 'lenguajes');
+            document.getElementById('tab-content-etica').classList.toggle('hidden', t !== 'etica');
+            document.getElementById('tab-btn-lenguajes').className = t === 'lenguajes' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-blue-600 text-white shadow-lg shrink-0 transition" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition";
+            document.getElementById('tab-btn-etica').className = t === 'etica' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-amber-600 text-white shadow-lg shrink-0 transition" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 shrink-0 transition";
         }
 
-        function closeQrModal() {
-            document.getElementById('modal-qr').classList.add('hidden');
+        function startMission(k) {
+            activeMissionKey = k;
+            document.getElementById('mission-modal').classList.remove('hidden');
+            gameSessionState.list = [...missionData[k].statements].sort(() => Math.random() - 0.5);
+            gameSessionState.idx = 0;
+            renderMission();
         }
 
-        function removeStudent(groupId, studentId) {
-            delete appData.students[studentId];
-            if (appData.groups[groupId]) {
-                appData.groups[groupId].students = (appData.groups[groupId].students || []).filter(id => id !== studentId);
+        function renderMission() {
+            const list = gameSessionState.list;
+            const idx = gameSessionState.idx;
+            const container = document.getElementById('mission-content');
+            if (idx >= list.length) {
+                completeMission();
+                return;
             }
-            saveDatabase();
-            renderTeacherGroups();
+            const item = list[idx];
+            let btns = activeMissionKey === 'L1' 
+                ? `<div class="grid grid-cols-3 gap-2"><button onclick="submitAns('M')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Metáfora</button><button onclick="submitAns('H')" class="p-3 bg-slate-800 hover:bg-purple-600 rounded-xl text-sm font-bold transition">Hipérbole</button><button onclick="submitAns('P')" class="p-3 bg-slate-800 hover:bg-emerald-600 rounded-xl text-sm font-bold transition">Personificación</button></div>`
+                : `<div class="grid grid-cols-2 gap-2"><button onclick="submitAns('E')" class="p-3 bg-slate-800 hover:bg-blue-600 rounded-xl text-sm font-bold transition">Evidencia</button><button onclick="submitAns('I')" class="p-3 bg-slate-800 hover:bg-amber-600 rounded-xl text-sm font-bold transition">Interpretación</button></div>`;
+
+            container.innerHTML = `
+                <span class="text-xs text-indigo-400 font-bold uppercase">Reactivo ${idx + 1} de ${list.length}</span>
+                <h4 class="text-xl font-bold text-white mb-4">${missionData[activeMissionKey].title}</h4>
+                <div class="glass-card p-5 rounded-2xl mb-4 text-center"><p class="text-base text-white">${item.text}</p></div>
+                ${btns}
+            `;
         }
 
-        // =========================================================================
-        // RESPALDO Y RESTAURACIÓN DE DATOS (OFFLINE Y PORTÁTIL)
-        // =========================================================================
-        function exportDatabase() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
-            const dlAnchorElem = document.createElement('a');
-            dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `televerso_respaldo_${Date.now()}.json`);
-            dlAnchorElem.click();
-        }
-
-        async function importDatabase() {
-            const { value: file } = await Swal.fire({
-                title: 'Selecciona el archivo de respaldo',
-                input: 'file',
-                inputAttributes: { 'accept': '.json' },
-                showCancelButton: true
+        function submitAns(c) {
+            const item = gameSessionState.list[gameSessionState.idx];
+            const ok = c === item.cat;
+            Swal.fire({
+                icon: ok ? 'success' : 'info',
+                title: ok ? '¡Correcto!' : 'Reflexiona',
+                text: item.exp,
+                timer: 1400,
+                showConfirmButton: false
+            }).then(() => {
+                gameSessionState.idx++;
+                renderMission();
             });
-
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const parsed = JSON.parse(e.target.result);
-                        if (parsed.groups && parsed.students) {
-                            appData = parsed;
-                            saveDatabase();
-                            renderTeacherGroups();
-                            Swal.fire('Éxito', 'Base de datos restaurada correctamente.', 'success');
-                        }
-                    } catch (err) {
-                        Swal.fire('Error', 'Archivo no válido.', 'error');
-                    }
-                };
-                reader.readAsText(file);
-            }
         }
+
+        async function completeMission() {
+            if (!currentUser.completedMissions) currentUser.completedMissions = {};
+            currentUser.score = (currentUser.score || 0) + 50;
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            
+            dbState.students[currentUser.id] = currentUser;
+            persistDatabase();
+
+            if (window.cloudDb && window.cloudOps) {
+                try {
+                    const { doc, setDoc } = window.cloudOps;
+                    await setDoc(doc(window.cloudDb, "students", currentUser.id), currentUser);
+                } catch (e) {
+                    console.warn(e);
+                }
+            }
+
+            closeMissionModal();
+            renderStudentDashboard();
+            Swal.fire('¡Reto Superado!', 'Tu puntuación ha sido guardada.', 'success');
+        }
+
+        function closeMissionModal() { document.getElementById('mission-modal').classList.add('hidden'); }
+        function closeTeacherModal() { document.getElementById('teacher-modal').classList.add('hidden'); }
+        function closeQrModal() { document.getElementById('qr-modal').classList.add('hidden'); }
+        
+        function switchView(v) {
+            document.getElementById('view-login').classList.toggle('hidden', v !== 'view-login');
+            document.getElementById('view-student').classList.toggle('hidden', v !== 'view-student');
+        }
+
+        // Activación de sincronización con respaldo por tiempo límite
+        window.addEventListener('firebase-ready', initSync);
+        window.addEventListener('firebase-fallback', initSync);
+        setTimeout(() => {
+            // Si pasan 1.5 segundos y la vista no ha cargado, forzar renderizado local
+            if (document.getElementById('view-login').classList.contains('hidden') && 
+                document.getElementById('view-student').classList.contains('hidden')) {
+                processAutoLogin();
+            }
+        }, 1500);
+
+        // Renderizado del objeto 3D con manejo seguro de excepciones
+        window.onload = () => {
+            try {
+                const c = document.getElementById('logo-3d-container');
+                if (!c) return;
+                const scene = new THREE.Scene();
+                const cam = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+                const ren = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                ren.setSize(128, 128);
+                c.appendChild(ren.domElement);
+                const m = new THREE.Mesh(new THREE.IcosahedronGeometry(1.2, 0), new THREE.MeshStandardMaterial({ color: 0x818cf8, emissive: 0x4338ca, emissiveIntensity: 0.4 }));
+                scene.add(m);
+                const l = new THREE.PointLight(0xffffff, 2.5, 50); l.position.set(5, 5, 5); scene.add(l);
+                scene.add(new THREE.AmbientLight(0xffffff, 1));
+                cam.position.z = 3.2;
+                function a() { requestAnimationFrame(a); m.rotation.x += 0.01; m.rotation.y += 0.01; ren.render(scene, cam); } a();
+            } catch (err) {
+                console.warn("Aviso: Three.js no pudo renderizar el logo 3D en este dispositivo:", err);
+            }
+        };
     </script>
 </body>
 </html>
