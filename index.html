@@ -317,7 +317,7 @@
                 statements: [
                     { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la cualidad de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
-                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Una exageración poética de la cantidad de llanto.' }
+                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, cat: 'H', exp: 'Hipérbole: Exageración poética de la cantidad de llanto.' }
                 ]
             },
             'L2': {
@@ -534,7 +534,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE: ELIMINACIÓN DE GRUPOS, EXPEDIENTES Y CÓDIGOS QR
+        // GESTIÓN DOCENTE: ELIMINACIÓN DE GRUPOS EN LOTE
         // =========================================================================
         async function requestTeacherLogin() {
             const { value: pin } = await Swal.fire({
@@ -572,14 +572,14 @@
             input.value = '';
         }
 
-        // FUNCIÓN CORREGIDA: Eliminación robusta de grupos y sus alumnos en cascada
+        // Eliminar grupo de forma atómica con batch write
         async function removeGroupCloud(groupId) {
             const group = localState.groups[groupId];
             const groupName = group ? group.name : 'este grupo';
 
             const confirm = await Swal.fire({
                 title: `¿Eliminar ${groupName}?`,
-                text: 'Se borrará el grupo escolar y se darán de baja todos sus alumnos registrados de forma definitiva en la nube.',
+                text: 'Se borrará el grupo y todos los alumnos registrados en él de forma permanente en la nube.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar grupo',
@@ -587,40 +587,53 @@
                 confirmButtonColor: '#e11d48'
             });
 
-            if (confirm.isConfirmed && db) {
-                try {
-                    Swal.fire({
-                        title: 'Eliminando grupo...',
-                        text: 'Procesando registros en la base de datos.',
-                        allowOutsideClick: false,
-                        didOpen: () => Swal.showLoading()
+            if (!confirm.isConfirmed) return;
+
+            if (!db) {
+                Swal.fire('Error', 'No hay conexión con la base de datos de Firebase.', 'error');
+                return;
+            }
+
+            try {
+                Swal.fire({
+                    title: 'Eliminando grupo...',
+                    text: 'Borrando registros en la base de datos.',
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                const batch = db.batch();
+
+                // 1. Borrar alumnos vinculados
+                if (group && Array.isArray(group.students)) {
+                    group.students.forEach(studentId => {
+                        const studentRef = db.collection("students").doc(studentId);
+                        batch.delete(studentRef);
                     });
-
-                    // 1. Borrar a todos los alumnos vinculados a este grupo
-                    if (group && Array.isArray(group.students)) {
-                        for (const sId of group.students) {
-                            await db.collection("students").doc(sId).delete().catch(e => console.warn(e));
-                        }
-                    }
-
-                    // 2. Borrar el documento del grupo en Firestore
-                    await db.collection("groups").doc(groupId).delete();
-
-                    // 3. Limpiar estado local inmediato
-                    delete localState.groups[groupId];
-                    renderTeacherGroups();
-
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Grupo Eliminado',
-                        text: `El grupo ${groupName} y sus alumnos fueron eliminados exitosamente.`,
-                        timer: 1800,
-                        showConfirmButton: false
-                    });
-                } catch (err) {
-                    console.error("Error al eliminar grupo:", err);
-                    Swal.fire('Error', 'Ocurrió un problema al intentar eliminar el grupo en la nube.', 'error');
                 }
+
+                // 2. Borrar documento del grupo
+                const groupRef = db.collection("groups").doc(groupId);
+                batch.delete(groupRef);
+
+                // Ejecutar transacción atómica
+                await batch.commit();
+
+                // Limpieza local inmediata
+                delete localState.groups[groupId];
+                renderTeacherGroups();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Grupo Eliminado',
+                    text: `El grupo ${groupName} fue borrado correctamente.`,
+                    timer: 1600,
+                    showConfirmButton: false
+                });
+
+            } catch (err) {
+                console.error("Error al eliminar grupo en Firestore:", err);
+                Swal.fire('Error al eliminar', 'Firebase rechazó la operación: ' + (err.message || err), 'error');
             }
         }
 
@@ -711,7 +724,7 @@
                                     <button onclick="displayStudentQr('${s.id}')" class="px-2.5 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
                                         <i class="fa-solid fa-qrcode"></i><span>QR</span>
                                     </button>
-                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
+                                    <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
                                     </button>
                                 </div>
