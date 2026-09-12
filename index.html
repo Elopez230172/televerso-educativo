@@ -14,6 +14,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Motor 3D Three.js para el Diamante/Logo interactivo del TeleVerso -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- SDK Directo de Firebase Firestore -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -76,13 +79,9 @@
             70% { transform: scale(1.02); opacity: 1; }
             100% { transform: scale(1); }
         }
-
-        .memcard {
-            min-height: 90px;
-            cursor: pointer;
-            transition: transform 0.2s ease;
+        .glow-title {
+            text-shadow: 0 0 35px rgba(129, 140, 248, 0.45);
         }
-        .memcard:active { transform: scale(0.96); }
 
         @media print {
             body {
@@ -114,12 +113,12 @@
     <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
     <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-graduation-cap text-white text-base"></i>
+            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-cube text-white text-lg"></i>
             </div>
             <div>
-                <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">Portal Educativo</span>
-                <span class="text-[10px] text-indigo-300 font-medium block -mt-1">Plataforma Interactiva</span>
+                <span class="font-extrabold text-base sm:text-lg tracking-tight text-white block">TeleVerso Educativo</span>
+                <span class="text-[11px] text-indigo-300 font-medium block -mt-1">Huellas de Humanidad · 3.º Telesecundaria</span>
             </div>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
@@ -131,32 +130,41 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL (SIN LOGOS 3D NI TEXTOS ANTIGUOS) -->
-        <div id="view-home" class="flex flex-col items-center justify-center min-h-[75vh]">
-            <div class="glass-panel p-8 sm:p-12 rounded-3xl w-full max-w-xl text-center border border-white/15 shadow-2xl animate-pop">
-                <div class="w-16 h-16 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-6 text-2xl border border-indigo-500/30 shadow-inner">
-                    <i class="fa-solid fa-qrcode"></i>
+        <!-- 1. PORTADA PRINCIPAL CENTRADA CON LOGO 3D, TÍTULO, FRASE Y BOTÓN DE ENTRADA -->
+        <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
+            <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden">
+                
+                <!-- Contenedor del Diamante 3D animado -->
+                <div id="logo-3d-canvas" class="w-40 h-40 mx-auto -mb-2 cursor-pointer flex justify-center items-center" title="Diamante del TeleVerso 3D"></div>
+                
+                <!-- Insignia temática superior -->
+                <div class="inline-block mb-3">
+                    <span class="px-4 py-1.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-indigo-300 text-xs font-black uppercase tracking-widest rounded-full border border-indigo-500/30 shadow-inner">
+                        <i class="fa-solid fa-atom mr-1.5 text-indigo-400"></i> Portal de Exploración Interactiva
+                    </span>
                 </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white mb-3 tracking-tight">
-                    Bienvenido a tu Espacio de Aprendizaje
+
+                <!-- Título destacado -->
+                <h1 class="text-4xl sm:text-5xl font-black mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title">
+                    TeleVerso Educativo
                 </h1>
-                <p class="text-slate-300 text-xs sm:text-sm mb-8 max-w-md mx-auto leading-relaxed">
-                    Escanea tu código QR personal asignado por tu docente para ingresar directamente a tus misiones y registrar tus avances.
+
+                <!-- Frase lema inspiradora -->
+                <p class="text-indigo-200 text-base sm:text-lg font-semibold max-w-lg mx-auto leading-relaxed mb-8 italic">
+                    «Explora el cosmos del conocimiento: donde cada huella del pasado guía el futuro de nuestra comunidad.»
                 </p>
-                <div class="grid grid-cols-2 gap-3 text-left">
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-blue-500">
-                        <span class="text-xs font-bold text-white block">Lenguajes</span>
-                        <span class="text-[10px] text-blue-400 font-semibold">Misiones Activas</span>
-                    </div>
-                    <div class="glass-card p-3 rounded-xl border-l-2 border-l-amber-500">
-                        <span class="text-xs font-bold text-white block">Ética y Sociedades</span>
-                        <span class="text-[10px] text-amber-400 font-semibold">Misiones Activas</span>
-                    </div>
+
+                <!-- Botón de acceso exclusivo para entrar a las misiones -->
+                <div id="home-action-container">
+                    <button onclick="enterStudentPanel()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-rocket mr-2"></i> Entrar a mis Misiones
+                    </button>
+                    <p class="text-slate-400 text-xs mt-3">*(Recuerda ingresar escaneando el código QR de tu credencial)*</p>
                 </div>
             </div>
         </div>
 
-        <!-- 2. TABLERO DE MISIONES DEL ESTUDIANTE (SIN LOGOS 3D) -->
+        <!-- 2. TABLERO DE MISIONES DEL ESTUDIANTE -->
         <div id="view-student" class="hidden space-y-8 animate-pop">
             <div class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-white/10">
                 <div>
@@ -211,6 +219,7 @@
                 </div>
             </div>
 
+            <!-- Lista de Misiones -->
             <div>
                 <h4 class="text-sm font-black text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-indigo-400"></i> Misiones Disponibles (10 Retos)
@@ -365,8 +374,79 @@
             }
         };
 
+        // =========================================================================
+        // MOTOR 3D: DIAMANTE DEL TELEVERSO
+        // =========================================================================
+        function init3DLogo() {
+            try {
+                const container = document.getElementById('logo-3d-canvas');
+                if (!container) return;
+                container.innerHTML = '';
+
+                const width = 160;
+                const height = 160;
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+                camera.position.z = 4.2;
+
+                const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                renderer.setSize(width, height);
+                renderer.setPixelRatio(window.devicePixelRatio || 1);
+                container.appendChild(renderer.domElement);
+
+                const geometry = new THREE.OctahedronGeometry(1.4, 0);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x818cf8,
+                    emissive: 0x4f46e5,
+                    emissiveIntensity: 0.35,
+                    roughness: 0.2,
+                    metalness: 0.8
+                });
+                const diamond = new THREE.Mesh(geometry, material);
+                scene.add(diamond);
+
+                const wireGeometry = new THREE.OctahedronGeometry(1.42, 0);
+                const wireMaterial = new THREE.MeshBasicMaterial({
+                    color: 0xc084fc,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const wireframe = new THREE.Mesh(wireGeometry, wireMaterial);
+                scene.add(wireframe);
+
+                const pLight = new THREE.PointLight(0x38bdf8, 2.5, 50);
+                pLight.position.set(5, 5, 5);
+                scene.add(pLight);
+
+                const pLight2 = new THREE.PointLight(0xf472b6, 2, 50);
+                pLight2.position.set(-5, -5, 5);
+                scene.add(pLight2);
+
+                scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+                function animate() {
+                    requestAnimationFrame(animate);
+                    diamond.rotation.x += 0.008;
+                    diamond.rotation.y += 0.012;
+                    wireframe.rotation.x += 0.008;
+                    wireframe.rotation.y += 0.012;
+                    renderer.render(scene, camera);
+                }
+                animate();
+            } catch (e) {
+                console.warn("WebGL no disponible:", e);
+                const container = document.getElementById('logo-3d-canvas');
+                if (container) {
+                    container.innerHTML = '<div class="w-24 h-24 rounded-3xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-4xl border border-indigo-500/30"><i class="fa-solid fa-gem"></i></div>';
+                }
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             renderStudentMissionsGrid();
+            init3DLogo();
+
             if (!db) return;
 
             db.collection("groups").onSnapshot(snapshot => {
@@ -400,6 +480,23 @@
         function switchView(viewId) {
             document.getElementById('view-home').classList.toggle('hidden', viewId !== 'view-home');
             document.getElementById('view-student').classList.toggle('hidden', viewId !== 'view-student');
+            if (viewId === 'view-home') {
+                setTimeout(init3DLogo, 50);
+            }
+        }
+
+        function enterStudentPanel() {
+            if (activeStudent) {
+                switchView('view-student');
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Acceso por credencial',
+                    text: 'Para ingresar a tu tablero personal, por favor escanea el código QR de tu credencial escolar.',
+                    confirmButtonText: 'Entendido',
+                    customClass: { popup: 'glass-panel text-white rounded-3xl' }
+                });
+            }
         }
 
         function navigateHome() {
@@ -789,7 +886,7 @@
                         });
                     }
                 } catch (e) {
-                    Swal.fire('Error', e.message, 'error');
+                    Swal.fire('Error al borrar alumno', e.message, 'error');
                 }
             }
         }
