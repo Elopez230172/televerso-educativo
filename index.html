@@ -41,7 +41,7 @@
             db = firebase.firestore();
             console.log("Conectado con éxito a Firebase Firestore.");
         } catch (err) {
-            console.error("Error al conectar Firebase:", err);
+            console.error("Aviso: No se pudo conectar a Firebase:", err);
         }
     </script>
 
@@ -255,7 +255,6 @@
             </div>
 
             <div class="overflow-y-auto space-y-6 pr-1">
-                <!-- Tarjetas de métricas clave -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="glass-card p-3.5 rounded-2xl text-center border-amber-500/20">
                         <span class="text-[10px] text-slate-400 font-bold uppercase block">Puntos Totales</span>
@@ -275,7 +274,6 @@
                     </div>
                 </div>
 
-                <!-- Historial desglosado de reactivos -->
                 <div>
                     <h5 class="text-sm font-bold text-white mb-3 flex items-center space-x-2">
                         <i class="fa-solid fa-list-check text-indigo-400"></i>
@@ -305,7 +303,7 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN CON ANALÍTICA EN TIEMPO REAL -->
+    <!-- LÓGICA DE PROGRAMACIÓN -->
     <script>
         const TEACHER_PIN = "1234";
         let localState = { groups: {}, students: {} };
@@ -313,14 +311,13 @@
         let activeMissionKey = null;
         let missionGameState = {};
 
-        // Banco de retos interactivos
         const missionCatalog = {
             'L1': {
                 title: "Figuras Retóricas en Comunidad",
                 statements: [
                     { text: `"El río murmura secretos antiguos entre las piedras."`, cat: 'P', exp: 'Personificación: Atribuye la cualidad de murmurar al río.' },
                     { text: `"Sus ojos eran dos luceros alumbrando el camino."`, cat: 'M', exp: 'Metáfora: Asocia los ojos con luceros directamente.' },
-                    { text: `"Lloró un océano de lágrimas al despedirse de su terruño."`, cat: 'H', exp: 'Hipérbole: Exageración poética de la cantidad de llanto.' }
+                    { text: `"Lloró un océano de lágrimas al despedirse."`, cat: 'H', exp: 'Hipérbole: Una exageración poética de la cantidad de llanto.' }
                 ]
             },
             'L2': {
@@ -339,18 +336,15 @@
             }
         };
 
-        // Sincronización en tiempo real de Firestore
         window.addEventListener('DOMContentLoaded', () => {
             if (!db) return;
 
-            // Escuchar grupos
             db.collection("groups").onSnapshot(snapshot => {
                 localState.groups = {};
                 snapshot.forEach(doc => { localState.groups[doc.id] = doc.data(); });
                 renderTeacherGroups();
             });
 
-            // Escuchar estudiantes
             db.collection("students").onSnapshot(snapshot => {
                 localState.students = {};
                 snapshot.forEach(doc => { localState.students[doc.id] = doc.data(); });
@@ -411,9 +405,6 @@
             document.getElementById('tab-btn-etica').className = tab === 'etica' ? "px-5 py-3 rounded-2xl font-bold text-sm bg-indigo-600 text-white shadow-lg shrink-0 transition flex items-center space-x-2" : "px-5 py-3 rounded-2xl font-bold text-sm bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0 transition flex items-center space-x-2";
         }
 
-        // =========================================================================
-        // MOTOR DE MISIONES CON REGISTRO DETALLADO DE ACIERTOS Y ERRORES
-        // =========================================================================
         function launchMission(missionKey) {
             activeMissionKey = missionKey;
             document.getElementById('modal-mission').classList.remove('hidden');
@@ -479,7 +470,6 @@
                 missionGameState.sessionErrors++;
             }
 
-            // Registrar detalle pedagógico
             missionGameState.details.push({
                 statement: item.text,
                 selectedCategory: choice,
@@ -514,11 +504,9 @@
                 confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
             }
 
-            // Actualizar métricas acumuladas
             activeStudent.totalHits = (activeStudent.totalHits || 0) + missionGameState.sessionHits;
             activeStudent.totalErrors = (activeStudent.totalErrors || 0) + missionGameState.sessionErrors;
             
-            // Guardar historial por reto
             activeStudent.history[activeMissionKey] = {
                 missionTitle: missionCatalog[activeMissionKey].title,
                 hits: missionGameState.sessionHits,
@@ -527,7 +515,6 @@
                 details: missionGameState.details
             };
 
-            // Guardar directamente en Firestore
             if (db) {
                 await db.collection("students").doc(activeStudent.id).set(activeStudent);
             }
@@ -547,7 +534,7 @@
         }
 
         // =========================================================================
-        // GESTIÓN DOCENTE: GRUPOS, EXPEDIENTES Y CÓDIGOS QR
+        // GESTIÓN DOCENTE: ELIMINACIÓN DE GRUPOS, EXPEDIENTES Y CÓDIGOS QR
         // =========================================================================
         async function requestTeacherLogin() {
             const { value: pin } = await Swal.fire({
@@ -585,11 +572,14 @@
             input.value = '';
         }
 
-        // Eliminar un grupo escolar y sus alumnos vinculados
-        async function removeGroupCloud(groupId, groupName) {
+        // FUNCIÓN CORREGIDA: Eliminación robusta de grupos y sus alumnos en cascada
+        async function removeGroupCloud(groupId) {
+            const group = localState.groups[groupId];
+            const groupName = group ? group.name : 'este grupo';
+
             const confirm = await Swal.fire({
                 title: `¿Eliminar ${groupName}?`,
-                text: 'Esta acción borrará el grupo y a todos los alumnos vinculados a él de forma permanente en la nube.',
+                text: 'Se borrará el grupo escolar y se darán de baja todos sus alumnos registrados de forma definitiva en la nube.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, eliminar grupo',
@@ -598,16 +588,39 @@
             });
 
             if (confirm.isConfirmed && db) {
-                const group = localState.groups[groupId];
-                if (group && Array.isArray(group.students)) {
-                    // Borrar alumnos de la colección
-                    for (const sId of group.students) {
-                        await db.collection("students").doc(sId).delete();
+                try {
+                    Swal.fire({
+                        title: 'Eliminando grupo...',
+                        text: 'Procesando registros en la base de datos.',
+                        allowOutsideClick: false,
+                        didOpen: () => Swal.showLoading()
+                    });
+
+                    // 1. Borrar a todos los alumnos vinculados a este grupo
+                    if (group && Array.isArray(group.students)) {
+                        for (const sId of group.students) {
+                            await db.collection("students").doc(sId).delete().catch(e => console.warn(e));
+                        }
                     }
+
+                    // 2. Borrar el documento del grupo en Firestore
+                    await db.collection("groups").doc(groupId).delete();
+
+                    // 3. Limpiar estado local inmediato
+                    delete localState.groups[groupId];
+                    renderTeacherGroups();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Grupo Eliminado',
+                        text: `El grupo ${groupName} y sus alumnos fueron eliminados exitosamente.`,
+                        timer: 1800,
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    console.error("Error al eliminar grupo:", err);
+                    Swal.fire('Error', 'Ocurrió un problema al intentar eliminar el grupo en la nube.', 'error');
                 }
-                // Borrar documento del grupo
-                await db.collection("groups").doc(groupId).delete();
-                Swal.fire('Grupo Eliminado', `${groupName} ha sido eliminado correctamente.`, 'success');
             }
         }
 
@@ -717,7 +730,7 @@
                                 <button onclick="addStudentCloud('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
                                     <i class="fa-solid fa-user-plus"></i><span>+ Alumno</span>
                                 </button>
-                                <button onclick="removeGroupCloud('${group.id}', '${group.name}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-rose-500/30" title="Eliminar Grupo">
+                                <button onclick="removeGroupCloud('${group.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-rose-500/30" title="Eliminar Grupo">
                                     <i class="fa-solid fa-folder-minus"></i><span>Borrar Grupo</span>
                                 </button>
                             </div>
@@ -748,7 +761,6 @@
             document.getElementById('stats-total-errors').innerText = errors;
             document.getElementById('stats-efficiency').innerText = `${efficiency}%`;
 
-            // Construir desglose detallado de respuestas
             const historyContainer = document.getElementById('stats-history-container');
             historyContainer.innerHTML = '';
 
