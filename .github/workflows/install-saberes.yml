@@ -1,0 +1,56 @@
+name: Instalar Saberes PPA1 en TeleVerso
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'saberes-addon.js'
+      - '.github/workflows/install-saberes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  instalar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Integrar Saberes en index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          tag = '<script src="saberes-addon.js"></script>'
+          if tag not in s:
+              anchor = '<script src="lenguajes-avanzado.js"></script>'
+              if anchor in s:
+                  s = s.replace(anchor, anchor + '\n    ' + tag, 1)
+              else:
+                  anchor = '<script src="lenguajes-addon.js"></script>'
+                  if anchor in s:
+                      s = s.replace(anchor, anchor + '\n    ' + tag, 1)
+                  else:
+                      s = s.replace('</body>', '    ' + tag + '\n</body>', 1)
+          # Mantener expediente después de los complementos para que conozca el catálogo completo.
+          exp = '<script src="expediente-mejorado.js"></script>'
+          if exp in s and tag in s and s.index(exp) < s.index(tag):
+              s = s.replace(exp, '', 1)
+              s = s.replace(tag, tag + '\n    ' + exp, 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        run: |
+          if git diff --quiet; then
+            echo "Saberes ya estaba integrado."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Integrar Saberes y Pensamiento Científico PPA1 [skip ci]"
+          git push
