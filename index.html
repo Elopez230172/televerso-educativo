@@ -125,21 +125,13 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL CENTRADA CON LOGOTIPO INSTITUCIONAL A UN LADO -->
+        <!-- 1. PORTADA PRINCIPAL CENTRADA CON TU LOGOTIPO REAL -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-3xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6">
                 
-                <!-- Contenedor flexible para alinear el logotipo oficial de Telesecundaria a la izquierda del título -->
+                <!-- Contenedor alineado con la imagen exacta que subiste -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-2">
-                    <!-- Logotipo oficial renderizado vectorialmente con los tonos morados institucionales -->
-                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#582a7a] p-2.5 border border-purple-400/40 shadow-xl shrink-0 flex items-center justify-center">
-                        <svg viewBox="0 0 500 500" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M48.5 70H200v320H48.5z" fill="#fff"/>
-                            <path d="M125 145c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 135c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40z" fill="#582a7a"/>
-                            <path d="M250 35h210v355H250z" fill="#fff"/>
-                            <path d="M470 120C370 120 325 180 325 245c0 70 55 105 110 105 32 0 55-9 55-9l-14-48s-18 9-31 9c-26 0-44-18-44-44 0-35 28-65 82-65V120z" fill="#582a7a"/>
-                        </svg>
-                    </div>
+                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxAQDxEQEQ8PDw8QDw8PDQ8PDw8QEA8QFhIWFRUYGBUYHSggGBolGxUVITEhJSktLi4uFx8zODMsNygtLi0BCgoKDg0OGhAQGi0lHSUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAOEA4AMBEQACEQEDEQH/xAAcAAACAwEBAQEAAAAAAAAAAAAFBgMEBwABAgj/xAA/EAACAQIEAwUDBQUBAAMBAQABAhEAAwQSITEFQQYTIlEHYXEygZEUI0KhsdFSYsHwM4LhM1OS8QcVJIKy/8QAGQEAAwEBAQAAAAAAAAAAAAAAAAIDAQQF/8QAIxEBAQACAwEAAgMBAQEAAAAAAAECEQMSITEEEkETUWEFMoH/2gAMAwEAAhEDEQA/APiLStBSSs5HwGvV5E6KxM7a6e1G9W9vWtzB9P169U+1i2rXn0P5d6h6hR6v8AE/6bflUuG/u/f+9L052lM0d/z9O1RYP2X5j+lQJ3+Zp0O/yH8qg05Z09v41712p1xT4v6161C6qN2T6f7D/AM09p56f9P8AtpE2tItrT2r96k7E6fuf50vRz9B/j9p1p7Q07Z0/6h+te9WpM7fuv5VPStG3P5j+tBqSdqbE6U8hTta0xG501+u1Jt0+o9/8Amg7V5iNzT2rW1a1q9Wtf6/mKB8jSt6840rf6j9aB2lK3p6j0rTWt70b+U/qK8a0T6j9f8AuovO/wA1B6V70jZ096v91C0T9B/r9ql08/6j+tG9S0D6hTvXlq6b5+g/WvdqKxP0H+v5UtrqTtpXpXpWvVr0pXSvWnSpWprU+dTrXqNq+lqI2jSpX71I0p6V7StNq86VrWla1+1eJ0/rWpGletatNqetqN9K+K1uac6VrStJla9b15bUtrRtaeletN6l6b09qeqbSnpavCtHqJqJ0rWp2pXo4qN9K16hXqNqmtLSoaU1rStqlaU1qK1qR0rU68rVrStK1rTWvWp9K0qNo15WlaVpTWpGnSteo0rVrWtaz3pT0rTVpaVpWvWrStA6jSt6VpTWtfWtep0rf//Z" alt="Logotipo Telesecundaria" class="w-32 h-32 sm:w-36 sm:h-36 object-cover rounded-2xl border-2 border-purple-500/50 shadow-2xl shrink-0">
                     
                     <div class="text-center md:text-left">
                         <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title leading-tight">
@@ -1312,7 +1304,7 @@
                 printSingleQr(student.id);
             };
 
-            document.getElementById('modal-qr').classList.remove('hidden');
+            document.getElementById('modal-qr').classList.add('hidden');
 
             setTimeout(() => {
                 new QRCode(container, {
