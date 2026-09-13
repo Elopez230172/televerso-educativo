@@ -1,0 +1,51 @@
+name: Portada con logo único
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-portada-logo-unico.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ajustar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Simplificar portada
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          if '.tv-home-logo-feature' not in s:
+              css='''\n        .tv-home-logo-feature{width:min(94vw,860px);max-height:540px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(56,189,248,.34)) drop-shadow(0 0 65px rgba(124,58,237,.22));animation:tvHomeFloat 5.2s ease-in-out infinite;transform-origin:center}\n        @keyframes tvHomeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.02)}}\n'''
+              s=s.replace('        @media print {', css+'\n        @media print {',1)
+
+          pattern=r'''\s*<!-- Contenedor con la ruta corregida a Logo\.jpg \(con L mayúscula\) -->.*?<!-- LOGO 3D ANIMADO EN PORTADA -->\s*<div id="logo-3d-canvas"[^>]*></div>'''
+          replacement='''\n                <!-- IDENTIDAD PRINCIPAL: un solo logo grande y centrado -->\n                <div class="flex items-center justify-center py-3 sm:py-7">\n                    <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto">\n                </div>'''
+          s2,n=re.subn(pattern,replacement,s,count=1,flags=re.S)
+          if n==0:
+              raise SystemExit('No se encontró el bloque central esperado de la portada.')
+          s=s2
+
+          s=s.replace('glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-3xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6','glass-panel p-7 sm:p-10 rounded-3xl w-full max-w-5xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-5',1)
+
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Publicar cambio
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then exit 0; fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Dejar un solo logo grande al centro de la portada [skip ci]"
+          git push
