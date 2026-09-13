@@ -44,7 +44,7 @@ jobs:
           # 2) Asegurar nombre, logo estático y diamante 3D en el encabezado del panel docente.
           if 'id="logo-3d-teacher"' not in s:
               logo_img = '<img src="Logo.jpg" alt="Logo de TeleVerso Educativo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-indigo-400/40 shadow-lg shadow-indigo-600/20 shrink-0 bg-slate-800">'
-              diamond = '''<div id="logo-3d-teacher" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center rounded-2xl bg-slate-950/30 border border-indigo-400/20 shadow-lg shadow-indigo-600/10" title="Diamante doble 3D de TeleVerso"></div>'''
+              diamond = '<div id="logo-3d-teacher" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center rounded-2xl bg-slate-950/30 border border-indigo-400/20 shadow-lg shadow-indigo-600/10" title="Diamante doble 3D de TeleVerso"></div>'
               if logo_img in s:
                   s = s.replace(logo_img, logo_img + '\n                    ' + diamond, 1)
               else:
@@ -52,18 +52,8 @@ jobs:
 
           # 3) Inicializar el diamante al abrir el panel docente sin recrearlo innecesariamente.
           if "createTeleversoDiamond('logo-3d-teacher'" not in s:
-              login_old = """if (pin === TEACHER_PIN) {
-                document.getElementById('modal-teacher').classList.remove('hidden');
-                renderTeacherGroups();
-"""
-              login_new = """if (pin === TEACHER_PIN) {
-                document.getElementById('modal-teacher').classList.remove('hidden');
-                const teacherDiamond = document.getElementById('logo-3d-teacher');
-                if (teacherDiamond && teacherDiamond.childElementCount === 0) {
-                    setTimeout(() => createTeleversoDiamond('logo-3d-teacher', 78), 60);
-                }
-                renderTeacherGroups();
-"""
+              login_old = "if (pin === TEACHER_PIN) {\n                document.getElementById('modal-teacher').classList.remove('hidden');\n                renderTeacherGroups();\n"
+              login_new = "if (pin === TEACHER_PIN) {\n                document.getElementById('modal-teacher').classList.remove('hidden');\n                const teacherDiamond = document.getElementById('logo-3d-teacher');\n                if (teacherDiamond && teacherDiamond.childElementCount === 0) {\n                    setTimeout(() => createTeleversoDiamond('logo-3d-teacher', 78), 60);\n                }\n                renderTeacherGroups();\n"
               if login_old in s:
                   s = s.replace(login_old, login_new, 1)
               else:
