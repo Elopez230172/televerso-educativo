@@ -1,0 +1,47 @@
+name: Instalar juegos variados de Lenguajes en TeleVerso
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'lenguajes-juegos-variedad.js'
+      - '.github/workflows/install-lenguajes-juegos.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  instalar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Integrar juegos variados de Lenguajes
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="lenguajes-juegos-variedad.js"></script>'
+          if tag not in s:
+              anchor='<script src="lenguajes-avanzado.js"></script>'
+              if anchor in s:
+                  s=s.replace(anchor, anchor+'\n    '+tag, 1)
+              else:
+                  s=s.replace('</body>', '    '+tag+'\n</body>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        run: |
+          if git diff --quiet; then
+            echo "Los juegos variados de Lenguajes ya estaban integrados."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Integrar juegos variados de Lenguajes PPA1 [skip ci]"
+          git push
