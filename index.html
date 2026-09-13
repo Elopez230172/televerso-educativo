@@ -10,10 +10,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Utilidades interactivas -->
+    <!-- Utilidades interactivas (Alertas, Confetti, QR y Lector de Cámara) -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     
     <!-- Motor 3D Three.js para el Diamante/Logo interactivo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -80,7 +81,7 @@
             100% { transform: scale(1); }
         }
         .glow-title {
-            text-shadow: 0 0 35px rgba(129, 140, 248, 0.45);
+            text-shadow: 0 0 40px rgba(129, 140, 248, 0.5);
         }
 
         @media print {
@@ -110,10 +111,10 @@
 </head>
 <body class="antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR (SIN EL TÍTULO ANTIGUO NI ÍCONO PEQUEÑO) -->
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
     <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">Portal Educativo</span>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">Portal Educativo Interactivo</span>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
             <i class="fa-solid fa-lock text-indigo-400"></i>
@@ -124,36 +125,36 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL CENTRADA CON LOGO 3D Y BOTÓN DE ENTRADA -->
+        <!-- 1. PORTADA PRINCIPAL -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
-            <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden">
+            <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6">
                 
-                <!-- Contenedor del Diamante 3D animado -->
-                <div id="logo-3d-canvas" class="w-40 h-40 mx-auto -mb-2 cursor-pointer flex justify-center items-center" title="Diamante 3D"></div>
-                
-                <!-- Insignia temática superior -->
-                <div class="inline-block mb-3">
-                    <span class="px-4 py-1.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-indigo-300 text-xs font-black uppercase tracking-widest rounded-full border border-indigo-500/30 shadow-inner">
-                        <i class="fa-solid fa-atom mr-1.5 text-indigo-400"></i> Portal de Exploración Interactiva
-                    </span>
-                </div>
-
-                <!-- Título destacado -->
-                <h1 class="text-4xl sm:text-5xl font-black mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title">
-                    TeleVerso Educativo
+                <!-- TÍTULO MUCHO MÁS GRANDE EN LA PARTE DE ARRIBA -->
+                <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title leading-tight">
+                    Portal Educativo Interactivo
                 </h1>
 
+                <!-- LOGO 3D ANIMADO RESTAURADO -->
+                <div id="logo-3d-canvas" class="w-36 h-36 mx-auto cursor-pointer flex justify-center items-center" title="Diamante 3D"></div>
+
                 <!-- Frase lema inspiradora -->
-                <p class="text-indigo-200 text-base sm:text-lg font-semibold max-w-lg mx-auto leading-relaxed mb-8 italic">
+                <p class="text-indigo-200 text-sm sm:text-base font-semibold max-w-lg mx-auto leading-relaxed italic">
                     «Explora el cosmos del conocimiento: donde cada huella del pasado guía el futuro de nuestra comunidad.»
                 </p>
 
-                <!-- Botón de acceso exclusivo para entrar a las misiones -->
-                <div>
-                    <button onclick="enterStudentPanel()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
-                        <i class="fa-solid fa-rocket mr-2"></i> Entrar a mis Misiones
+                <!-- BOTONES DE ACCESO Y ESCÁNER QR POR CÁMARA -->
+                <div class="space-y-3 pt-2">
+                    <button onclick="startCameraScanner()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-camera mr-2"></i> Escanear Código QR con Cámara
                     </button>
-                    <p class="text-slate-400 text-xs mt-3">*(Recuerda ingresar escaneando el código QR de tu credencial)*</p>
+                </div>
+
+                <!-- CONTENEDOR OCULTO PARA EL LECTOR DE CÁMARA QR -->
+                <div id="reader-container" class="hidden mt-4 p-4 rounded-2xl bg-slate-900/90 border border-slate-700">
+                    <div id="reader" class="w-full max-w-sm mx-auto overflow-hidden rounded-xl"></div>
+                    <button onclick="stopCameraScanner()" class="mt-3 px-4 py-2 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 rounded-xl font-bold text-xs transition">
+                        Cancelar Escáner
+                    </button>
                 </div>
             </div>
         </div>
@@ -339,6 +340,7 @@
         let activeStudent = null;
         let activeMissionKey = null;
         let missionGameState = {};
+        let html5QrCode = null;
 
         const missionCatalog = {
             'm1': {
@@ -437,6 +439,87 @@
             }
         }
 
+        // =========================================================================
+        // ESCÁNER DE CÁMARA QR
+        // =========================================================================
+        function startCameraScanner() {
+            const readerContainer = document.getElementById('reader-container');
+            readerContainer.classList.remove('hidden');
+
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                (decodedText) => {
+                    // Si el QR escaneado contiene un enlace con ?s=TOKEN o un token directo
+                    stopCameraScanner();
+                    processScannedToken(decodedText);
+                },
+                (errorMessage) => {
+                    // Errores de escaneo continuo se pueden ignorar
+                }
+            ).catch(err => {
+                console.error("No se pudo iniciar la cámara:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de cámara',
+                    text: 'No se pudo acceder a la cámara. Verifica los permisos de tu dispositivo.',
+                    customClass: { popup: 'glass-panel text-white rounded-3xl' }
+                });
+                readerContainer.classList.add('hidden');
+            });
+        }
+
+        function stopCameraScanner() {
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    document.getElementById('reader-container').classList.add('hidden');
+                }).catch(err => {
+                    console.warn("Error al detener el escáner:", err);
+                    document.getElementById('reader-container').classList.add('hidden');
+                });
+            } else {
+                document.getElementById('reader-container').classList.add('hidden');
+            }
+        }
+
+        function processScannedToken(text) {
+            let studentId = text;
+            if (text.includes('?s=')) {
+                try {
+                    const url = new URL(text);
+                    studentId = url.searchParams.get('s');
+                } catch (e) {
+                    const parts = text.split('?s=');
+                    if (parts.length > 1) studentId = parts[1];
+                }
+            }
+
+            if (localState.students[studentId]) {
+                activeStudent = localState.students[studentId];
+                renderStudentDashboard();
+                switchView('view-student');
+                Swal.fire({
+                    icon: 'success',
+                    title: `¡Bienvenido, ${activeStudent.name}!`,
+                    text: 'Sesión iniciada correctamente mediante QR.',
+                    timer: 1600,
+                    showConfirmButton: false,
+                    customClass: { popup: 'glass-panel text-white rounded-3xl' }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Credencial no reconocida',
+                    text: 'El código QR escaneado no coincide con ningún alumno registrado en este navegador o base de datos.',
+                    customClass: { popup: 'glass-panel text-white rounded-3xl' }
+                });
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             renderStudentMissionsGrid();
             init3DLogo();
@@ -476,20 +559,6 @@
             document.getElementById('view-student').classList.toggle('hidden', viewId !== 'view-student');
             if (viewId === 'view-home') {
                 setTimeout(init3DLogo, 50);
-            }
-        }
-
-        function enterStudentPanel() {
-            if (activeStudent) {
-                switchView('view-student');
-            } else {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Acceso por credencial',
-                    text: 'Para ingresar a tu tablero personal, por favor escanea el código QR de tu credencial escolar.',
-                    confirmButtonText: 'Entendido',
-                    customClass: { popup: 'glass-panel text-white rounded-3xl' }
-                });
             }
         }
 
