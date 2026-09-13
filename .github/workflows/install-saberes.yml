@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'saberes-addon.js'
+      - 'saberes-nivel-tercero.js'
       - 'saberes-campo-fix.js'
       - '.github/workflows/install-saberes.yml'
 
@@ -27,6 +28,7 @@ jobs:
           s = p.read_text(encoding='utf-8')
 
           saber = '<script src="saberes-addon.js"></script>'
+          level = '<script src="saberes-nivel-tercero.js"></script>'
           fix = '<script src="saberes-campo-fix.js"></script>'
           exp = '<script src="expediente-mejorado.js"></script>'
 
@@ -41,20 +43,29 @@ jobs:
                   else:
                       s = s.replace('</body>', '    ' + saber + '\n</body>', 1)
 
-          # La corrección debe ejecutarse después del catálogo de Saberes.
-          if fix not in s:
+          # El banco revisado de tercer grado debe ejecutarse después del catálogo base.
+          if level not in s:
               if saber in s:
+                  s = s.replace(saber, saber + '\n    ' + level, 1)
+              else:
+                  s = s.replace('</body>', '    ' + level + '\n</body>', 1)
+
+          # La corrección del campo se ejecuta después del banco revisado.
+          if fix not in s:
+              if level in s:
+                  s = s.replace(level, level + '\n    ' + fix, 1)
+              elif saber in s:
                   s = s.replace(saber, saber + '\n    ' + fix, 1)
               else:
                   s = s.replace('</body>', '    ' + fix + '\n</body>', 1)
 
-          # Mantener expediente al final de los complementos para que conozca el catálogo completo.
-          if exp in s:
-              s = s.replace(exp, '', 1)
-              if fix in s:
-                  s = s.replace(fix, fix + '\n    ' + exp, 1)
-              elif saber in s:
-                  s = s.replace(saber, saber + '\n    ' + exp, 1)
+          # Normalizar orden por si alguna versión previa dejó scripts en otra posición.
+          for tag in (level, fix, exp):
+              s = s.replace('    ' + tag + '\n', '').replace(tag + '\n', '')
+          if saber in s:
+              s = s.replace(saber, saber + '\n    ' + level + '\n    ' + fix + '\n    ' + exp, 1)
+          else:
+              s = s.replace('</body>', '    ' + level + '\n    ' + fix + '\n    ' + exp + '\n</body>', 1)
 
           p.write_text(s, encoding='utf-8')
           PY
@@ -62,11 +73,11 @@ jobs:
       - name: Publicar cambios
         run: |
           if git diff --quiet; then
-            echo "Saberes y su corrección ya estaban integrados."
+            echo "Saberes PPA1 ya está integrado con nivel de tercer grado."
             exit 0
           fi
           git config user.name "televerso-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Corregir campo formativo Saberes en TeleVerso [skip ci]"
+          git commit -m "Elevar Saberes PPA1 a nivel de tercer grado [skip ci]"
           git push
