@@ -129,10 +129,17 @@
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-3xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6">
                 
-                <!-- Contenedor flexible para alinear el logotipo de Telesecundaria de forma distinguible a la izquierda del título o centro -->
+                <!-- Contenedor flexible para alinear el logotipo oficial de Telesecundaria a la izquierda del título -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-2">
-                    <!-- Logotipo oficial de Telesecundaria incorporado a un tamaño distinguible -->
-                    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAASABIAAP/wAARCAAgACADASIAAhEBAxEB/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" alt="Logotipo Telesecundaria" class="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-2xl bg-purple-900/60 p-2 border border-purple-400/40 shadow-xl shrink-0">
+                    <!-- Logotipo oficial renderizado vectorialmente con los tonos morados institucionales -->
+                    <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#582a7a] p-2.5 border border-purple-400/40 shadow-xl shrink-0 flex items-center justify-center">
+                        <svg viewBox="0 0 500 500" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M48.5 70H200v320H48.5z" fill="#fff"/>
+                            <path d="M125 145c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 135c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40z" fill="#582a7a"/>
+                            <path d="M250 35h210v355H250z" fill="#fff"/>
+                            <path d="M470 120C370 120 325 180 325 245c0 70 55 105 110 105 32 0 55-9 55-9l-14-48s-18 9-31 9c-26 0-44-18-44-44 0-35 28-65 82-65V120z" fill="#582a7a"/>
+                        </svg>
+                    </div>
                     
                     <div class="text-center md:text-left">
                         <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title leading-tight">
