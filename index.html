@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Educativo Interactivo</title>
+    <title>TeleVerso Educativo · Huellas de Humanidad</title>
     
     <!-- Librerías de diseño visual e iconos -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
-    <!-- Utilidades interactivas (Alertas, Confetti, QR y Lector de Cámara) -->
+    <!-- Utilidades interactivas -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -81,7 +81,7 @@
             100% { transform: scale(1); }
         }
         .glow-title {
-            text-shadow: 0 0 40px rgba(129, 140, 248, 0.5);
+            text-shadow: 0 0 35px rgba(129, 140, 248, 0.45);
         }
 
         @media print {
@@ -111,10 +111,16 @@
 </head>
 <body class="antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR RESTAURADA -->
     <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">Portal Educativo Interactivo</span>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid fa-cube text-white text-base"></i>
+            </div>
+            <div>
+                <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">TeleVerso Educativo · Huellas de Humanidad</span>
+                <span class="text-[10px] text-indigo-300 font-medium block -mt-1">3.º Telesecundaria</span>
+            </div>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
             <i class="fa-solid fa-lock text-indigo-400"></i>
@@ -125,14 +131,19 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL -->
+        <!-- 1. PORTADA PRINCIPAL RESTAURADA (CENTRADA CON TÍTULO, LOGO 3D Y CÁMARA) -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6">
                 
-                <!-- TÍTULO MUCHO MÁS GRANDE EN LA PARTE DE ARRIBA -->
-                <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title leading-tight">
-                    Portal Educativo Interactivo
-                </h1>
+                <!-- TÍTULO EN LA PARTE DE ARRIBA Y AL CENTRO CON SU TAMAÑO ANTERIOR -->
+                <div>
+                    <span class="px-4 py-1.5 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 text-indigo-300 text-xs font-black uppercase tracking-widest rounded-full border border-indigo-500/30 shadow-inner inline-block mb-3">
+                        <i class="fa-solid fa-atom mr-1.5 text-indigo-400"></i> Portal de Exploración Interactiva
+                    </span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 glow-title leading-tight">
+                        TeleVerso Educativo · Huellas de Humanidad
+                    </h1>
+                </div>
 
                 <!-- LOGO 3D ANIMADO RESTAURADO -->
                 <div id="logo-3d-canvas" class="w-36 h-36 mx-auto cursor-pointer flex justify-center items-center" title="Diamante 3D"></div>
@@ -142,11 +153,12 @@
                     «Explora el cosmos del conocimiento: donde cada huella del pasado guía el futuro de nuestra comunidad.»
                 </p>
 
-                <!-- BOTONES DE ACCESO Y ESCÁNER QR POR CÁMARA -->
+                <!-- BOTÓN DE ESCÁNER QR POR CÁMARA -->
                 <div class="space-y-3 pt-2">
                     <button onclick="startCameraScanner()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5">
                         <i class="fa-solid fa-camera mr-2"></i> Escanear Código QR con Cámara
                     </button>
+                    <p class="text-slate-400 text-xs mt-2">*(También puedes ingresar escaneando el código QR de tu credencial)*</p>
                 </div>
 
                 <!-- CONTENEDOR OCULTO PARA EL LECTOR DE CÁMARA QR -->
@@ -454,13 +466,10 @@
                 { facingMode: "environment" },
                 { fps: 10, qrbox: { width: 250, height: 250 } },
                 (decodedText) => {
-                    // Si el QR escaneado contiene un enlace con ?s=TOKEN o un token directo
                     stopCameraScanner();
                     processScannedToken(decodedText);
                 },
-                (errorMessage) => {
-                    // Errores de escaneo continuo se pueden ignorar
-                }
+                (errorMessage) => {}
             ).catch(err => {
                 console.error("No se pudo iniciar la cámara:", err);
                 Swal.fire({
@@ -514,7 +523,7 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Credencial no reconocida',
-                    text: 'El código QR escaneado no coincide con ningún alumno registrado en este navegador o base de datos.',
+                    text: 'El código QR escaneado no coincide con ningún alumno registrado en esta base de datos.',
                     customClass: { popup: 'glass-panel text-white rounded-3xl' }
                 });
             }
@@ -646,7 +655,7 @@
             const area = document.getElementById('mission-content-area');
 
             if (idx >= list.length) {
-                saveMissionResults("¡Actividad completada!");
+                saveMissionResults("¡Actividad completada![cite: 1]");
                 return;
             }
 
@@ -717,7 +726,7 @@
             const deck = missionGameState.deck;
 
             if (missionGameState.matched.length === deck.length) {
-                saveMissionResults("¡Memorama completado!");
+                saveMissionResults("¡Memorama completado![cite: 1]");
                 return;
             }
 
@@ -803,7 +812,7 @@
                 try {
                     await db.collection("students").doc(activeStudent.id).set(activeStudent);
                 } catch (e) {
-                    console.error("Error al guardar:", e);
+                    console.error("Error al guardar:[cite: 1]", e);
                 }
             }
 
@@ -865,7 +874,7 @@
 
             const result = await Swal.fire({
                 title: `¿Eliminar ${groupName}?`,
-                text: 'Se eliminará el grupo y todos los alumnos asignados en la nube.',
+                text: 'Se eliminará el grupo y todos los alumnos asignados en la nube.[cite: 1]',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, borrar',
@@ -931,7 +940,7 @@
         async function removeStudentCloud(groupId, studentId) {
             const confirm = await Swal.fire({
                 title: '¿Eliminar alumno?',
-                text: 'Se borrará su expediente completo de la nube.',
+                text: 'Se borrará su expediente completo de la nube.[cite: 1]',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, borrar',
@@ -961,7 +970,7 @@
 
             const keys = Object.keys(localState.groups);
             if (keys.length === 0) {
-                container.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-sm">No hay grupos registrados en la nube. Crea uno arriba.</div>`;
+                container.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-sm">No hay grupos registrados en la nube. Crea uno arriba.[cite: 1]</div>`;
                 return;
             }
 
@@ -976,17 +985,17 @@
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-900/80 p-3 rounded-xl border border-slate-700/60 text-sm gap-2">
                                 <div>
                                     <span class="font-bold text-white text-base">${s.name}</span>
-                                    <span class="ml-2 px-2.5 py-0.5 bg-amber-500/20 text-amber-300 font-mono text-xs font-bold rounded-lg border border-amber-500/30">${s.score || 0} pts</span>
+                                    <span class="ml-2 px-2.5 py-0.5 bg-amber-500/20 text-amber-300 font-mono text-xs font-bold rounded-lg border border-amber-500/30">${s.score || 0} pts[cite: 1]</span>
                                 </div>
                                 <div class="flex flex-wrap gap-1.5">
                                     <button onclick="viewStudentStats('${s.id}')" class="px-2.5 py-1.5 bg-blue-600/30 hover:bg-blue-600 text-blue-200 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-blue-500/30">
-                                        <i class="fa-solid fa-chart-pie"></i><span>Expediente</span>
+                                        <i class="fa-solid fa-chart-pie"></i><span>Expediente[cite: 1]</span>
                                     </button>
                                     <button onclick="displayStudentQr('${s.id}')" class="px-2.5 py-1.5 bg-indigo-600/40 hover:bg-indigo-600 text-indigo-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                        <i class="fa-solid fa-qrcode"></i><span>Ver QR</span>
+                                        <i class="fa-solid fa-qrcode"></i><span>Ver QR[cite: 1]</span>
                                     </button>
                                     <button onclick="printSingleQr('${s.id}')" class="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                        <i class="fa-solid fa-print"></i><span>Imprimir</span>
+                                        <i class="fa-solid fa-print"></i><span>Imprimir[cite: 1]</span>
                                     </button>
                                     <button onclick="removeStudentCloud('${group.id}', '${s.id}')" class="px-2 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs transition">
                                         <i class="fa-solid fa-trash"></i>
@@ -1001,21 +1010,21 @@
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 border-b border-white/10 gap-2">
                             <h5 class="font-bold text-white text-base flex items-center space-x-2">
                                 <i class="fa-solid fa-users text-indigo-400"></i>
-                                <span>${group.name}</span>
+                                <span>${group.name}[cite: 1]</span>
                             </h5>
                             <div class="flex flex-wrap items-center gap-2">
                                 <button onclick="printGroupQrs('${group.id}')" class="px-3 py-1.5 bg-emerald-600/30 hover:bg-emerald-600 text-emerald-200 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-emerald-500/30">
-                                    <i class="fa-solid fa-print"></i><span>Imprimir Grupo</span>
+                                    <i class="fa-solid fa-print"></i><span>Imprimir Grupo[cite: 1]</span>
                                 </button>
                                 <button onclick="addStudentCloud('${group.id}')" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1">
-                                    <i class="fa-solid fa-user-plus"></i><span>+ Alumno</span>
+                                    <i class="fa-solid fa-user-plus"></i><span>+ Alumno[cite: 1]</span>
                                 </button>
                                 <button onclick="removeGroupCloud('${group.id}')" class="px-2.5 py-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 rounded-lg text-xs font-bold transition flex items-center space-x-1 border border-rose-500/30">
-                                    <i class="fa-solid fa-folder-minus"></i><span>Borrar Grupo</span>
+                                    <i class="fa-solid fa-folder-minus"></i><span>Borrar Grupo[cite: 1]</span>
                                 </button>
                             </div>
                         </div>
-                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún.</p>'}</div>
+                        <div class="space-y-2">${studentsHtml || '<p class="text-xs text-slate-500 italic py-1">Sin alumnos registrados aún.[cite: 1]</p>'}</div>
                     </div>`;
             });
         }
@@ -1043,7 +1052,7 @@
 
             const historyEntries = Object.entries(student.history || {});
             if (historyEntries.length === 0) {
-                historyContainer.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-xs italic">Aún no hay actividades contestadas por este estudiante.</div>`;
+                historyContainer.innerHTML = `<div class="glass-card p-6 text-center text-slate-400 text-xs italic">Aún no hay actividades contestadas por este estudiante.[cite: 1]</div>`;
             } else {
                 historyEntries.forEach(([mKey, activity]) => {
                     const missionInfo = missionCatalog[mKey] || { title: activity.missionTitle, icon: '📌' };
@@ -1053,7 +1062,7 @@
                             <div class="flex justify-between items-start gap-2">
                                 <span class="font-black text-xs text-white">Pregunta ${qIndex + 1}</span>
                                 <span class="px-2 py-0.5 rounded-md font-bold text-[10px] uppercase ${q.isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'}">
-                                    ${q.isCorrect ? 'Acierto ✓' : 'Error ✗'}
+                                    ${q.isCorrect ? 'Acierto ✓' : 'Error ✗'}[cite: 1]
                                 </span>
                             </div>
                             <p class="text-xs font-semibold text-slate-200">${q.statement}</p>
@@ -1083,14 +1092,14 @@
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">
-                                        ${activity.hits} aciertos
+                                        ${activity.hits} aciertos[cite: 1]
                                     </span>
                                     <span class="px-2.5 py-1 rounded-lg bg-rose-500/20 text-rose-300 font-bold text-xs border border-rose-500/30">
-                                        ${activity.errors} errores
+                                        ${activity.errors} errores[cite: 1]
                                     </span>
                                 </div>
                             </div>
-                            <div class="space-y-2.5 pt-1">${questionsHtml || '<p class="text-xs text-slate-400 italic">Sin reactivos desglosados en esta sesión.</p>'}</div>
+                            <div class="space-y-2.5 pt-1">${questionsHtml || '<p class="text-xs text-slate-400 italic">Sin reactivos desglosados en esta sesión.[cite: 1]</p>'}</div>
                         </div>
                     `;
                 });
@@ -1115,7 +1124,7 @@
             printArea.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
                     <div class="print-card" style="border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; width: 280px; font-family: sans-serif; background: #ffffff;">
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">Portal Educativo</h3>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">TeleVerso Educativo · Huellas de Humanidad</h3>
                         <p style="margin: 2px 0 12px 0; font-size: 11px; color: #64748b;">Credencial del Estudiante</p>
                         <div id="print-qr-target" style="display: flex; justify-content: center; margin: 12px 0;"></div>
                         <h2 style="margin: 10px 0 2px 0; font-size: 18px; font-weight: 900; color: #0f172a;">${student.name}</h2>
@@ -1142,7 +1151,7 @@
         function printGroupQrs(groupId) {
             const group = localState.groups[groupId];
             if (!group || !Array.isArray(group.students) || group.students.length === 0) {
-                Swal.fire('Atención', 'Este grupo no tiene alumnos registrados para imprimir.', 'info');
+                Swal.fire('Atención', 'Este grupo no tiene alumnos registrados para imprimir.[cite: 1]', 'info');
                 return;
             }
 
@@ -1152,8 +1161,8 @@
             let cardsHtml = `
                 <div style="font-family: sans-serif; padding: 10px;">
                     <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 8px;">
-                        <h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">Portal Educativo · Credenciales Escolares</h2>
-                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">Grupo: <strong>${group.name}</strong> • Total de alumnos: ${group.students.length}</p>
+                        <h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">TeleVerso Educativo · Huellas de Humanidad · Credenciales Escolares</h2>
+                        <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">Grupo: <strong>${group.name}[cite: 1]</strong> • Total de alumnos: ${group.students.length}</p>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
             `;
@@ -1163,10 +1172,10 @@
                 if (s) {
                     cardsHtml += `
                         <div class="print-card" style="border: 1.5px dashed #475569; border-radius: 12px; padding: 14px; text-align: center; background: #ffffff; break-inside: avoid;">
-                            <span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">Portal Educativo</span>
+                            <span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">TeleVerso Educativo</span>
                             <div id="print-qr-${s.id}" style="display: flex; justify-content: center; margin: 8px 0;"></div>
                             <h4 style="margin: 6px 0 2px 0; font-size: 13px; font-weight: 900; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.name}</h4>
-                            <p style="margin: 0; font-size: 10px; font-weight: 600; color: #334155;">Grupo: ${group.name}</p>
+                            <p style="margin: 0; font-size: 10px; font-weight: 600; color: #334155;">Grupo: ${group.name}[cite: 1]</p>
                             <p style="margin: 6px 0 0 0; font-size: 8px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 4px;">
                                 Escanea con la cámara para ingresar
                             </p>
