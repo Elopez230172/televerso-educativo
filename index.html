@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TeleVerso Educativo · Huellas de Humanidad</title>
+    <title>Portal Educativo Interactivo</title>
     
     <!-- Librerías de diseño visual e iconos -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
-    <!-- Motor 3D Three.js para el Diamante/Logo interactivo del TeleVerso -->
+    <!-- Motor 3D Three.js para el Diamante/Logo interactivo -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <!-- SDK Directo de Firebase Firestore -->
@@ -110,16 +110,10 @@
 </head>
 <body class="antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR (SIN EL TÍTULO ANTIGUO NI ÍCONO PEQUEÑO) -->
     <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-cube text-white text-lg"></i>
-            </div>
-            <div>
-                <span class="font-extrabold text-base sm:text-lg tracking-tight text-white block">TeleVerso Educativo</span>
-                <span class="text-[11px] text-indigo-300 font-medium block -mt-1">Huellas de Humanidad · 3.º Telesecundaria</span>
-            </div>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">Portal Educativo</span>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
             <i class="fa-solid fa-lock text-indigo-400"></i>
@@ -130,12 +124,12 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL RESTAURADA (CENTRADA CON LOGO 3D, TÍTULO, FRASE Y BOTÓN) -->
+        <!-- 1. PORTADA PRINCIPAL CENTRADA CON LOGO 3D Y BOTÓN DE ENTRADA -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden">
                 
                 <!-- Contenedor del Diamante 3D animado -->
-                <div id="logo-3d-canvas" class="w-40 h-40 mx-auto -mb-2 cursor-pointer flex justify-center items-center" title="Diamante del TeleVerso 3D"></div>
+                <div id="logo-3d-canvas" class="w-40 h-40 mx-auto -mb-2 cursor-pointer flex justify-center items-center" title="Diamante 3D"></div>
                 
                 <!-- Insignia temática superior -->
                 <div class="inline-block mb-3">
