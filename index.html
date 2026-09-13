@@ -114,7 +114,7 @@
     <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
     <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">                 PORTAL EDUCATIVO               </span>
+            <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">PORTAL EDUCATIVO TELESECUNDARIA</span>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
             <i class="fa-solid fa-lock text-indigo-400"></i>
@@ -137,9 +137,9 @@
                 <!-- LOGO 3D ANIMADO -->
                 <div id="logo-3d-canvas" class="w-36 h-36 mx-auto cursor-pointer flex justify-center items-center" title="Diamante 3D"></div>
 
-                <!-- LEMA INSPIRADOR RESTAURADO -->
-                <p class="text-indigo-200 text-sm sm:text-base font-semibold max-w-lg mx-auto leading-relaxed italic">
-                    «Explora el cosmos del conocimiento: donde cada huella del pasado guía el futuro de nuestra comunidad.»
+                <!-- NUEVO LEMA CORTO Y SENCILLO -->
+                <p class="text-indigo-200 text-sm sm:text-base font-semibold max-w-md mx-auto leading-relaxed italic">
+                    «Explora, aprende y transforma tu comunidad.»
                 </p>
 
                 <!-- BOTÓN DE ESCÁNER QR POR CÁMARA -->
@@ -1113,7 +1113,7 @@
             printArea.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
                     <div class="print-card" style="border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; width: 280px; font-family: sans-serif; background: #ffffff;">
-                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">TeleVerso Educativo</h3>
+                        <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">PORTAL EDUCATIVO TELESECUNDARIA</h3>
                         <p style="margin: 2px 0 12px 0; font-size: 11px; color: #64748b;">Credencial del Estudiante</p>
                         <div id="print-qr-target" style="display: flex; justify-content: center; margin: 12px 0;"></div>
                         <h2 style="margin: 10px 0 2px 0; font-size: 18px; font-weight: 900; color: #0f172a;">${student.name}</h2>
@@ -1150,7 +1150,7 @@
             let cardsHtml = `
                 <div style="font-family: sans-serif; padding: 10px;">
                     <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 8px;">
-                        <h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">TeleVerso Educativo · Credenciales Escolares</h2>
+                        <h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">PORTAL EDUCATIVO TELESECUNDARIA · Credenciales Escolares</h2>
                         <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">Grupo: <strong>${group.name}[cite: 1]</strong> • Total de alumnos: ${group.students.length}</p>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
@@ -1161,7 +1161,7 @@
                 if (s) {
                     cardsHtml += `
                         <div class="print-card" style="border: 1.5px dashed #475569; border-radius: 12px; padding: 14px; text-align: center; background: #ffffff; break-inside: avoid;">
-                            <span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">TeleVerso Educativo</span>
+                            <span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">PORTAL EDUCATIVO TELESECUNDARIA</span>
                             <div id="print-qr-${s.id}" style="display: flex; justify-content: center; margin: 8px 0;"></div>
                             <h4 style="margin: 6px 0 2px 0; font-size: 13px; font-weight: 900; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.name}</h4>
                             <p style="margin: 0; font-size: 10px; font-weight: 600; color: #334155;">Grupo: ${group.name}[cite: 1]</p>
