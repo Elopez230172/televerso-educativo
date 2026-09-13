@@ -17,7 +17,7 @@ jobs:
       - name: Descargar repositorio
         uses: actions/checkout@v4
 
-      - name: Corregir QR y encabezado docente
+      - name: Corregir QR y enriquecer panel docente
         shell: bash
         run: |
           python - <<'PY'
@@ -27,7 +27,7 @@ jobs:
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
 
-          # 1) El modal QR individual se estaba ocultando justo antes de dibujar el código.
+          # 1) Mantener corregida la apertura del modal QR individual.
           qr_pattern = r"(function displayStudentQr\(studentId\) \{.*?document\.getElementById\('btn-print-from-modal'\)\.onclick = \(\) => \{.*?\};\s*)document\.getElementById\('modal-qr'\)\.classList\.add\('hidden'\);"
           s, qr_count = re.subn(
               qr_pattern,
@@ -37,38 +37,37 @@ jobs:
               flags=re.S,
           )
           if qr_count == 0 and "function displayStudentQr(studentId)" in s:
-              # Si ya estaba corregido no fallamos.
               qr_block = re.search(r"function displayStudentQr\(studentId\) \{.*?function closeQrModal", s, re.S)
               if not qr_block or "classList.remove('hidden')" not in qr_block.group(0):
-                  raise SystemExit('No fue posible corregir la apertura del modal QR individual.')
+                  raise SystemExit('No fue posible mantener la corrección del QR individual.')
 
-          # 2) Sustituir sólo el encabezado del modal docente, conservando el resto del panel.
-          new_header = '''<div class="flex justify-between items-center pb-4 border-b border-white/10 mb-6 gap-4">
-                <div class="flex items-center gap-4 min-w-0">
-                    <img src="Logo.jpg" alt="Logo de TeleVerso Educativo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-indigo-400/40 shadow-lg shadow-indigo-600/20 shrink-0 bg-slate-800">
-                    <div class="min-w-0">
-                        <div class="text-indigo-300 text-[11px] sm:text-xs font-black uppercase tracking-[0.16em] mb-1">TeleVerso Educativo</div>
-                        <h3 class="text-xl sm:text-2xl font-black text-white flex items-center gap-2 leading-tight">
-                            <i class="fa-solid fa-chalkboard-user text-indigo-400"></i>
-                            <span>Panel Docente · Control en la Nube</span>
-                        </h3>
-                        <p class="text-slate-400 text-xs mt-1">Gestión de grupos, expedientes, códigos QR, impresión y seguimiento de actividades.</p>
-                    </div>
-                </div>
-                <button onclick="closeTeacherModal()" aria-label="Cerrar panel docente" class="text-slate-400 hover:text-white text-2xl shrink-0"><i class="fa-solid fa-xmark"></i></button>
-            </div>'''
+          # 2) Asegurar nombre, logo estático y diamante 3D en el encabezado del panel docente.
+          if 'id="logo-3d-teacher"' not in s:
+              logo_img = '<img src="Logo.jpg" alt="Logo de TeleVerso Educativo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-indigo-400/40 shadow-lg shadow-indigo-600/20 shrink-0 bg-slate-800">'
+              diamond = '''<div id="logo-3d-teacher" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center rounded-2xl bg-slate-950/30 border border-indigo-400/20 shadow-lg shadow-indigo-600/10" title="Diamante doble 3D de TeleVerso"></div>'''
+              if logo_img in s:
+                  s = s.replace(logo_img, logo_img + '\n                    ' + diamond, 1)
+              else:
+                  raise SystemExit('No se encontró el logo estático del panel docente para agregar el diamante 3D.')
 
-          if 'Logo de TeleVerso Educativo' not in s:
-              teacher_pattern = r"(<div id=\"modal-teacher\".*?<div class=\"glass-panel[^>]*>\s*)(<div class=\"flex justify-between items-center pb-4 border-b border-white/10 mb-6\">.*?<button onclick=\"closeTeacherModal\(\)\".*?</button>\s*</div>)"
-              s, header_count = re.subn(
-                  teacher_pattern,
-                  lambda m: m.group(1) + new_header,
-                  s,
-                  count=1,
-                  flags=re.S,
-              )
-              if header_count == 0:
-                  raise SystemExit('No fue posible localizar el encabezado del panel docente.')
+          # 3) Inicializar el diamante al abrir el panel docente sin recrearlo innecesariamente.
+          if "createTeleversoDiamond('logo-3d-teacher'" not in s:
+              login_old = """if (pin === TEACHER_PIN) {
+                document.getElementById('modal-teacher').classList.remove('hidden');
+                renderTeacherGroups();
+"""
+              login_new = """if (pin === TEACHER_PIN) {
+                document.getElementById('modal-teacher').classList.remove('hidden');
+                const teacherDiamond = document.getElementById('logo-3d-teacher');
+                if (teacherDiamond && teacherDiamond.childElementCount === 0) {
+                    setTimeout(() => createTeleversoDiamond('logo-3d-teacher', 78), 60);
+                }
+                renderTeacherGroups();
+"""
+              if login_old in s:
+                  s = s.replace(login_old, login_new, 1)
+              else:
+                  raise SystemExit('No se encontró el bloque de acceso docente para inicializar el diamante 3D.')
 
           p.write_text(s, encoding='utf-8')
           PY
@@ -83,5 +82,5 @@ jobs:
           git config user.name "televerso-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Corregir QR de alumnos y encabezado del panel docente [skip ci]"
+          git commit -m "Agregar diamante 3D al panel docente [skip ci]"
           git push
