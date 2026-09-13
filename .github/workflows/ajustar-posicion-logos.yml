@@ -1,0 +1,72 @@
+name: Ajustar posición de logos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ajustar-posicion-logos.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ajustar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ajustar portada y panel docente
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # PORTADA: desplazar TeleVerso un poco hacia la izquierda para evitar solape.
+          s = s.replace(
+              'class="flex items-center justify-center h-full">\n                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto sm:max-w-[78%] lg:max-w-[76%]">',
+              'class="flex items-center justify-center h-full sm:-translate-x-8 lg:-translate-x-12">\n                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto sm:max-w-[74%] lg:max-w-[72%]">',
+              1
+          )
+
+          # PORTADA: mover el logo de Telesecundaria un poco hacia la izquierda.
+          s = s.replace(
+              'sm:right-3 lg:right-6 sm:top-1/2',
+              'sm:right-10 lg:right-14 sm:top-1/2',
+              1
+          )
+
+          # PANEL DOCENTE: eliminar el logo animado secundario (logo-3d-teacher).
+          s = re.sub(
+              r'\s*<div id="logo-3d-teacher"[^>]*></div>',
+              '',
+              s,
+              count=1
+          )
+
+          # PANEL DOCENTE: desplazar el logo de Telesecundaria ligeramente a la izquierda.
+          s = s.replace(
+              'class="telesec-logo-card w-16 sm:w-20 lg:w-24 p-2">',
+              'class="telesec-logo-card w-16 sm:w-20 lg:w-24 p-2 mr-5 sm:mr-8">',
+              1
+          )
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "Los ajustes ya estaban aplicados."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Ajustar posición de logos en portada y panel docente [skip ci]"
+          git push
