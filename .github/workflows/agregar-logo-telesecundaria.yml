@@ -1,0 +1,90 @@
+name: Agregar logo de Telesecundaria
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/agregar-logo-telesecundaria.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Colocar logo institucional
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Estilos visuales para el logo de Telesecundaria.
+          if '.telesec-logo-card' not in s:
+              css = '''
+        .telesec-logo-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;padding:.65rem;border-radius:1.4rem;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(15,23,42,.25));border:1px solid rgba(255,255,255,.13);box-shadow:0 14px 34px rgba(2,6,23,.34),0 0 28px rgba(56,189,248,.08);backdrop-filter:blur(12px)}
+        .telesec-logo-img{width:100%;height:100%;object-fit:cover;border-radius:1rem;filter:drop-shadow(0 0 14px rgba(255,255,255,.08));transition:transform .3s ease,filter .3s ease}
+        .telesec-logo-card:hover .telesec-logo-img{transform:scale(1.035);filter:drop-shadow(0 0 18px rgba(129,140,248,.24))}
+        .telesec-logo-label{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#cbd5e1;white-space:nowrap}
+'''
+              s = s.replace('        @media print {', css + '\n        @media print {', 1)
+
+          # Portada principal: mantener TeleVerso grande al centro y sumar Telesecundaria a la derecha.
+          home_old = '''                <!-- IDENTIDAD PRINCIPAL: un solo logo grande y centrado -->
+                <div class="flex items-center justify-center py-3 sm:py-7">
+                    <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto">
+                </div>'''
+          home_new = '''                <!-- IDENTIDAD PRINCIPAL -->
+                <div class="relative flex flex-col sm:block items-center justify-center py-3 sm:py-7 min-h-[300px] sm:min-h-[360px]">
+                    <div class="flex items-center justify-center h-full">
+                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto sm:max-w-[78%] lg:max-w-[76%]">
+                    </div>
+                    <div class="telesec-logo-card mt-5 sm:mt-0 sm:absolute sm:right-3 lg:right-6 sm:top-1/2 sm:-translate-y-1/2 w-28 h-auto sm:w-32 lg:w-36 z-10">
+                        <img src="Logo.jpg" alt="Logo de Telesecundaria" class="telesec-logo-img aspect-square">
+                        <span class="telesec-logo-label">Telesecundaria</span>
+                    </div>
+                </div>'''
+          if home_old in s:
+              s = s.replace(home_old, home_new, 1)
+          elif 'telesec-logo-label">Telesecundaria</span>' not in s:
+              raise SystemExit('No se encontró el bloque principal esperado.')
+
+          # Panel docente: agregar el logo de Telesecundaria del lado derecho del encabezado.
+          teacher_old = '''      </div>
+      <button onclick="closeTeacherModal()" aria-label="Cerrar panel docente" class="text-slate-400 hover:text-white text-2xl shrink-0"><i class="fa-solid fa-xmark"></i></button>
+  </div>'''
+          teacher_new = '''      </div>
+      <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+          <div class="telesec-logo-card w-16 sm:w-20 lg:w-24 p-2">
+              <img src="Logo.jpg" alt="Logo de Telesecundaria" class="telesec-logo-img aspect-square">
+              <span class="telesec-logo-label hidden sm:block">Telesecundaria</span>
+          </div>
+          <button onclick="closeTeacherModal()" aria-label="Cerrar panel docente" class="text-slate-400 hover:text-white text-2xl shrink-0"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+  </div>'''
+          if teacher_old in s:
+              s = s.replace(teacher_old, teacher_new, 1)
+          elif 'alt="Logo de Telesecundaria"' not in s[s.find('<!-- PANEL DOCENTE -->'):s.find('<!-- MODAL DE EXPEDIENTE')]:
+              raise SystemExit('No se encontró el encabezado docente esperado.')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "Los logos ya estaban colocados."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Agregar logo de Telesecundaria en portada y panel docente [skip ci]"
+          git push
