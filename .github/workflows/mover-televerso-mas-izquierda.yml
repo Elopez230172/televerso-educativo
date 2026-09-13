@@ -1,0 +1,46 @@
+name: Mover TeleVerso más a la izquierda
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/mover-televerso-mas-izquierda.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ajustar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Separar logo TeleVerso del logo de Telesecundaria
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = 'class="flex items-center justify-center h-full sm:-translate-x-8 lg:-translate-x-12"'
+          new = 'class="flex items-center justify-center h-full sm:-translate-x-16 md:-translate-x-24 lg:-translate-x-32 xl:-translate-x-40"'
+          if old in s:
+              s = s.replace(old, new, 1)
+          elif new not in s:
+              raise SystemExit('No se encontró la posición actual del logo principal.')
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambio
+        shell: bash
+        run: |
+          if git diff --quiet -- index.html; then
+            echo "El desplazamiento ya estaba aplicado."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Mover logo TeleVerso más a la izquierda [skip ci]"
+          git push
