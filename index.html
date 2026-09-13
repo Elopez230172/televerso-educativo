@@ -130,7 +130,7 @@
     <!-- ÁREA PRINCIPAL -->
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- 1. PORTADA PRINCIPAL CENTRADA CON LOGO 3D, TÍTULO, FRASE Y BOTÓN DE ENTRADA -->
+        <!-- 1. PORTADA PRINCIPAL RESTAURADA (CENTRADA CON LOGO 3D, TÍTULO, FRASE Y BOTÓN) -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-2xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden">
                 
@@ -155,7 +155,7 @@
                 </p>
 
                 <!-- Botón de acceso exclusivo para entrar a las misiones -->
-                <div id="home-action-container">
+                <div>
                     <button onclick="enterStudentPanel()" class="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm rounded-2xl shadow-lg shadow-indigo-600/30 transition transform hover:-translate-y-0.5">
                         <i class="fa-solid fa-rocket mr-2"></i> Entrar a mis Misiones
                     </button>
@@ -192,28 +192,28 @@
             <!-- Insignias cooperativas -->
             <div>
                 <h4 class="text-sm font-black text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-award text-amber-400"></i> Insignias Cooperativas[cite: 2]
+                    <i class="fa-solid fa-award text-amber-400"></i> Insignias Cooperativas
                 </h4>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div id="badge-past" class="glass-card p-4 rounded-2xl border border-white/10 opacity-50 transition duration-300 flex items-center gap-3.5">
                         <div class="w-12 h-12 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-2xl">🗿</div>
                         <div>
-                            <strong class="text-white text-sm block">Rastreador del Pasado[cite: 2]</strong>
-                            <span class="text-[11px] text-slate-400">Domina evidencia y fuentes.[cite: 2]</span>
+                            <strong class="text-white text-sm block">Rastreador del Pasado</strong>
+                            <span class="text-[11px] text-slate-400">Domina evidencia y fuentes.</span>
                         </div>
                     </div>
                     <div id="badge-water" class="glass-card p-4 rounded-2xl border border-white/10 opacity-50 transition duration-300 flex items-center gap-3.5">
                         <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-2xl">💧</div>
                         <div>
-                            <strong class="text-white text-sm block">Guardián del Agua[cite: 2]</strong>
-                            <span class="text-[11px] text-slate-400">Ríos y acuerdos comunitarios.[cite: 2]</span>
+                            <strong class="text-white text-sm block">Guardián del Agua</strong>
+                            <span class="text-[11px] text-slate-400">Ríos y acuerdos comunitarios.</span>
                         </div>
                     </div>
                     <div id="badge-equality" class="glass-card p-4 rounded-2xl border border-white/10 opacity-50 transition duration-300 flex items-center gap-3.5">
                         <div class="w-12 h-12 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-2xl">🤝</div>
                         <div>
-                            <strong class="text-white text-sm block">Constructor de Igualdad[cite: 2]</strong>
-                            <span class="text-[11px] text-slate-400">Supera barreras con equidad.[cite: 2]</span>
+                            <strong class="text-white text-sm block">Constructor de Igualdad</strong>
+                            <span class="text-[11px] text-slate-400">Supera barreras con equidad.</span>
                         </div>
                     </div>
                 </div>
@@ -352,11 +352,11 @@
                 title: 'R1 · Detectives de afirmaciones',
                 type: 'classify',
                 icon: '🔎',
-                desc: '18 reactivos para clasificar evidencia, interpretación y propuesta con rigor metodológico.[cite: 2]',
+                desc: '18 reactivos para clasificar evidencia, interpretación y propuesta con rigor metodológico.',
                 statements: [
-                    { text: "En la fotografía se observan marcas en el borde del objeto.[cite: 2]", cat: "E", exp: "Evidencia: Es un dato empírico observable en la imagen.[cite: 2]" },
-                    { text: "Ese objeto demuestra que todas las personas vivían igual.[cite: 2]", cat: "I", exp: "Interpretación: Afirmar igualdad generalizada a partir de una pieza aislada excede la evidencia.[cite: 2]" },
-                    { text: "Organicemos turnos para que todas las voces sean escuchadas.[cite: 2]", cat: "P", exp: "Propuesta: Es una acción organizativa orientada a la equidad.[cite: 2]" }
+                    { text: "En la fotografía se observan marcas en el borde del objeto.", cat: "E", exp: "Evidencia: Es un dato empírico observable en la imagen." },
+                    { text: "Ese objeto demuestra que todas las personas vivían igual.", cat: "I", exp: "Interpretación: Afirmar igualdad generalizada a partir de una pieza aislada excede la evidencia." },
+                    { text: "Organicemos turnos para que todas las voces sean escuchadas.", cat: "P", exp: "Propuesta: Es una acción organizativa orientada a la equidad." }
                 ]
             },
             'm2': {
@@ -364,12 +364,12 @@
                 title: 'Memorama · Conceptos que dejan huella',
                 type: 'memory',
                 icon: '🧠',
-                desc: '12 parejas de conceptos y definiciones sobre pasado material, agua e igualdad.[cite: 2]',
+                desc: '12 parejas de conceptos y definiciones sobre pasado material, agua e igualdad.',
                 pairs: [
-                    { c: "Hominización", d: "Proceso evolutivo relacionado con el origen humano.[cite: 2]" },
-                    { c: "Fósil", d: "Evidencia del pasado biológico; no es igual a una herramienta cultural.[cite: 2]" },
-                    { c: "Evidencia", d: "Dato observable o documentado que puede respaldar una afirmación.[cite: 2]" },
-                    { c: "Inclusión", d: "Eliminar barreras para que todas las personas puedan participar.[cite: 2]" }
+                    { c: "Hominización", d: "Proceso evolutivo relacionado con el origen humano." },
+                    { c: "Fósil", d: "Evidencia del pasado biológico; no es igual a una herramienta cultural." },
+                    { c: "Evidencia", d: "Dato observable o documentado que puede respaldar una afirmación." },
+                    { c: "Inclusión", d: "Eliminar barreras para que todas las personas puedan participar." }
                 ]
             }
         };
