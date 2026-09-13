@@ -90,6 +90,10 @@
         .tv-logo-brand:hover{transform:translateY(-2px) scale(1.02);filter:drop-shadow(0 0 20px rgba(129,140,248,.48))}
         .tv-logo-shell{position:relative;border-radius:24px;background:radial-gradient(circle at 50% 42%,rgba(56,189,248,.12),rgba(15,23,42,.08) 60%,transparent 78%);box-shadow:inset 0 0 0 1px rgba(129,140,248,.10)}
 
+
+        .tv-home-logo-feature{width:min(92vw,820px);max-height:520px;object-fit:contain;filter:drop-shadow(0 0 26px rgba(56,189,248,.30)) drop-shadow(0 0 52px rgba(124,58,237,.18));animation:tvHomeFloat 5.2s ease-in-out infinite;transform-origin:center}
+        @keyframes tvHomeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.018)}}
+
         @media print {
             body {
                 background: #ffffff !important;
@@ -134,7 +138,7 @@
 
         <!-- 1. PORTADA PRINCIPAL CENTRADA -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
-            <div class="glass-panel p-8 sm:p-14 rounded-3xl w-full max-w-3xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-6">
+            <div class="glass-panel p-7 sm:p-10 rounded-3xl w-full max-w-5xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-5">
                 
                 <!-- Contenedor con la ruta corregida a Logo.jpg (con L mayúscula) -->
                 <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-2">
@@ -553,7 +557,7 @@
             printArea.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
                     <div style="border: 2px dashed #334155; border-radius: 16px; padding: 32px; text-align: center; width: 320px; font-family: sans-serif; background: #ffffff;">
-                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:210px;height:auto;margin:0 auto 8px auto;"><h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #1e293b;">TeleVerso Educativo</h3>
+                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:210px;height:auto;margin:0 auto 8px auto;"><img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:210px;height:auto;margin:0 auto 8px auto;"><h3 style="margin: 0; font-size: 18px; font-weight: 800; color: #1e293b;">TeleVerso Educativo</h3>
                         <p style="margin: 4px 0 16px 0; font-size: 12px; color: #64748b;">Escanea para ingresar a la plataforma</p>
                         <div id="print-main-qr-target" style="display: flex; justify-content: center; margin: 16px 0;"></div>
                         <p style="margin: 16px 0 0 0; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 12px;">
@@ -1176,7 +1180,7 @@
             printArea.innerHTML = `
                 <div style="display: flex; justify-content: center; align-items: center; min-height: 80vh;">
                     <div class="print-card" style="border: 2px dashed #334155; border-radius: 16px; padding: 24px; text-align: center; width: 280px; font-family: sans-serif; background: #ffffff;">
-                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:190px;height:auto;margin:0 auto 6px auto;"><h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">TeleVerso Educativo</h3>
+                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:190px;height:auto;margin:0 auto 6px auto;"><img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:190px;height:auto;margin:0 auto 6px auto;"><h3 style="margin: 0; font-size: 16px; font-weight: 800; color: #1e293b;">TeleVerso Educativo</h3>
                         <p style="margin: 2px 0 12px 0; font-size: 11px; color: #64748b;">Credencial del Estudiante</p>
                         <div id="print-qr-target" style="display: flex; justify-content: center; margin: 12px 0;"></div>
                         <h2 style="margin: 10px 0 2px 0; font-size: 18px; font-weight: 900; color: #0f172a;">${student.name}</h2>
@@ -1213,7 +1217,7 @@
             let cardsHtml = `
                 <div style="font-family: sans-serif; padding: 10px;">
                     <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 8px;">
-                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:240px;height:auto;margin:0 auto 8px auto;"><h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">TeleVerso Educativo · Credenciales Escolares</h2>
+                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:240px;height:auto;margin:0 auto 8px auto;"><img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:240px;height:auto;margin:0 auto 8px auto;"><h2 style="margin: 0; font-size: 20px; font-weight: 900; color: #0f172a;">TeleVerso Educativo · Credenciales Escolares</h2>
                         <p style="margin: 4px 0 0 0; font-size: 13px; color: #475569;">Grupo: <strong>${group.name}</strong> • Total de alumnos: ${group.students.length}</p>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;">
@@ -1224,7 +1228,7 @@
                 if (s) {
                     cardsHtml += `
                         <div class="print-card" style="border: 1.5px dashed #475569; border-radius: 12px; padding: 14px; text-align: center; background: #ffffff; break-inside: avoid;">
-                            <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:120px;height:auto;margin:0 auto 4px auto;"><span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">TeleVerso Educativo</span>
+                            <img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:120px;height:auto;margin:0 auto 4px auto;"><img src="televerso-logo.svg" alt="TeleVerso Educativo" style="display:block;width:120px;height:auto;margin:0 auto 4px auto;"><span style="font-size: 9px; font-weight: 800; color: #6366f1; text-transform: uppercase; display: block;">TeleVerso Educativo</span>
                             <div id="print-qr-${s.id}" style="display: flex; justify-content: center; margin: 8px 0;"></div>
                             <h4 style="margin: 6px 0 2px 0; font-size: 13px; font-weight: 900; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${s.name}</h4>
                             <p style="margin: 0; font-size: 10px; font-weight: 600; color: #334155;">Grupo: ${group.name}</p>
