@@ -1,0 +1,47 @@
+name: Integrar acceso por grado en TeleVerso
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'acceso-por-grado.js'
+      - '.github/workflows/install-acceso-por-grado.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  instalar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Cargar control de acceso por grado
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="acceso-por-grado.js"></script>'
+          if tag not in s:
+              anchor='<script src="expediente-mejorado.js"></script>'
+              if anchor in s:
+                  s=s.replace(anchor, tag+'\n    '+anchor, 1)
+              else:
+                  s=s.replace('</body>', '    '+tag+'\n</body>', 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        run: |
+          if git diff --quiet; then
+            echo "El control por grado ya estaba integrado."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Separar actividades de segundo y tercer grado [skip ci]"
+          git push
