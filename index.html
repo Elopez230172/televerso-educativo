@@ -111,11 +111,21 @@
 </head>
 <body class="antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR CON LOGOTIPO INSTITUCIONAL -->
-    <header class="glass-panel sticky top-0 z-30 px-6 py-3 border-b border-white/10 flex justify-between items-center">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
-            <!-- Logotipo institucional de Telesecundaria añadido de forma distinguible -->
-            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAAMAB8BAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" alt="Logo Telesecundaria" class="w-10 h-10 object-contain rounded-xl bg-white/10 p-1 border border-white/20">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR CON LOGOTIPO INSTITUCIONAL VISIBLE -->
+    <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
+        <div class="flex items-center space-x-3.5 cursor-pointer" onclick="navigateHome()">
+            <!-- SVG vectorial limpio y nítido del logotipo institucional para garantizar visibilidad total -->
+            <div class="w-11 h-11 rounded-xl bg-purple-900 border border-purple-500/40 flex items-center justify-center shadow-lg shadow-purple-900/40 shrink-0 p-1">
+                <svg viewBox="0 0 500 500" class="w-full h-full fill-white" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h200v500H0zM300 0h200v500H300z" opacity="0"/>
+                    <rect width="500" height="500" rx="75" fill="#582a7a"/>
+                    <path d="M48.5 120H200v300H48.5z" fill="#fff"/>
+                    <path d="M125 185c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40zm0 135c-22 0-40 18-40 40s18 40 40 40 40-18 40-40-18-40-40-40z" fill="#582a7a"/>
+                    <path d="M110 200c0 15-12 28-27 28s-27-13-27-28 12-28 27-28 27 13 27 28zm0 135c0 15-12 28-27 28s-27-13-27-28 12-28 27-28 27 13 27 28z" fill="#fff" opacity="0"/>
+                    <path d="M250 35h210v430H250z" fill="#fff"/>
+                    <path d="M500 130C380 130 330 200 330 270c0 80 60 120 120 120 35 0 60-10 60-10l-15-55s-20 10-35 10c-30 0-50-20-50-50 0-40 30-75 90-75V130z" fill="#582a7a"/>
+                </svg>
+            </div>
             <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">PORTAL EDUCATIVO TELESECUNDARIA</span>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
