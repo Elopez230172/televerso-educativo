@@ -6,6 +6,7 @@ on:
     branches: [main]
     paths:
       - 'saberes-addon.js'
+      - 'saberes-campo-fix.js'
       - '.github/workflows/install-saberes.yml'
 
 permissions:
@@ -24,33 +25,48 @@ jobs:
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          tag = '<script src="saberes-addon.js"></script>'
-          if tag not in s:
+
+          saber = '<script src="saberes-addon.js"></script>'
+          fix = '<script src="saberes-campo-fix.js"></script>'
+          exp = '<script src="expediente-mejorado.js"></script>'
+
+          if saber not in s:
               anchor = '<script src="lenguajes-avanzado.js"></script>'
               if anchor in s:
-                  s = s.replace(anchor, anchor + '\n    ' + tag, 1)
+                  s = s.replace(anchor, anchor + '\n    ' + saber, 1)
               else:
                   anchor = '<script src="lenguajes-addon.js"></script>'
                   if anchor in s:
-                      s = s.replace(anchor, anchor + '\n    ' + tag, 1)
+                      s = s.replace(anchor, anchor + '\n    ' + saber, 1)
                   else:
-                      s = s.replace('</body>', '    ' + tag + '\n</body>', 1)
-          # Mantener expediente después de los complementos para que conozca el catálogo completo.
-          exp = '<script src="expediente-mejorado.js"></script>'
-          if exp in s and tag in s and s.index(exp) < s.index(tag):
+                      s = s.replace('</body>', '    ' + saber + '\n</body>', 1)
+
+          # La corrección debe ejecutarse después del catálogo de Saberes.
+          if fix not in s:
+              if saber in s:
+                  s = s.replace(saber, saber + '\n    ' + fix, 1)
+              else:
+                  s = s.replace('</body>', '    ' + fix + '\n</body>', 1)
+
+          # Mantener expediente al final de los complementos para que conozca el catálogo completo.
+          if exp in s:
               s = s.replace(exp, '', 1)
-              s = s.replace(tag, tag + '\n    ' + exp, 1)
+              if fix in s:
+                  s = s.replace(fix, fix + '\n    ' + exp, 1)
+              elif saber in s:
+                  s = s.replace(saber, saber + '\n    ' + exp, 1)
+
           p.write_text(s, encoding='utf-8')
           PY
 
       - name: Publicar cambios
         run: |
           if git diff --quiet; then
-            echo "Saberes ya estaba integrado."
+            echo "Saberes y su corrección ya estaban integrados."
             exit 0
           fi
           git config user.name "televerso-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Integrar Saberes y Pensamiento Científico PPA1 [skip ci]"
+          git commit -m "Corregir campo formativo Saberes en TeleVerso [skip ci]"
           git push
