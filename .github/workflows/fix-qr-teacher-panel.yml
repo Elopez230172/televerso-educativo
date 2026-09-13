@@ -1,4 +1,4 @@
-name: Ajustar panel docente y Lenguajes avanzado
+name: Ajustar panel docente y expediente por campo
 
 on:
   push:
@@ -15,22 +15,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Aplicar ajustes de interfaz y actividades
+      - name: Aplicar ajustes de interfaz y expediente
         run: |
           python - <<'PY'
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
+
+          # Mantener el diamante 3D a la derecha del bloque de título.
           marker = 'id="logo-3d-teacher" class="'
           if marker in s and 'id="logo-3d-teacher" class="order-last ' not in s:
               s = s.replace(marker, 'id="logo-3d-teacher" class="order-last ', 1)
-          tag = '    <script src="lenguajes-avanzado.js"></script>\n'
+
+          # Banco avanzado de Lenguajes.
+          advanced_tag = '    <script src="lenguajes-avanzado.js"></script>\n'
           if 'src="lenguajes-avanzado.js"' not in s:
               base = '    <script src="lenguajes-addon.js"></script>\n'
               if base in s:
-                  s = s.replace(base, base + tag, 1)
+                  s = s.replace(base, base + advanced_tag, 1)
               else:
-                  s = s.replace('</body>', tag + '</body>')
+                  s = s.replace('</body>', advanced_tag + '</body>')
+
+          # Expediente mejorado: debe cargarse después de los campos formativos.
+          expediente_tag = '    <script src="expediente-mejorado.js"></script>\n'
+          if 'src="expediente-mejorado.js"' not in s:
+              if advanced_tag in s:
+                  s = s.replace(advanced_tag, advanced_tag + expediente_tag, 1)
+              else:
+                  s = s.replace('</body>', expediente_tag + '</body>')
+
           p.write_text(s, encoding='utf-8')
           PY
       - name: Guardar cambios
@@ -39,5 +52,5 @@ jobs:
           git config user.name "televerso-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Mover diamante y activar banco avanzado [skip ci]"
+          git commit -m "Separar expediente del alumno por campo formativo [skip ci]"
           git push
