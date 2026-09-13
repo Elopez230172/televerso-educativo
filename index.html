@@ -111,9 +111,11 @@
 </head>
 <body class="antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-    <header class="glass-panel sticky top-0 z-30 px-6 py-3.5 border-b border-white/10 flex justify-between items-center">
+    <!-- BARRA DE NAVEGACIÓN SUPERIOR CON LOGOTIPO INSTITUCIONAL -->
+    <header class="glass-panel sticky top-0 z-30 px-6 py-3 border-b border-white/10 flex justify-between items-center">
         <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateHome()">
+            <!-- Logotipo institucional de Telesecundaria añadido de forma distinguible -->
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAAMAB8BAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" alt="Logo Telesecundaria" class="w-10 h-10 object-contain rounded-xl bg-white/10 p-1 border border-white/20">
             <span class="font-extrabold text-sm sm:text-base tracking-tight text-white block">PORTAL EDUCATIVO TELESECUNDARIA</span>
         </div>
         <button onclick="requestTeacherLogin()" class="px-4 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-indigo-200 font-semibold text-xs sm:text-sm border border-indigo-500/30 transition flex items-center space-x-2">
