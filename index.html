@@ -94,6 +94,12 @@
         .tv-home-logo-feature{width:min(92vw,820px);max-height:520px;object-fit:contain;filter:drop-shadow(0 0 26px rgba(56,189,248,.30)) drop-shadow(0 0 52px rgba(124,58,237,.18));animation:tvHomeFloat 5.2s ease-in-out infinite;transform-origin:center}
         @keyframes tvHomeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.018)}}
 
+
+        .telesec-logo-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.45rem;padding:.65rem;border-radius:1.4rem;background:linear-gradient(145deg,rgba(255,255,255,.085),rgba(15,23,42,.25));border:1px solid rgba(255,255,255,.13);box-shadow:0 14px 34px rgba(2,6,23,.34),0 0 28px rgba(56,189,248,.08);backdrop-filter:blur(12px)}
+        .telesec-logo-img{width:100%;height:100%;object-fit:cover;border-radius:1rem;filter:drop-shadow(0 0 14px rgba(255,255,255,.08));transition:transform .3s ease,filter .3s ease}
+        .telesec-logo-card:hover .telesec-logo-img{transform:scale(1.035);filter:drop-shadow(0 0 18px rgba(129,140,248,.24))}
+        .telesec-logo-label{font-size:.66rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#cbd5e1;white-space:nowrap}
+
         @media print {
             body {
                 background: #ffffff !important;
@@ -139,9 +145,15 @@
         <!-- 1. PORTADA PRINCIPAL CENTRADA -->
         <div id="view-home" class="flex flex-col items-center justify-center min-h-[82vh]">
             <div class="glass-panel p-7 sm:p-10 rounded-3xl w-full max-w-5xl text-center border border-white/15 shadow-2xl animate-pop relative overflow-hidden space-y-5">
-                <!-- IDENTIDAD PRINCIPAL: un solo logo grande y centrado -->
-                <div class="flex items-center justify-center py-3 sm:py-7">
-                    <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto">
+                <!-- IDENTIDAD PRINCIPAL -->
+                <div class="relative flex flex-col sm:block items-center justify-center py-3 sm:py-7 min-h-[300px] sm:min-h-[360px]">
+                    <div class="flex items-center justify-center h-full">
+                        <img src="televerso-logo.svg" alt="TeleVerso Educativo" class="tv-home-logo-feature mx-auto sm:max-w-[78%] lg:max-w-[76%]">
+                    </div>
+                    <div class="telesec-logo-card mt-5 sm:mt-0 sm:absolute sm:right-3 lg:right-6 sm:top-1/2 sm:-translate-y-1/2 w-28 h-auto sm:w-32 lg:w-36 z-10">
+                        <img src="Logo.jpg" alt="Logo de Telesecundaria" class="telesec-logo-img aspect-square">
+                        <span class="telesec-logo-label">Telesecundaria</span>
+                    </div>
                 </div>
 
                 <!-- BOTÓN DE ESCÁNER QR POR CÁMARA -->
@@ -258,7 +270,13 @@
               <p class="text-slate-400 text-xs mt-1">Gestión de grupos, expedientes, códigos QR, impresión y seguimiento de actividades.</p>
           </div>
       </div>
-      <button onclick="closeTeacherModal()" aria-label="Cerrar panel docente" class="text-slate-400 hover:text-white text-2xl shrink-0"><i class="fa-solid fa-xmark"></i></button>
+      <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+          <div class="telesec-logo-card w-16 sm:w-20 lg:w-24 p-2">
+              <img src="Logo.jpg" alt="Logo de Telesecundaria" class="telesec-logo-img aspect-square">
+              <span class="telesec-logo-label hidden sm:block">Telesecundaria</span>
+          </div>
+          <button onclick="closeTeacherModal()" aria-label="Cerrar panel docente" class="text-slate-400 hover:text-white text-2xl shrink-0"><i class="fa-solid fa-xmark"></i></button>
+      </div>
   </div>
 
             <div class="overflow-y-auto space-y-6 pr-1">
