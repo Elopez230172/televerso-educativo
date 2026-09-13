@@ -1,4 +1,4 @@
-name: Corregir QR y panel docente
+name: Ajustar panel docente y Lenguajes avanzado
 
 on:
   push:
@@ -11,66 +11,33 @@ permissions:
   contents: write
 
 jobs:
-  corregir:
+  ajustar:
     runs-on: ubuntu-latest
     steps:
-      - name: Descargar repositorio
-        uses: actions/checkout@v4
-
-      - name: Corregir QR y enriquecer panel docente
-        shell: bash
+      - uses: actions/checkout@v4
+      - name: Aplicar ajustes de interfaz y actividades
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-
-          # 1) Mantener corregida la apertura del modal QR individual.
-          qr_pattern = r"(function displayStudentQr\(studentId\) \{.*?document\.getElementById\('btn-print-from-modal'\)\.onclick = \(\) => \{.*?\};\s*)document\.getElementById\('modal-qr'\)\.classList\.add\('hidden'\);"
-          s, qr_count = re.subn(
-              qr_pattern,
-              r"\1document.getElementById('modal-qr').classList.remove('hidden');",
-              s,
-              count=1,
-              flags=re.S,
-          )
-          if qr_count == 0 and "function displayStudentQr(studentId)" in s:
-              qr_block = re.search(r"function displayStudentQr\(studentId\) \{.*?function closeQrModal", s, re.S)
-              if not qr_block or "classList.remove('hidden')" not in qr_block.group(0):
-                  raise SystemExit('No fue posible mantener la corrección del QR individual.')
-
-          # 2) Asegurar nombre, logo estático y diamante 3D en el encabezado del panel docente.
-          if 'id="logo-3d-teacher"' not in s:
-              logo_img = '<img src="Logo.jpg" alt="Logo de TeleVerso Educativo" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border border-indigo-400/40 shadow-lg shadow-indigo-600/20 shrink-0 bg-slate-800">'
-              diamond = '<div id="logo-3d-teacher" class="w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center rounded-2xl bg-slate-950/30 border border-indigo-400/20 shadow-lg shadow-indigo-600/10" title="Diamante doble 3D de TeleVerso"></div>'
-              if logo_img in s:
-                  s = s.replace(logo_img, logo_img + '\n                    ' + diamond, 1)
+          marker = 'id="logo-3d-teacher" class="'
+          if marker in s and 'id="logo-3d-teacher" class="order-last ' not in s:
+              s = s.replace(marker, 'id="logo-3d-teacher" class="order-last ', 1)
+          tag = '    <script src="lenguajes-avanzado.js"></script>\n'
+          if 'src="lenguajes-avanzado.js"' not in s:
+              base = '    <script src="lenguajes-addon.js"></script>\n'
+              if base in s:
+                  s = s.replace(base, base + tag, 1)
               else:
-                  raise SystemExit('No se encontró el logo estático del panel docente para agregar el diamante 3D.')
-
-          # 3) Inicializar el diamante al abrir el panel docente sin recrearlo innecesariamente.
-          if "createTeleversoDiamond('logo-3d-teacher'" not in s:
-              login_old = "if (pin === TEACHER_PIN) {\n                document.getElementById('modal-teacher').classList.remove('hidden');\n                renderTeacherGroups();\n"
-              login_new = "if (pin === TEACHER_PIN) {\n                document.getElementById('modal-teacher').classList.remove('hidden');\n                const teacherDiamond = document.getElementById('logo-3d-teacher');\n                if (teacherDiamond && teacherDiamond.childElementCount === 0) {\n                    setTimeout(() => createTeleversoDiamond('logo-3d-teacher', 78), 60);\n                }\n                renderTeacherGroups();\n"
-              if login_old in s:
-                  s = s.replace(login_old, login_new, 1)
-              else:
-                  raise SystemExit('No se encontró el bloque de acceso docente para inicializar el diamante 3D.')
-
+                  s = s.replace('</body>', tag + '</body>')
           p.write_text(s, encoding='utf-8')
           PY
-
-      - name: Publicar correcciones
-        shell: bash
+      - name: Guardar cambios
         run: |
-          if git diff --quiet -- index.html; then
-            echo "Las correcciones ya estaban aplicadas."
-            exit 0
-          fi
+          if git diff --quiet -- index.html; then exit 0; fi
           git config user.name "televerso-bot"
           git config user.email "actions@users.noreply.github.com"
           git add index.html
-          git commit -m "Agregar diamante 3D al panel docente [skip ci]"
+          git commit -m "Mover diamante y activar banco avanzado [skip ci]"
           git push
