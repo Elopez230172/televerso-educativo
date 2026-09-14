@@ -58,7 +58,7 @@
       m.periodTitle='Primer periodo';
       m.ppa=1;
       m.ppaTitle='PPA 1';
-      m.curriculumPath=`Primer periodo · PPA 1`;
+      m.curriculumPath='Primer periodo · PPA 1';
     });
   }
 
@@ -121,7 +121,9 @@
   function findMissionSection(){
     const grid=document.getElementById('student-missions-grid');
     if(!grid) return null;
-    return {grid, section:grid.parentElement, heading:grid.parentElement?.querySelector('h4')};
+    const section=grid.parentElement;
+    const heading=section ? Array.from(section.children).find(el=>el.tagName==='H4') : null;
+    return {grid,section,heading};
   }
 
   function ensureNavigation(grade,state){
@@ -146,7 +148,7 @@
 
   function adaptLegacySaberes(){
     const banner=document.getElementById('tv-sp2-block1-banner');
-    if(banner){ replaceText(banner,'Bloque 1','Primer periodo · PPA 1'); }
+    if(banner) replaceText(banner,'Bloque 1','Primer periodo · PPA 1');
     document.querySelectorAll('.tv-sp2-section-divider').forEach(el=>replaceText(el,'Bloque 1','Primer periodo · PPA 1'));
     const readings=document.getElementById('tv-sp2-reading-deliveries');
     if(readings) replaceText(readings,'Bloque 1','Primer periodo · PPA 1');
