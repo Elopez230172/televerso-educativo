@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'navegacion-curricular.js'
+      - 'modo-retos.js'
       - '.github/workflows/install-navegacion-curricular.yml'
 permissions:
   contents: write
@@ -12,20 +13,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validar JavaScript
-        run: node --check navegacion-curricular.js
-      - name: Insertar módulo curricular
+        run: |
+          node --check navegacion-curricular.js
+          node --check modo-retos.js
+      - name: Insertar módulos de interfaz
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          tag='    <script src="navegacion-curricular.js"></script>\n'
-          anchor='    <script src="acceso-por-grado.js"></script>\n'
-          if tag not in s:
-              if anchor not in s:
+
+          nav='    <script src="navegacion-curricular.js"></script>\n'
+          nav_anchor='    <script src="acceso-por-grado.js"></script>\n'
+          if nav not in s:
+              if nav_anchor not in s:
                   raise SystemExit('No se encontró acceso-por-grado.js en index.html')
-              s=s.replace(anchor, anchor+tag, 1)
-              p.write_text(s, encoding='utf-8')
+              s=s.replace(nav_anchor, nav_anchor+nav, 1)
+
+          direct='    <script src="modo-retos.js"></script>\n'
+          direct_anchor='    <script src="expediente-mejorado.js"></script>\n'
+          if direct not in s:
+              if direct_anchor not in s:
+                  raise SystemExit('No se encontró expediente-mejorado.js en index.html')
+              s=s.replace(direct_anchor, direct_anchor+direct, 1)
+
+          p.write_text(s, encoding='utf-8')
           PY
       - name: Publicar cambio
         run: |
@@ -33,5 +45,5 @@ jobs:
           git config user.name 'televerso-bot'
           git config user.email 'actions@users.noreply.github.com'
           git add index.html
-          git commit -m 'Integrar navegación por campo, periodo y PPA [skip ci]'
+          git commit -m 'Integrar navegación curricular y modo de retos [skip ci]'
           git push
