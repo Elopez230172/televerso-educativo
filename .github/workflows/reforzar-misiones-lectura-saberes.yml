@@ -1,0 +1,78 @@
+name: Reforzar misiones de lectura Saberes 2
+on:
+  push:
+    paths:
+      - '.github/workflows/reforzar-misiones-lectura-saberes.yml'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Actualizar Saberes 2
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('saberes-segundo.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final, 10 retos y lecturas activas.',
+                      'Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final, 10 retos y tres misiones de lectura con entregas parciales.')
+          old="""Object.assign(missionCatalog.sp2_2,{
+  readingSource:'Proyecto pp. 111-115 · Saberes pp. 82-97',
+  readingTask:'Antes de la sopa, marca en la lectura D = definición, P = procedimiento, E = ejemplo y ? = duda. Elige tres hallazgos, explícalos con tus palabras y escribe cómo los aplicarás al informe.'
+});
+Object.assign(missionCatalog.sp2_5,{
+  readingSource:'Proyecto pp. 116-119 · Saberes pp. 82-97',
+  readingTask:'Elige dos afirmaciones o datos de las lecturas. Para cada uno identifica evidencia u origen, contexto que falta y decide: usar, revisar o descartar. Cierra con una paráfrasis científica propia.'
+});
+Object.assign(missionCatalog.sp2_7,{
+  readingSource:'Proyecto pp. 120-124 · Saberes pp. 82-97',
+  readingTask:'Aplica una lupa de equidad: registra qué personas o grupos aparecen, quiénes podrían faltar, qué dato ayudaría a comprobarlo y qué otra fuente consultarías. Contrasta un dato cuantitativo con un registro cualitativo verificable.'
+});
+
+const readingBox=m=>m.readingTask?`<div class="rounded-xl bg-cyan-950/30 border border-cyan-500/20 p-3 mb-3"><span class="text-[9px] uppercase tracking-wider text-cyan-300 font-black">Lectura activa previa</span><p class="text-[11px] text-slate-200 mt-1 leading-relaxed">${m.readingTask}</p><p class="text-[10px] text-amber-300 mt-1 font-semibold">${m.readingSource}</p></div>`:'';"""
+          new="""Object.assign(missionCatalog.sp2_2,{
+  readingTitle:'Misión de lectura A · Diseña tu estudio',
+  readingSource:'Proyecto pp. 111-115 · Saberes pp. 82-97',
+  readingTask:'Lee sólo para resolver decisiones del proyecto: identifica cómo se define una pregunta investigable, cómo distinguir población, muestra y variables, y qué procedimiento conviene antes de graficar. Traduce tres hallazgos con tus palabras y aplícalos a tus propios datos.',
+  readingSteps:['Anota 3 conceptos o procedimientos con página.','Explícalos con tus palabras.','Completa pregunta, población, muestra/alcance, variables y procedimiento de obtención.'],
+  readingDeliverable:'ENTREGA PARCIAL 1: ficha metodológica completa. Se incorpora al apartado “Cómo investigamos”. No avances a R2 sin esta ficha.'
+});
+Object.assign(missionCatalog.sp2_5,{
+  readingTitle:'Misión de lectura B · De la fuente a la evidencia',
+  readingSource:'Proyecto pp. 116-119 · Saberes pp. 82-97',
+  readingTask:'Lee para decidir qué información merece entrar al informe. Localiza dos fuentes o datos, identifica autor/institución, fecha o periodo, población o contexto y explica por qué son verificables. Después redacta un párrafo propio que conecte una fuente con los resultados del equipo.',
+  readingSteps:['Completa 2 fichas de fuente.','Decide qué dato o idea usarás de cada fuente.','Redacta un párrafo de 4 a 6 líneas: afirmación propia + evidencia + relación con tus resultados.'],
+  readingDeliverable:'ENTREGA PARCIAL 2: dos fichas de fuente + un párrafo científico. Se incorpora al apartado “Fuentes y evidencia”.'
+});
+Object.assign(missionCatalog.sp2_7,{
+  readingTitle:'Misión de lectura C · Interpreta con equidad y límites',
+  readingSource:'Proyecto pp. 120-124 · Saberes pp. 82-97',
+  readingTask:'Lee para detectar qué muestran los datos y qué no permiten afirmar. Identifica una ausencia, sesgo o limitación, busca qué dato o fuente adicional ayudaría a contrastarla y reescribe una conclusión del equipo para hacerla más prudente.',
+  readingSteps:['Completa una matriz: patrón / quién puede quedar fuera / qué dato falta / cómo cambia la interpretación.','Contrasta con una fuente o evidencia adicional.','Reescribe una conclusión incluyendo alcance, periodo, muestra y una limitación.'],
+  readingDeliverable:'ENTREGA PARCIAL 3: matriz de equidad y ausencias + conclusión reescrita. Se incorpora al apartado “Interpretación, equidad y límites”.'
+});
+
+const readingBox=m=>m.readingTask?`<div class="rounded-2xl bg-cyan-950/30 border border-cyan-500/25 p-3.5 mb-3"><div class="flex flex-wrap items-center justify-between gap-2"><span class="text-[10px] uppercase tracking-wider text-cyan-300 font-black">${m.readingTitle||'Misión de lectura activa'}</span><span class="text-[10px] text-amber-300 font-bold">${m.readingSource}</span></div><p class="text-[11px] text-slate-200 mt-2 leading-relaxed">${m.readingTask}</p>${m.readingSteps?`<div class="mt-2 grid gap-1.5">${m.readingSteps.map((x,i)=>`<div class="flex gap-2 text-[11px] text-slate-300"><span class="shrink-0 w-5 h-5 rounded-md bg-cyan-500/15 text-cyan-300 font-black flex items-center justify-center">${i+1}</span><span>${x}</span></div>`).join('')}</div>`:''}<div class="mt-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 p-2.5"><span class="text-[9px] uppercase tracking-wider text-emerald-300 font-black">Qué debes entregar</span><p class="text-[11px] text-white mt-1 font-semibold leading-relaxed">${m.readingDeliverable||''}</p></div></div>`:'';"""
+          if old not in s:
+              raise SystemExit('No se encontró bloque de lecturas activas esperado')
+          s=s.replace(old,new)
+          s=s.replace("['5','Distintas fuentes de consulta','Lecturas activas A, B y C + R2-R9: datos, cálculos, gráficas, fuentes y equidad.']",
+                      "['5','Distintas fuentes de consulta','Misión A → entrega 1; Misión B → entrega 2; Misión C → entrega 3; R2-R9 sirven para practicar y mejorar cada entrega.']")
+          s=s.replace("`${PAPER} p. 10`,STAGE5,PROJECT,'Tres conceptos con un ejemplo real.'),",
+                      "`${PAPER} p. 10`,STAGE5,PROJECT,'Entrega parcial 1: ficha metodológica completa + tres conceptos aplicados a tus propios datos.'),")
+          s=s.replace("`${PAPER} p. 18`,STAGE5,PROJECT,'Criterio de verificación para una fuente.'),",
+                      "`${PAPER} p. 18`,STAGE5,PROJECT,'Entrega parcial 2: dos fichas de fuente + un párrafo científico que conecte evidencia y resultados.'),")
+          s=s.replace("`${PAPER} p. 25`,STAGE5,PROJECT,'Dos conceptos usados en una explicación del proyecto.'),",
+                      "`${PAPER} p. 25`,STAGE5,PROJECT,'Entrega parcial 3: matriz de equidad y ausencias + una conclusión reescrita con límites.'),")
+          s=s.replace("`${PAPER} p. 30`,'Etapa 6 · Unimos las piezas',PROJECT,'Una mejora concreta que aplicarás al informe científico visual final.')",
+                      "`${PAPER} p. 30`,'Etapa 6 · Unimos las piezas',PROJECT,'Integra las tres entregas parciales en el informe final y aplica una mejora concreta antes de presentarlo.')")
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add saberes-segundo.js
+          git commit -m 'Reforzar misiones de lectura y entregas parciales [skip ci]'
+          git push
