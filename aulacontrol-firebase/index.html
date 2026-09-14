@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#192a56">
+  <title>AulaControl Web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/app.css">
+</head>
+<body>
+  <div id="toast-root" class="toast-root" aria-live="polite"></div>
+
+  <section id="login-view" class="auth-shell">
+    <div class="auth-card">
+      <div class="brand-lockup">
+        <div class="brand-mark">AC</div>
+        <div>
+          <h1>AulaControl</h1>
+          <p>Sistema de Control Escolar · Firebase</p>
+        </div>
+      </div>
+      <form id="login-form" class="stack-lg">
+        <label>Correo electrónico
+          <input id="login-email" type="email" autocomplete="username" required placeholder="usuario@escuela.mx">
+        </label>
+        <label>Contraseña
+          <input id="login-password" type="password" autocomplete="current-password" required placeholder="••••••••">
+        </label>
+        <button class="btn primary full" type="submit">Iniciar sesión</button>
+      </form>
+      <p id="login-error" class="form-error" hidden></p>
+      <div class="auth-note">La sesión y los permisos se validan con Firebase Authentication y Firestore.</div>
+    </div>
+  </section>
+
+  <div id="app-view" class="app-shell" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">AC</div>
+        <div><strong>AulaControl</strong><span id="school-name-side">Plantel</span></div>
+      </div>
+      <nav id="main-nav" class="nav-list"></nav>
+      <div class="sidebar-footer">
+        <div class="connection-line"><span id="connection-dot" class="dot online"></span><span id="connection-label">Conectado</span></div>
+        <button id="logout-btn" class="btn ghost full">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div>
+          <h2 id="page-title">Panel principal</h2>
+          <p id="page-subtitle">Resumen del ciclo escolar</p>
+        </div>
+        <div class="topbar-actions">
+          <select id="cycle-selector" title="Ciclo escolar"></select>
+          <div class="user-chip">
+            <strong id="user-display">Usuario</strong>
+            <span id="user-role">Rol</span>
+          </div>
+        </div>
+      </header>
+      <section id="content" class="content"></section>
+    </main>
+  </div>
+
+  <dialog id="form-dialog" class="modal">
+    <form id="entity-form" method="dialog">
+      <div class="modal-head">
+        <div><h3 id="dialog-title">Registro</h3><p id="dialog-help"></p></div>
+        <button type="button" class="icon-btn" data-close-dialog aria-label="Cerrar">×</button>
+      </div>
+      <div id="form-fields" class="form-grid"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" data-close-dialog>Cancelar</button>
+        <button type="submit" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="modal small-modal">
+    <form method="dialog">
+      <h3 id="confirm-title">Confirmar</h3>
+      <p id="confirm-message"></p>
+      <div class="modal-actions">
+        <button value="cancel" class="btn ghost">Cancelar</button>
+        <button value="confirm" class="btn danger">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
