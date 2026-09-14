@@ -1,0 +1,72 @@
+name: Integrar Saberes PPA1 segundo grado
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'saberes-segundo.js'
+      - '.github/workflows/install-saberes-segundo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Integrar campo de Saberes 2.º y acceso por grado
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          idx=Path('index.html')
+          s=idx.read_text(encoding='utf-8')
+          old='    <script src="lenguajes-segundo.js"></script>\n    <script src="acceso-por-grado.js"></script>'
+          new='    <script src="lenguajes-segundo.js"></script>\n    <script src="saberes-segundo.js"></script>\n    <script src="acceso-por-grado.js"></script>'
+          if 'saberes-segundo.js' not in s:
+              if old not in s:
+                  raise SystemExit('No se encontró el punto de inserción de saberes-segundo.js')
+              s=s.replace(old,new,1)
+              idx.write_text(s,encoding='utf-8')
+
+          p=Path('acceso-por-grado.js')
+          a=p.read_text(encoding='utf-8')
+          reps={
+            "const FIELD_GRADE = { lenguajes2: 2, ens: 3, lenguajes: 3, saberes: 3 };":"const FIELD_GRADE = { lenguajes2: 2, saberes2: 2, ens: 3, lenguajes: 3, saberes: 3 };",
+            "const GRADE_FIELDS = { 2: ['lenguajes2'], 3: ['ens', 'lenguajes', 'saberes'] };":"const GRADE_FIELDS = { 2: ['lenguajes2', 'saberes2'], 3: ['ens', 'lenguajes', 'saberes'] };",
+            "const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2};":"const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2,'tv-btn-spc2':2};",
+            "if (grade === 3) grid.classList.add('sm:grid-cols-3'); else grid.classList.add('sm:grid-cols-1');":"if (grade === 3) grid.classList.add('sm:grid-cols-3'); else if (grade === 2) grid.classList.add('sm:grid-cols-2'); else grid.classList.add('sm:grid-cols-1');"
+          }
+          for old,new in reps.items():
+              if old in a:
+                  a=a.replace(old,new,1)
+              elif new not in a:
+                  raise SystemExit('No se encontró patrón esperado en acceso-por-grado.js: '+old)
+          a=a.replace('   - 2.º: Lenguajes 2.º PPA 1 (lenguajes2)','   - 2.º: Lenguajes 2.º PPA 1 (lenguajes2) y Saberes 2.º PPA 1 (saberes2)')
+          p.write_text(a,encoding='utf-8')
+          PY
+
+      - name: Verificar integración
+        run: |
+          grep -F '<script src="saberes-segundo.js"></script>' index.html
+          grep -F "saberes2: 2" acceso-por-grado.js
+          grep -F "['lenguajes2', 'saberes2']" acceso-por-grado.js
+          grep -F "'tv-btn-spc2':2" acceso-por-grado.js
+          grep -F "grid.classList.add('sm:grid-cols-2')" acceso-por-grado.js
+          node --check saberes-segundo.js
+
+      - name: Publicar integración y retirar instalador
+        run: |
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add index.html acceso-por-grado.js saberes-segundo.js
+          git rm .github/workflows/install-saberes-segundo.yml
+          git commit -m 'Integrar Saberes PPA1 de segundo grado [skip ci]'
+          git push origin main
