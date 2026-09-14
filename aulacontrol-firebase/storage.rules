@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn(){ return request.auth != null; }
+    function profile(){ return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data; }
+    function sameSchool(schoolId){ return signedIn() && profile().active == true && profile().schoolId == schoolId; }
+    function admin(){ return signedIn() && profile().role == 'Administrador'; }
+    match /schools/{schoolId}/{allPaths=**} {
+      allow read: if sameSchool(schoolId);
+      allow write: if sameSchool(schoolId) && (admin() || request.resource.size < 15 * 1024 * 1024);
+    }
+  }
+}
