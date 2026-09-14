@@ -12,7 +12,7 @@
     2:[
       {key:'lenguajes2',label:'Lenguajes',icon:'fa-language',tone:'indigo',real:true,ppa1:'Nos comunicamos en la riqueza de la diversidad'},
       {key:'saberes2',label:'Saberes y pensamiento científico',icon:'fa-flask',tone:'emerald',real:true,ppa1:'Yo también puedo generar conocimiento científico'},
-      {key:'etica2',label:'Ética, naturaleza y sociedades',icon:'fa-earth-americas',tone:'amber',real:false},
+      {key:'etica2',label:'Ética, naturaleza y sociedades',icon:'fa-earth-americas',tone:'amber',real:true,ppa1:'Tenemos derecho a ser diferentes'},
       {key:'humano2',label:'De lo humano y lo comunitario',icon:'fa-people-group',tone:'rose',real:false}
     ],
     3:[

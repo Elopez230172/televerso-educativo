@@ -1,13 +1,13 @@
 /* TeleVerso Educativo · Acceso por grado escolar
    Separa las actividades de 2.º y 3.º de Telesecundaria según el grado del grupo inscrito.
-   - 2.º: Lenguajes 2.º PPA 1 (lenguajes2) y Saberes 2.º PPA 1 (saberes2)
+   - 2.º: Lenguajes, Saberes y Ética PPA 1 (lenguajes2, saberes2, etica2)
    - 3.º: Ética, Lenguajes 3.º y Saberes
 */
 (() => {
   if (typeof missionCatalog === 'undefined') return;
 
-  const FIELD_GRADE = { lenguajes2: 2, saberes2: 2, ens: 3, lenguajes: 3, saberes: 3 };
-  const GRADE_FIELDS = { 2: ['lenguajes2', 'saberes2'], 3: ['ens', 'lenguajes', 'saberes'] };
+  const FIELD_GRADE = { lenguajes2: 2, saberes2: 2, etica2: 2, ens: 3, lenguajes: 3, saberes: 3 };
+  const GRADE_FIELDS = { 2: ['lenguajes2', 'saberes2', 'etica2'], 3: ['ens', 'lenguajes', 'saberes'] };
   const DEFAULT_FIELD = {2: 'lenguajes2', 3: 'lenguajes'};
 
   const normalizeGrade = value => {
@@ -61,12 +61,12 @@
     if (!activeStudent) return;
     const grade = getStudentGrade(activeStudent);
     const selector = document.getElementById('tv-field-selector');
-    const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2,'tv-btn-spc2':2};
+    const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2,'tv-btn-spc2':2,'tv-btn-etica2':2};
     Object.entries(map).forEach(([id,g]) => { const el=document.getElementById(id); if(el) el.style.display=grade===g?'':'none'; });
     const grid = selector?.querySelector('.grid');
     if (grid) {
       grid.classList.remove('sm:grid-cols-2','sm:grid-cols-3','lg:grid-cols-4');
-      if (grade === 3) grid.classList.add('sm:grid-cols-3'); else if (grade === 2) grid.classList.add('sm:grid-cols-2'); else grid.classList.add('sm:grid-cols-1');
+      if (grade === 3) grid.classList.add('sm:grid-cols-3'); else if (grade === 2) grid.classList.add('sm:grid-cols-3'); else grid.classList.add('sm:grid-cols-1');
     }
     const grp = groupForStudent(activeStudent);
     const meta = document.getElementById('student-group-display');
