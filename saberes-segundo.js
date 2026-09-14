@@ -1,6 +1,6 @@
 /* TeleVerso Educativo · Saberes y pensamiento científico · 2.º de Telesecundaria · PPA 1
    PPA: "Yo también puedo generar conocimiento científico"
-   Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final y 10 retos.
+   Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final, 10 retos y lecturas activas.
 */
 (() => {
   if (typeof missionCatalog === 'undefined') return;
@@ -139,6 +139,22 @@
       `${PAPER} p. 30`,'Etapa 6 · Unimos las piezas',PROJECT,'Una mejora concreta que aplicarás al informe científico visual final.')
   });
 
+  // Lecturas activas: convierten los materiales de consulta en acciones concretas del proyecto.
+Object.assign(missionCatalog.sp2_2,{
+  readingSource:'Proyecto pp. 111-115 · Saberes pp. 82-97',
+  readingTask:'Antes de la sopa, marca en la lectura D = definición, P = procedimiento, E = ejemplo y ? = duda. Elige tres hallazgos, explícalos con tus palabras y escribe cómo los aplicarás al informe.'
+});
+Object.assign(missionCatalog.sp2_5,{
+  readingSource:'Proyecto pp. 116-119 · Saberes pp. 82-97',
+  readingTask:'Elige dos afirmaciones o datos de las lecturas. Para cada uno identifica evidencia u origen, contexto que falta y decide: usar, revisar o descartar. Cierra con una paráfrasis científica propia.'
+});
+Object.assign(missionCatalog.sp2_7,{
+  readingSource:'Proyecto pp. 120-124 · Saberes pp. 82-97',
+  readingTask:'Aplica una lupa de equidad: registra qué personas o grupos aparecen, quiénes podrían faltar, qué dato ayudaría a comprobarlo y qué otra fuente consultarías. Contrasta un dato cuantitativo con un registro cualitativo verificable.'
+});
+
+const readingBox=m=>m.readingTask?`<div class="rounded-xl bg-cyan-950/30 border border-cyan-500/20 p-3 mb-3"><span class="text-[9px] uppercase tracking-wider text-cyan-300 font-black">Lectura activa previa</span><p class="text-[11px] text-slate-200 mt-1 leading-relaxed">${m.readingTask}</p><p class="text-[10px] text-amber-300 mt-1 font-semibold">${m.readingSource}</p></div>`:'';
+
   const prevSetField=window.tvSetField;
   const prevGrid=window.renderStudentMissionsGrid || renderStudentMissionsGrid;
   const prevLaunch=window.launchMission || launchMission;
@@ -153,7 +169,7 @@
         ['2','¡Ése es el problema!','R1 + diagnóstico de datos.'],
         ['3','¡Una propuesta de solución!','Pregunta de investigación y horizonte.'],
         ['4','Paso a paso','Plan, responsables, fuentes y tiempos.'],
-        ['5','Distintas fuentes de consulta','R2-R9: datos, cálculos, gráficas, fuentes y equidad.'],
+        ['5','Distintas fuentes de consulta','Lecturas activas A, B y C + R2-R9: datos, cálculos, gráficas, fuentes y equidad.'],
         ['6','Unimos las piezas','Armamos y revisamos el informe + R10.'],
         ['7','¡Ya lo tenemos!','Presentamos un solo informe, valoramos y mejoramos.']
       ].map(([n,t,d])=>`<div class="rounded-2xl bg-slate-900/70 border border-white/10 p-3"><span class="inline-flex w-7 h-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300 font-black">${n}</span><strong class="block text-white mt-2">${t}</strong><span class="block text-slate-400 mt-1 leading-relaxed">${d}</span></div>`).join('')}
@@ -192,7 +208,7 @@
   function renderGrid(){
     ensureUI();const c=document.getElementById('student-missions-grid');if(!c)return;
     const ms=missions();const heading=c.previousElementSibling;if(heading&&heading.tagName==='H4')heading.innerHTML='<i class="fa-solid fa-flask text-emerald-400"></i> Saberes y pensamiento científico · 2.º grado · PPA 1 · proyecto integrado · 10 retos';
-    c.innerHTML=roadmapHtml()+ms.map((m,i)=>`<div class="glass-card p-5 rounded-3xl flex flex-col justify-between border-t-2 border-t-emerald-500"><div><div class="flex justify-between items-start gap-2 mb-3"><div class="space-y-1"><span class="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase rounded-lg border border-emerald-500/30">Misión ${i+1}</span><span class="block text-[10px] font-black text-cyan-300">${m.stage}</span><span class="block text-[10px] text-slate-400">${m.project}</span></div><i id="badge-mission-${m.id}" class="fa-solid fa-lock text-slate-500 text-base"></i></div><h4 class="text-base font-bold text-white mb-1.5">${m.icon} ${m.title}</h4><p class="text-slate-300 text-xs mb-2 leading-relaxed">${m.desc}</p><div class="rounded-xl bg-slate-900/50 border border-white/5 p-2.5 mb-3"><span class="text-[9px] uppercase tracking-wider text-slate-500 font-black">Evidencia en papel</span><p class="text-[11px] text-slate-300 mt-1">${m.evidence}</p></div><p class="text-amber-300/90 text-[11px] font-semibold mb-4">Actividad equivalente: ${m.paper}</p></div><button onclick="launchMission('${m.id}')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-play mr-1"></i> Iniciar reto</button></div>`).join('');
+    c.innerHTML=roadmapHtml()+ms.map((m,i)=>`<div class="glass-card p-5 rounded-3xl flex flex-col justify-between border-t-2 border-t-emerald-500"><div><div class="flex justify-between items-start gap-2 mb-3"><div class="space-y-1"><span class="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase rounded-lg border border-emerald-500/30">Misión ${i+1}</span><span class="block text-[10px] font-black text-cyan-300">${m.stage}</span><span class="block text-[10px] text-slate-400">${m.project}</span></div><i id="badge-mission-${m.id}" class="fa-solid fa-lock text-slate-500 text-base"></i></div><h4 class="text-base font-bold text-white mb-1.5">${m.icon} ${m.title}</h4><p class="text-slate-300 text-xs mb-2 leading-relaxed">${m.desc}</p>${readingBox(m)}<div class="rounded-xl bg-slate-900/50 border border-white/5 p-2.5 mb-3"><span class="text-[9px] uppercase tracking-wider text-slate-500 font-black">Evidencia en papel</span><p class="text-[11px] text-slate-300 mt-1">${m.evidence}</p></div><p class="text-amber-300/90 text-[11px] font-semibold mb-4">Actividad equivalente: ${m.paper}</p></div><button onclick="launchMission('${m.id}')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-play mr-1"></i> Iniciar reto</button></div>`).join('');
     ['tv-badges-ens','tv-badges-leng','tv-badges-spc','tv-badges-leng2'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
     document.getElementById('tv-badges-spc2')?.classList.remove('hidden');
     ['tv-btn-ens','tv-btn-leng','tv-btn-spc','tv-btn-leng2','tv-btn-spc2'].forEach(id=>document.getElementById(id)?.classList.remove('ring-2','ring-emerald-400','ring-sky-400','ring-indigo-400','bg-indigo-950/50','bg-sky-950/50','bg-emerald-950/50'));
@@ -206,7 +222,7 @@
   window.renderStudentMissionsGrid=renderStudentMissionsGrid=function(){if(currentField()===FIELD)return renderGrid();const r=prevGrid();setTimeout(()=>{ensureUI();syncVisibility();},0);return r;};
 
   function open(m){activeMissionKey=m.id;missionGameState={};document.getElementById('modal-mission').classList.remove('hidden');}
-  const head=(m,p='')=>`<div class="flex flex-wrap justify-between gap-2 text-xs font-bold text-emerald-300"><span>${p}</span><span class="text-amber-300">${m.paper}</span></div><div class="flex flex-wrap gap-2"><span class="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] font-black">${m.stage}</span><span class="px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black">${m.project}</span></div><h3 class="text-xl font-black text-white">${m.icon} ${m.title}</h3><p class="text-slate-300 text-xs">${m.desc}</p><p class="text-[11px] text-slate-400"><b class="text-emerald-300">Evidencia:</b> ${m.evidence}</p>`;
+  const head=(m,p='')=>`<div class="flex flex-wrap justify-between gap-2 text-xs font-bold text-emerald-300"><span>${p}</span><span class="text-amber-300">${m.paper}</span></div><div class="flex flex-wrap gap-2"><span class="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] font-black">${m.stage}</span><span class="px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black">${m.project}</span></div><h3 class="text-xl font-black text-white">${m.icon} ${m.title}</h3><p class="text-slate-300 text-xs">${m.desc}</p>${readingBox(m)}<p class="text-[11px] text-slate-400"><b class="text-emerald-300">Evidencia:</b> ${m.evidence}</p>`;
   window.launchMission=launchMission=function(id){const m=missionCatalog[id];if(!m||m.field!==FIELD)return prevLaunch(id);open(m);({'sp2-classify':classify,'sp2-wordsearch':wordsearch,'sp2-calc':calc,'sp2-match':match,'sp2-source':classify,'sp2-choice':choice,'sp2-crossword':crossword,'sp2-story':story,'sp2-escape':escape}[m.type]||(()=>{}))(m);};
 
   function classify(m){missionGameState={list:[...m.items].sort(()=>Math.random()-.5),idx:0,hits:0,errors:0,details:[]};classRender();}
