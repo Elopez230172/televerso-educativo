@@ -1,4 +1,4 @@
-name: Agrandar logo QR premium
+name: Verificar QR premium
 
 on:
   push:
@@ -9,60 +9,20 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  ajustar-logo:
+  verificar-qr:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
 
-      - name: Aplicar logo grande con fondo translúcido premium
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('qr-premium.js')
-          s = p.read_text(encoding='utf-8')
-
-          old_css = ".tvqr-code-target{position:relative;display:flex;align-items:center;justify-content:center}.tvqr-logo-chip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;display:flex;align-items:center;justify-content:center;width:58px;height:42px;padding:5px 6px;border-radius:11px;background:#fff;border:1px solid #dbe4ef;box-shadow:0 4px 13px rgba(2,6,23,.18);pointer-events:none}.tvqr-logo-chip img{display:block;width:100%;height:100%;object-fit:contain}"
-          new_css = ".tvqr-code-target{position:relative;display:flex;align-items:center;justify-content:center}.tvqr-logo-chip{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:6;display:flex;align-items:center;justify-content:center;width:94px;height:62px;padding:8px 10px;border-radius:17px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(10px) saturate(1.22);backdrop-filter:blur(10px) saturate(1.22);border:1.5px solid rgba(125,211,252,.58);box-shadow:0 0 0 3px rgba(255,255,255,.74),0 8px 24px rgba(15,23,42,.24),0 0 25px rgba(34,211,238,.34),0 0 34px rgba(124,58,237,.18);pointer-events:none}.tvqr-logo-chip:before{content:'';position:absolute;inset:3px;border-radius:13px;border:1px solid rgba(129,140,248,.24);pointer-events:none}.tvqr-logo-chip img{position:relative;z-index:1;display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(15,23,42,.12))}"
-          if old_css not in s:
-              raise SystemExit('No se encontró el bloque CSS esperado de .tvqr-logo-chip')
-          s = s.replace(old_css, new_css, 1)
-
-          old_mobile = ".tvqr-logo-chip{width:50px;height:36px}"
-          new_mobile = ".tvqr-logo-chip{width:86px;height:56px;padding:7px 9px;border-radius:16px}"
-          if old_mobile not in s:
-              raise SystemExit('No se encontró el ajuste móvil esperado de .tvqr-logo-chip')
-          s = s.replace(old_mobile, new_mobile, 1)
-
-          old_fn = "function addLogo(container,size){if(!container)return;container.style.position='relative';container.querySelectorAll('.tvqr-logo-chip').forEach(n=>n.remove());const chip=document.createElement('div');chip.className='tvqr-logo-chip';chip.style.width=Math.max(25,Math.round(size*.27))+'px';chip.style.height=Math.max(18,Math.round(size*.19))+'px';chip.innerHTML=`<img src=\"${BRAND_LOGO}\" alt=\"TeleVerso\">`;container.appendChild(chip);}"
-          new_fn = "function addLogo(container,size){if(!container)return;container.style.position='relative';container.querySelectorAll('.tvqr-logo-chip').forEach(n=>n.remove());const chip=document.createElement('div');chip.className='tvqr-logo-chip';chip.style.width=Math.max(54,Math.round(size*.46))+'px';chip.style.height=Math.max(38,Math.round(size*.30))+'px';chip.style.padding=Math.max(6,Math.round(size*.038))+'px '+Math.max(8,Math.round(size*.05))+'px';chip.style.borderRadius=Math.max(12,Math.round(size*.075))+'px';chip.innerHTML=`<img src=\"${BRAND_LOGO}\" alt=\"TeleVerso\">`;container.appendChild(chip);}"
-          if old_fn not in s:
-              raise SystemExit('No se encontró la función addLogo esperada')
-          s = s.replace(old_fn, new_fn, 1)
-
-          p.write_text(s, encoding='utf-8')
-          PY
-
-      - name: Verificar cambio
+      - name: Verificar diseño premium y equivalencia de impresión
         run: |
           grep -F "Math.round(size*.46)" qr-premium.js
           grep -F "background:rgba(255,255,255,.92)" qr-premium.js
           grep -F "backdrop-filter:blur(10px)" qr-premium.js
-
-      - name: Publicar cambio
-        run: |
-          if git diff --quiet -- qr-premium.js; then
-            echo 'Sin cambios pendientes.'
-            exit 0
-          fi
-          git config user.name 'televerso-bot'
-          git config user.email 'actions@users.noreply.github.com'
-          git add qr-premium.js
-          git commit -m 'Agrandar logo translúcido en QR premium [skip ci]'
-          git push origin main
+          grep -F "function groupStudentCard" qr-premium.js
+          grep -F "renderQr(document.getElementById(\`print-qr-\${st.id}\`),\`${base}?s=\${encodeURIComponent(st.id)}\`,176)" qr-premium.js
+          echo 'QR individual y QR grupal usan el mismo tamaño y estilo premium.'
