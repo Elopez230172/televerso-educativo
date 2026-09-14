@@ -24,22 +24,18 @@ jobs:
               'saberes2-retos-directos.js',
           ]
 
-          patterns = [
-              re.compile(r'\n\s*let timer\s*=\s*null;\s*\n\s*const observer\s*=\s*new MutationObserver\(.*?\n\s*observer\.observe\(document\.documentElement,\s*\{\s*childList\s*:\s*true,\s*subtree\s*:\s*true\s*\}\);\s*\n', re.S),
-              re.compile(r'\n\s*let timer\s*=\s*null;\s*\n\s*const observer\s*=\s*new MutationObserver\(.*?\n\s*observer\.observe\(document\.documentElement,\s*\{\s*childList:true,subtree:true\s*\}\);\s*\n', re.S),
-          ]
+          pat = re.compile(
+              r'\n\s*const observer\s*=\s*new MutationObserver\(\s*\(\)\s*=>\s*\{.*?\}\s*\);\s*\n\s*observer\.observe\(document\.documentElement,\s*\{.*?childList\s*:\s*true.*?subtree\s*:\s*true.*?\}\s*\);\s*\n',
+              re.S,
+          )
 
           for name in files:
               p = Path(name)
               s = p.read_text(encoding='utf-8')
-              original = s
-              for pat in patterns:
-                  s, n = pat.subn('\n', s, count=1)
-                  if n:
-                      break
-              if s == original:
-                  raise SystemExit(f'No se encontró el observador global esperado en {name}')
-              p.write_text(s, encoding='utf-8')
+              s2, n = pat.subn('\n', s, count=1)
+              if n != 1:
+                  raise SystemExit(f'No se encontró exactamente un observador global en {name}; encontrados: {n}')
+              p.write_text(s2, encoding='utf-8')
 
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
