@@ -6,6 +6,7 @@ on:
       - 'navegacion-progresiva.js'
       - 'modo-retos.js'
       - 'saberes2-retos-directos.js'
+      - 'etica-segundo.js'
       - '.github/workflows/install-navegacion-curricular.yml'
 permissions:
   contents: write
@@ -20,46 +21,80 @@ jobs:
           node --check navegacion-progresiva.js
           node --check modo-retos.js
           node --check saberes2-retos-directos.js
-      - name: Insertar módulos de interfaz
+          node --check etica-segundo.js
+      - name: Integrar Ética 2.º y módulos de interfaz
         run: |
           python - <<'PY'
           from pathlib import Path
+
+          def replace_once(path, old, new, label):
+              p=Path(path)
+              s=p.read_text(encoding='utf-8')
+              if new in s:
+                  return
+              if old not in s:
+                  raise SystemExit(f'No se encontró patrón para {label} en {path}')
+              p.write_text(s.replace(old,new,1),encoding='utf-8')
+
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-
-          nav='    <script src="navegacion-curricular.js"></script>\n'
-          nav_anchor='    <script src="acceso-por-grado.js"></script>\n'
-          if nav not in s:
-              if nav_anchor not in s:
+          etica='    <script src="etica-segundo.js"></script>\n'
+          anchor='    <script src="acceso-por-grado.js"></script>\n'
+          if etica not in s:
+              if anchor not in s:
                   raise SystemExit('No se encontró acceso-por-grado.js en index.html')
-              s=s.replace(nav_anchor, nav_anchor+nav, 1)
+              s=s.replace(anchor,etica+anchor,1)
+          p.write_text(s,encoding='utf-8')
 
-          progressive='    <script src="navegacion-progresiva.js"></script>\n'
-          if progressive not in s:
-              if nav not in s:
-                  raise SystemExit('No se encontró navegacion-curricular.js en index.html')
-              s=s.replace(nav, nav+progressive, 1)
+          replace_once('acceso-por-grado.js',
+              "   - 2.º: Lenguajes 2.º PPA 1 (lenguajes2) y Saberes 2.º PPA 1 (saberes2)",
+              "   - 2.º: Lenguajes, Saberes y Ética PPA 1 (lenguajes2, saberes2, etica2)",
+              'comentario 2.º')
+          replace_once('acceso-por-grado.js',
+              "const FIELD_GRADE = { lenguajes2: 2, saberes2: 2, ens: 3, lenguajes: 3, saberes: 3 };",
+              "const FIELD_GRADE = { lenguajes2: 2, saberes2: 2, etica2: 2, ens: 3, lenguajes: 3, saberes: 3 };",
+              'FIELD_GRADE')
+          replace_once('acceso-por-grado.js',
+              "const GRADE_FIELDS = { 2: ['lenguajes2', 'saberes2'], 3: ['ens', 'lenguajes', 'saberes'] };",
+              "const GRADE_FIELDS = { 2: ['lenguajes2', 'saberes2', 'etica2'], 3: ['ens', 'lenguajes', 'saberes'] };",
+              'GRADE_FIELDS')
+          replace_once('acceso-por-grado.js',
+              "const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2,'tv-btn-spc2':2};",
+              "const map = {'tv-btn-ens':3,'tv-btn-leng':3,'tv-btn-spc':3,'tv-btn-leng2':2,'tv-btn-spc2':2,'tv-btn-etica2':2};",
+              'mapa de botones')
+          replace_once('acceso-por-grado.js',
+              "if (grade === 3) grid.classList.add('sm:grid-cols-3'); else if (grade === 2) grid.classList.add('sm:grid-cols-2'); else grid.classList.add('sm:grid-cols-1');",
+              "if (grade === 3) grid.classList.add('sm:grid-cols-3'); else if (grade === 2) grid.classList.add('sm:grid-cols-3'); else grid.classList.add('sm:grid-cols-1');",
+              'columnas 2.º')
 
-          direct='    <script src="modo-retos.js"></script>\n'
-          direct_anchor='    <script src="expediente-mejorado.js"></script>\n'
-          if direct not in s:
-              if direct_anchor not in s:
-                  raise SystemExit('No se encontró expediente-mejorado.js en index.html')
-              s=s.replace(direct_anchor, direct_anchor+direct, 1)
+          replace_once('navegacion-curricular.js',
+              "{key:'etica2', label:'Ética, naturaleza y sociedades', icon:'fa-earth-americas', tone:'amber', real:false},",
+              "{key:'etica2', label:'Ética, naturaleza y sociedades', icon:'fa-earth-americas', tone:'amber', real:true, ppa1:'Tenemos derecho a ser diferentes'},",
+              'etica2 curricular')
+          replace_once('navegacion-curricular.js',
+              "const REAL_FIELDS = new Set(['lenguajes2','saberes2','lenguajes','saberes','ens']);",
+              "const REAL_FIELDS = new Set(['lenguajes2','saberes2','etica2','lenguajes','saberes','ens']);",
+              'REAL_FIELDS')
 
-          sp2='    <script src="saberes2-retos-directos.js"></script>\n'
-          if sp2 not in s:
-              if direct not in s:
-                  raise SystemExit('No se encontró modo-retos.js en index.html')
-              s=s.replace(direct, direct+sp2, 1)
-
-          p.write_text(s, encoding='utf-8')
+          replace_once('navegacion-progresiva.js',
+              "{key:'etica2',label:'Ética, naturaleza y sociedades',icon:'fa-earth-americas',tone:'amber',real:false},",
+              "{key:'etica2',label:'Ética, naturaleza y sociedades',icon:'fa-earth-americas',tone:'amber',real:true,ppa1:'Tenemos derecho a ser diferentes'},",
+              'etica2 progresiva')
           PY
+      - name: Validar integración
+        run: |
+          node --check acceso-por-grado.js
+          node --check navegacion-curricular.js
+          node --check navegacion-progresiva.js
+          grep -q 'etica-segundo.js' index.html
+          grep -q "etica2: 2" acceso-por-grado.js
+          grep -q "Tenemos derecho a ser diferentes" navegacion-curricular.js
+          grep -q "Tenemos derecho a ser diferentes" navegacion-progresiva.js
       - name: Publicar cambio
         run: |
           if git diff --quiet; then exit 0; fi
           git config user.name 'televerso-bot'
           git config user.email 'actions@users.noreply.github.com'
-          git add index.html
-          git commit -m 'Integrar navegación curricular progresiva [skip ci]'
+          git add index.html acceso-por-grado.js navegacion-curricular.js navegacion-progresiva.js
+          git commit -m 'Integrar Ética PPA1 de segundo grado [skip ci]'
           git push
