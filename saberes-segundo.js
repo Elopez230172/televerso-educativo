@@ -1,6 +1,6 @@
 /* TeleVerso Educativo · Saberes y pensamiento científico · 2.º de Telesecundaria · PPA 1
    PPA: "Yo también puedo generar conocimiento científico"
-   Alineado al cuaderno de Lenguajes 2.º: siete etapas oficiales, 3 proyectos académicos y 10 retos.
+   Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final y 10 retos.
 */
 (() => {
   if (typeof missionCatalog === 'undefined') return;
@@ -9,9 +9,10 @@
   const FIELD_TITLE='Saberes y pensamiento científico · 2.º grado · PPA 1';
   const PAPER='Cuaderno Saberes 2.º PPA1';
   const STAGE5='Etapa 5 · Distintas fuentes de consulta';
-  const meta=(m,desc,paper,stage,pa,evidence)=>Object.assign(m,{
+  const PROJECT='Proyecto integrado · Informe científico visual de nuestra comunidad';
+  const meta=(m,desc,paper,stage,project,evidence)=>Object.assign(m,{
     field:FIELD,fieldTitle:FIELD_TITLE,level:'2.º de Telesecundaria',grade:2,
-    cognitiveLevel:'comprender-aplicar-analizar',desc,paper,stage,pa,evidence
+    cognitiveLevel:'comprender-aplicar-analizar',desc,paper,stage,project,evidence
   });
 
   Object.assign(missionCatalog,{
@@ -28,7 +29,7 @@
         ['Tipo de actividad física preferida.',3,'Se organiza por categorías o cualidades.']
       ]},
       'Clasifica ejemplos para distinguir población, muestra y tipos de datos antes de construir tablas o gráficas.',
-      `${PAPER} p. 5`,'Etapa 2 · ¡Ése es el problema!','PA1 · Nuestra comunidad en gráficas','Regla para distinguir población, muestra y tipo de dato.'),
+      `${PAPER} p. 5`,'Etapa 2 · ¡Ése es el problema!',PROJECT,'Regla para distinguir población, muestra y tipo de dato.'),
 
     sp2_2:meta({id:'sp2_2',title:'R2 · Sopa estadística',type:'sp2-wordsearch',icon:'🔤',
       grid:[
@@ -43,7 +44,7 @@
         {word:'HISTOGRAMA',clue:'Gráfica de barras continuas para intervalos.'},{word:'DATOS',clue:'Información obtenida al contar, medir u observar.'}
       ]},
       'Encuentra conceptos estadísticos en una sopa interactiva y relaciónalos con ejemplos de tu contexto.',
-      `${PAPER} p. 10`,STAGE5,'PA1 · Nuestra comunidad en gráficas','Tres conceptos con un ejemplo real.'),
+      `${PAPER} p. 10`,STAGE5,PROJECT,'Tres conceptos con un ejemplo real.'),
 
     sp2_3:meta({id:'sp2_3',title:'R3 · Laboratorio de cálculos',type:'sp2-calc',icon:'🧮',
       problems:[
@@ -55,7 +56,7 @@
         {q:'Rango de 12, 12, 12, 12, 12',ans:0,tol:0,fb:'Máximo y mínimo son iguales.'}
       ]},
       'Resuelve cálculos de media, mediana, moda y rango; después interpreta qué aporta cada medida.',
-      `${PAPER} p. 12`,STAGE5,'PA1 · Nuestra comunidad en gráficas','Procedimientos e interpretación de tres conjuntos.'),
+      `${PAPER} p. 12`,STAGE5,PROJECT,'Procedimientos e interpretación de tres conjuntos.'),
 
     sp2_4:meta({id:'sp2_4',title:'R4 · Selector de gráficas',type:'sp2-match',icon:'📊',
       pairs:[
@@ -66,7 +67,7 @@
         ['Datos individuales antes de graficar','Tabla de frecuencias']
       ]},
       'Empareja cada propósito con la representación que permite comunicar mejor el comportamiento de los datos.',
-      `${PAPER} p. 17`,STAGE5,'PA2 · La ciencia y sus cálculos','Justificación de una representación para el artículo.'),
+      `${PAPER} p. 17`,STAGE5,PROJECT,'Justificación de una representación para el informe.'),
 
     sp2_5:meta({id:'sp2_5',title:'R5 · Laboratorio de fuentes',type:'sp2-source',icon:'🧪',
       cats:['USABLE Y VERIFICABLE','REQUIERE VERIFICAR','INSUFICIENTE / ENGAÑOSA'],
@@ -78,8 +79,8 @@
         ['Gráfica con porcentajes que suman 140% y sin explicación de respuestas múltiples.',2,'La presentación necesita contexto o puede inducir a error.'],
         ['Nota periodística que enlaza al informe original y resume sus datos.',1,'Conviene revisar el informe original antes de usar la cifra como evidencia principal.']
       ]},
-      'Evalúa la trazabilidad de una fuente antes de incorporar datos a un artículo informativo.',
-      `${PAPER} p. 18`,STAGE5,'PA2 · La ciencia y sus cálculos','Criterio de verificación para una fuente.'),
+      'Evalúa la trazabilidad de una fuente antes de incorporar datos al informe científico visual.',
+      `${PAPER} p. 18`,STAGE5,PROJECT,'Criterio de verificación para una fuente.'),
 
     sp2_6:meta({id:'sp2_6',title:'R6 · Detective de gráficas engañosas',type:'sp2-choice',icon:'🕵️',
       qs:[
@@ -90,7 +91,7 @@
         ['¿Qué combinación fortalece una gráfica científica?',['Título, ejes, unidades, fuente y escala clara.','Colores brillantes y animación.','Muchos iconos sin etiquetas.'],0,'Los elementos de contexto permiten leer y verificar la gráfica.']
       ]},
       'Analiza escalas, ejes, periodos y fuentes para detectar representaciones que pueden distorsionar un mensaje.',
-      `${PAPER} p. 20`,STAGE5,'PA2 · La ciencia y sus cálculos','Dos señales de alerta para revisar gráficas publicadas.'),
+      `${PAPER} p. 20`,STAGE5,PROJECT,'Dos señales de alerta para revisar gráficas publicadas.'),
 
     sp2_7:meta({id:'sp2_7',title:'R7 · Crucigrama de estadística y equidad',type:'sp2-crossword',icon:'✍️',size:13,
       entries:[
@@ -102,7 +103,7 @@
         {word:'FUENTE',r:1,c:10,dir:'V',clue:'Origen verificable de la información.'}
       ]},
       'Completa un crucigrama real con conceptos que usarás para organizar datos y explicar límites del estudio.',
-      `${PAPER} p. 25`,STAGE5,'PA3 · Equidad de género en gráficas','Dos conceptos usados en una explicación del proyecto.'),
+      `${PAPER} p. 25`,STAGE5,PROJECT,'Dos conceptos usados en una explicación del proyecto.'),
 
     sp2_8:meta({id:'sp2_8',title:'R8 · Evidencia y representación',type:'sp2-match',icon:'🔗',
       pairs:[
@@ -112,8 +113,8 @@
         ['Frecuencia conectada por marcas de clase','Gráfica poligonal'],
         ['Persona, aportación y fuente','Tabla de registro']
       ]},
-      'Relaciona distintos tipos de evidencia con formas de representación útiles para el proyecto sobre equidad.',
-      `${PAPER} p. 27`,STAGE5,'PA3 · Equidad de género en gráficas','Justificación de una pareja y el contexto que no debe perderse.'),
+      'Relaciona distintos tipos de evidencia con representaciones útiles para incorporar equidad y contexto al mismo informe científico visual.',
+      `${PAPER} p. 27`,STAGE5,PROJECT,'Justificación de una pareja y el contexto que no debe perderse.'),
 
     sp2_9:meta({id:'sp2_9',title:'R9 · Ruta de interpretación',type:'sp2-story',icon:'🧭',
       scenes:[
@@ -121,21 +122,21 @@
         {title:'Estación 2 · Periodo',q:'La fuente sólo cubre el último año. ¿Qué debes hacer?',opts:['Presentarlo como si describiera toda la historia.','Indicar explícitamente el periodo y evitar extender la conclusión.'],ans:1,fb:'El periodo forma parte del contexto de los datos.'},
         {title:'Estación 3 · Escalas',q:'Dos gráficas usan escalas diferentes. ¿Qué haces antes de compararlas?',opts:['Comparo sólo la altura visual.','Reviso unidades, límites y escala de ambos ejes.'],ans:1,fb:'Las escalas diferentes pueden producir impresiones engañosas.'},
         {title:'Estación 4 · Calidad',q:'Un área tiene pocos casos pero aportaciones muy relevantes. ¿Qué reconoce un análisis cuidadoso?',opts:['La frecuencia resume por completo el valor de una aportación.','La cantidad de casos es una dimensión y debe complementarse con contexto cualitativo.'],ans:1,fb:'No todo el significado puede reducirse a una sola frecuencia.'},
-        {title:'Estación 5 · Cierre',q:'¿Qué cierre comunica mejor el estudio?',opts:['“Los datos demuestran definitivamente cómo es toda la sociedad”.','“En nuestra colección observamos este patrón; señalamos sus límites y proponemos ampliar la búsqueda”.'],ans:1,fb:'Una conclusión científica declara alcance y límites.'}
+        {title:'Estación 5 · Cierre',q:'¿Qué cierre comunica mejor el estudio?',opts:['“Los datos demuestran definitivamente cómo es toda la sociedad”.','“En nuestro estudio observamos este patrón; señalamos sus límites y proponemos ampliar la búsqueda”.'],ans:1,fb:'Una conclusión científica declara alcance y límites.'}
       ]},
       'Toma decisiones de interpretación para evitar generalizaciones y explicar con honestidad lo que sí muestran los datos.',
-      `${PAPER} p. 29`,STAGE5,'PA3 · Equidad de género en gráficas','Ajuste a una interpretación para declarar alcance y límites.'),
+      `${PAPER} p. 29`,STAGE5,PROJECT,'Ajuste a una interpretación para declarar alcance y límites.'),
 
     sp2_10:meta({id:'sp2_10',title:'R10 · Escape DATOS',type:'sp2-escape',icon:'🔐',
       locks:[
         {letter:'D',title:'Dato verificable',q:'¿Qué acompaña mejor a una cifra?',opts:['Su fuente y contexto.','Un color llamativo.','Una opinión sin evidencia.'],ans:0,fb:'Un dato debe poder rastrearse y comprenderse en contexto.'},
         {letter:'A',title:'Análisis',q:'Si existe un valor extremo muy grande, ¿qué medida suele resistir mejor su influencia?',opts:['Mediana.','Media aritmética siempre.','Ninguna, porque no se puede analizar.'],ans:0,fb:'La mediana suele ser menos sensible a valores extremos.'},
         {letter:'T',title:'Tipo de gráfica',q:'¿Qué gráfica muestra cambios a lo largo del tiempo?',opts:['Gráfica de línea.','Histograma necesariamente.','Tabla sin ordenar.'],ans:0,fb:'Una línea ayuda a visualizar tendencias o cambios temporales.'},
-        {letter:'O',title:'Origen',q:'¿Qué práctica fortalece un artículo científico escolar?',opts:['Registrar fuente o procedimiento de obtención.','Ocultar de dónde salieron los datos.','Eliminar unidades.'],ans:0,fb:'La trazabilidad permite revisar la evidencia.'},
+        {letter:'O',title:'Origen',q:'¿Qué práctica fortalece un informe científico escolar?',opts:['Registrar fuente o procedimiento de obtención.','Ocultar de dónde salieron los datos.','Eliminar unidades.'],ans:0,fb:'La trazabilidad permite revisar la evidencia.'},
         {letter:'S',title:'Síntesis',q:'¿Cuál conclusión es más responsable?',opts:['La que reconoce lo que muestran los datos y sus límites.','La que generaliza a toda la población sin revisar la muestra.','La que ignora resultados incómodos.'],ans:0,fb:'La síntesis debe ser proporcional a la evidencia disponible.'}
       ]},
       'Abre cinco candados integrando recolección, cálculo, representación, fuentes e interpretación. Código final: DATOS.',
-      `${PAPER} p. 30`,'Etapa 6 · Unimos las piezas','Integración de PA1, PA2 y PA3','Una mejora concreta en cada uno de los tres productos.')
+      `${PAPER} p. 30`,'Etapa 6 · Unimos las piezas',PROJECT,'Una mejora concreta que aplicarás al informe científico visual final.')
   });
 
   const prevSetField=window.tvSetField;
@@ -145,16 +146,16 @@
   const missions=()=>Object.values(missionCatalog).filter(m=>m.field===FIELD);
 
   const roadmapHtml=()=>`<div class="col-span-full glass-panel p-5 rounded-3xl border border-emerald-500/20">
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><span class="text-[10px] uppercase tracking-widest font-black text-emerald-300">Ruta oficial del proyecto</span><h4 class="text-lg font-black text-white mt-1">Las siete etapas del PPA 1</h4></div><span class="text-[11px] text-slate-400">Cuaderno pp. 3-31</span></div>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><span class="text-[10px] uppercase tracking-widest font-black text-emerald-300">Ruta del proyecto integrado</span><h4 class="text-lg font-black text-white mt-1">Un proyecto · un producto · siete etapas</h4><p class="text-[11px] text-slate-400 mt-1">Producto final: Informe científico visual de nuestra comunidad</p></div><span class="text-[11px] text-slate-400">Cuaderno pp. 3-31</span></div>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-[11px]">
       ${[
-        ['1','¿Qué haremos?','Propósito, detonador y producto.'],
+        ['1','¿Qué haremos?','Conocemos el reto y el único producto final.'],
         ['2','¡Ése es el problema!','R1 + diagnóstico de datos.'],
-        ['3','¡Una propuesta de solución!','Pregunta y horizonte.'],
-        ['4','Paso a paso','Plan, responsables y tiempos.'],
-        ['5','Distintas fuentes de consulta','R2-R9 + investigación de los 3 PA.'],
-        ['6','Unimos las piezas','Revisión de productos + R10.'],
-        ['7','¡Ya lo tenemos!','Presentación, valoración y retroalimentación.']
+        ['3','¡Una propuesta de solución!','Pregunta de investigación y horizonte.'],
+        ['4','Paso a paso','Plan, responsables, fuentes y tiempos.'],
+        ['5','Distintas fuentes de consulta','R2-R9: datos, cálculos, gráficas, fuentes y equidad.'],
+        ['6','Unimos las piezas','Armamos y revisamos el informe + R10.'],
+        ['7','¡Ya lo tenemos!','Presentamos un solo informe, valoramos y mejoramos.']
       ].map(([n,t,d])=>`<div class="rounded-2xl bg-slate-900/70 border border-white/10 p-3"><span class="inline-flex w-7 h-7 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-300 font-black">${n}</span><strong class="block text-white mt-2">${t}</strong><span class="block text-slate-400 mt-1 leading-relaxed">${d}</span></div>`).join('')}
     </div></div>`;
 
@@ -166,14 +167,14 @@
         const b=document.createElement('button');
         b.id='tv-btn-spc2'; b.setAttribute('onclick',"tvSetField('saberes2')");
         b.className='p-4 rounded-2xl text-left bg-slate-800/80 hover:bg-slate-700 border border-white/10 transition';
-        b.innerHTML='<span class="block text-[10px] font-black uppercase tracking-wider text-emerald-300">Campo formativo · 2.º grado</span><strong class="block text-white mt-1 text-sm">Saberes · PPA 1</strong><span class="block text-[10px] text-slate-400 mt-1">7 etapas · 3 proyectos · 10 retos</span>';
+        b.innerHTML='<span class="block text-[10px] font-black uppercase tracking-wider text-emerald-300">Campo formativo · 2.º grado</span><strong class="block text-white mt-1 text-sm">Saberes · PPA 1</strong><span class="block text-[10px] text-slate-400 mt-1">7 etapas · 1 proyecto · 1 producto · 10 retos</span>';
         grid.appendChild(b);
       }
     }
     const anchor=document.getElementById('tv-badges-leng2') || document.getElementById('tv-badges-spc') || document.getElementById('tv-badges-leng');
     if(anchor && !document.getElementById('tv-badges-spc2')){
       const d=document.createElement('div');d.id='tv-badges-spc2';d.className='hidden';
-      d.innerHTML='<h4 class="text-sm font-black text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="fa-solid fa-flask text-emerald-400"></i> Insignias Cooperativas · Saberes 2.º</h4><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div id="sp2-badge-data" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Explorador de datos</strong><span class="block text-[11px] text-slate-400">R1-R3 · problema, conceptos y cálculos.</span></div><div id="sp2-badge-graph" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Analista científico</strong><span class="block text-[11px] text-slate-400">R4-R6 · artículo, fuentes y gráficas.</span></div><div id="sp2-badge-science" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Comunicador con evidencia</strong><span class="block text-[11px] text-slate-400">R7-R10 · equidad, interpretación e integración.</span></div></div>';
+      d.innerHTML='<h4 class="text-sm font-black text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2"><i class="fa-solid fa-flask text-emerald-400"></i> Insignias Cooperativas · Saberes 2.º</h4><div class="grid grid-cols-1 sm:grid-cols-3 gap-4"><div id="sp2-badge-data" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Explorador de datos</strong><span class="block text-[11px] text-slate-400">R1-R3 · problema, datos y cálculos del informe.</span></div><div id="sp2-badge-graph" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Analista científico</strong><span class="block text-[11px] text-slate-400">R4-R6 · gráficas, fuentes y comunicación científica.</span></div><div id="sp2-badge-science" class="glass-card p-4 rounded-2xl opacity-50"><strong class="text-white">Comunicador con evidencia</strong><span class="block text-[11px] text-slate-400">R7-R10 · equidad, interpretación y cierre del informe.</span></div></div>';
       anchor.after(d);
     }
     syncVisibility();
@@ -190,8 +191,8 @@
   }
   function renderGrid(){
     ensureUI();const c=document.getElementById('student-missions-grid');if(!c)return;
-    const ms=missions();const heading=c.previousElementSibling;if(heading&&heading.tagName==='H4')heading.innerHTML='<i class="fa-solid fa-flask text-emerald-400"></i> Saberes y pensamiento científico · 2.º grado · PPA 1 · 7 etapas · 10 retos';
-    c.innerHTML=roadmapHtml()+ms.map((m,i)=>`<div class="glass-card p-5 rounded-3xl flex flex-col justify-between border-t-2 border-t-emerald-500"><div><div class="flex justify-between items-start gap-2 mb-3"><div class="space-y-1"><span class="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase rounded-lg border border-emerald-500/30">Misión ${i+1}</span><span class="block text-[10px] font-black text-cyan-300">${m.stage}</span><span class="block text-[10px] text-slate-400">${m.pa}</span></div><i id="badge-mission-${m.id}" class="fa-solid fa-lock text-slate-500 text-base"></i></div><h4 class="text-base font-bold text-white mb-1.5">${m.icon} ${m.title}</h4><p class="text-slate-300 text-xs mb-2 leading-relaxed">${m.desc}</p><div class="rounded-xl bg-slate-900/50 border border-white/5 p-2.5 mb-3"><span class="text-[9px] uppercase tracking-wider text-slate-500 font-black">Evidencia en papel</span><p class="text-[11px] text-slate-300 mt-1">${m.evidence}</p></div><p class="text-amber-300/90 text-[11px] font-semibold mb-4">Actividad equivalente: ${m.paper}</p></div><button onclick="launchMission('${m.id}')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-play mr-1"></i> Iniciar reto</button></div>`).join('');
+    const ms=missions();const heading=c.previousElementSibling;if(heading&&heading.tagName==='H4')heading.innerHTML='<i class="fa-solid fa-flask text-emerald-400"></i> Saberes y pensamiento científico · 2.º grado · PPA 1 · proyecto integrado · 10 retos';
+    c.innerHTML=roadmapHtml()+ms.map((m,i)=>`<div class="glass-card p-5 rounded-3xl flex flex-col justify-between border-t-2 border-t-emerald-500"><div><div class="flex justify-between items-start gap-2 mb-3"><div class="space-y-1"><span class="inline-block px-2.5 py-0.5 bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase rounded-lg border border-emerald-500/30">Misión ${i+1}</span><span class="block text-[10px] font-black text-cyan-300">${m.stage}</span><span class="block text-[10px] text-slate-400">${m.project}</span></div><i id="badge-mission-${m.id}" class="fa-solid fa-lock text-slate-500 text-base"></i></div><h4 class="text-base font-bold text-white mb-1.5">${m.icon} ${m.title}</h4><p class="text-slate-300 text-xs mb-2 leading-relaxed">${m.desc}</p><div class="rounded-xl bg-slate-900/50 border border-white/5 p-2.5 mb-3"><span class="text-[9px] uppercase tracking-wider text-slate-500 font-black">Evidencia en papel</span><p class="text-[11px] text-slate-300 mt-1">${m.evidence}</p></div><p class="text-amber-300/90 text-[11px] font-semibold mb-4">Actividad equivalente: ${m.paper}</p></div><button onclick="launchMission('${m.id}')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition"><i class="fa-solid fa-play mr-1"></i> Iniciar reto</button></div>`).join('');
     ['tv-badges-ens','tv-badges-leng','tv-badges-spc','tv-badges-leng2'].forEach(id=>document.getElementById(id)?.classList.add('hidden'));
     document.getElementById('tv-badges-spc2')?.classList.remove('hidden');
     ['tv-btn-ens','tv-btn-leng','tv-btn-spc','tv-btn-leng2','tv-btn-spc2'].forEach(id=>document.getElementById(id)?.classList.remove('ring-2','ring-emerald-400','ring-sky-400','ring-indigo-400','bg-indigo-950/50','bg-sky-950/50','bg-emerald-950/50'));
@@ -205,7 +206,7 @@
   window.renderStudentMissionsGrid=renderStudentMissionsGrid=function(){if(currentField()===FIELD)return renderGrid();const r=prevGrid();setTimeout(()=>{ensureUI();syncVisibility();},0);return r;};
 
   function open(m){activeMissionKey=m.id;missionGameState={};document.getElementById('modal-mission').classList.remove('hidden');}
-  const head=(m,p='')=>`<div class="flex flex-wrap justify-between gap-2 text-xs font-bold text-emerald-300"><span>${p}</span><span class="text-amber-300">${m.paper}</span></div><div class="flex flex-wrap gap-2"><span class="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] font-black">${m.stage}</span><span class="px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black">${m.pa}</span></div><h3 class="text-xl font-black text-white">${m.icon} ${m.title}</h3><p class="text-slate-300 text-xs">${m.desc}</p><p class="text-[11px] text-slate-400"><b class="text-emerald-300">Evidencia:</b> ${m.evidence}</p>`;
+  const head=(m,p='')=>`<div class="flex flex-wrap justify-between gap-2 text-xs font-bold text-emerald-300"><span>${p}</span><span class="text-amber-300">${m.paper}</span></div><div class="flex flex-wrap gap-2"><span class="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-[10px] font-black">${m.stage}</span><span class="px-2 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-300 text-[10px] font-black">${m.project}</span></div><h3 class="text-xl font-black text-white">${m.icon} ${m.title}</h3><p class="text-slate-300 text-xs">${m.desc}</p><p class="text-[11px] text-slate-400"><b class="text-emerald-300">Evidencia:</b> ${m.evidence}</p>`;
   window.launchMission=launchMission=function(id){const m=missionCatalog[id];if(!m||m.field!==FIELD)return prevLaunch(id);open(m);({'sp2-classify':classify,'sp2-wordsearch':wordsearch,'sp2-calc':calc,'sp2-match':match,'sp2-source':classify,'sp2-choice':choice,'sp2-crossword':crossword,'sp2-story':story,'sp2-escape':escape}[m.type]||(()=>{}))(m);};
 
   function classify(m){missionGameState={list:[...m.items].sort(()=>Math.random()-.5),idx:0,hits:0,errors:0,details:[]};classRender();}
