@@ -1,6 +1,7 @@
-/* TeleVerso Educativo · Estabilidad visual en móviles
-   Reduce saltos visuales sin bloquear el desplazamiento vertical.
-   En móvil se desactivan únicamente animaciones y transforms que mueven elementos.
+/* TeleVerso Educativo · Estabilidad móvil
+   Corrección conservadora: no modifica overflow, height, touch-action ni overscroll.
+   Deja que iOS/Android manejen el desplazamiento de forma nativa y sólo elimina
+   efectos visuales que pueden provocar saltos o repintados durante el scroll.
 */
 (() => {
   if (document.getElementById('tv-mobile-stability-style')) return;
@@ -9,42 +10,40 @@
   style.id = 'tv-mobile-stability-style';
   style.textContent = `
     @media (hover: none), (pointer: coarse), (max-width: 768px) {
-      html {
+      /* IMPORTANTE: no tocar overflow, height, touch-action ni overscroll. */
+      html, body {
         scroll-behavior: auto !important;
-        overflow-y: auto !important;
-        height: auto !important;
-        min-height: 100% !important;
-        touch-action: pan-y pinch-zoom !important;
       }
 
       body {
         background-attachment: scroll !important;
-        overflow-y: auto !important;
-        height: auto !important;
-        min-height: 100svh !important;
-        overscroll-behavior-y: auto !important;
-        touch-action: pan-y pinch-zoom !important;
-        -webkit-overflow-scrolling: touch;
       }
 
-      main,
-      #view-home,
-      #view-student,
-      #view-teacher {
-        overflow-y: visible !important;
-        height: auto !important;
-        max-height: none !important;
+      /* El encabezado deja de ser sticky en móvil para evitar repintados/saltos. */
+      header {
+        position: relative !important;
+        top: auto !important;
       }
 
-      #view-home {
-        min-height: 78svh !important;
+      /* Backdrop-filter + sticky/transforms puede producir brincos en Safari/Chrome móvil. */
+      .glass-panel,
+      .glass-card,
+      header {
+        -webkit-backdrop-filter: none !important;
+        backdrop-filter: none !important;
       }
 
-      /* En táctil el estado :hover puede quedar pegado y mover las tarjetas. */
+      /* En móvil no usamos animaciones ni transiciones geométricas. */
+      *, *::before, *::after {
+        animation: none !important;
+        transition-duration: 0s !important;
+      }
+
       .glass-card,
       .glass-card:hover,
       .tv-logo-brand,
       .tv-logo-brand:hover,
+      .tv-home-logo-feature,
       .telesec-logo-img,
       .telesec-logo-card:hover .telesec-logo-img,
       [class*="hover:-translate-y"],
@@ -52,29 +51,12 @@
       [class*="hover:scale-"] {
         transform: none !important;
       }
-
-      /* Se eliminan sólo las animaciones que cambian la posición del contenido. */
-      .tv-home-logo-feature,
-      .animate-pop {
-        animation: none !important;
-        transform: none !important;
-      }
-
-      .glass-card {
-        transition-property: border-color, background-color, box-shadow, opacity !important;
-        transition-duration: 140ms !important;
-      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      html {
-        scroll-behavior: auto !important;
-      }
-
       *, *::before, *::after {
-        animation-duration: 0.001ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.001ms !important;
+        animation: none !important;
+        transition-duration: 0s !important;
       }
     }
   `;
