@@ -190,9 +190,4 @@
 
   document.addEventListener('DOMContentLoaded',()=>setTimeout(render,700));
   setTimeout(render,100);
-  const observer=new MutationObserver(()=>{
-    clearTimeout(timer);
-    timer=setTimeout(render,120);
-  });
-  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();

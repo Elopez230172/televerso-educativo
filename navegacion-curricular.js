@@ -239,9 +239,4 @@
   patchCatalog();
   document.addEventListener('DOMContentLoaded',()=>setTimeout(applyView,500));
   let timer=null;
-  const observer=new MutationObserver(()=>{
-    if(timer) clearTimeout(timer);
-    timer=setTimeout(()=>{ if(typeof activeStudent!=='undefined' && activeStudent) applyView(); },180);
-  });
-  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();

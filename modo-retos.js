@@ -136,9 +136,4 @@
   setTimeout(simplify, 0);
 
   let timer = null;
-  const observer = new MutationObserver(() => {
-    clearTimeout(timer);
-    timer = setTimeout(simplify, 60);
-  });
-  observer.observe(document.documentElement, { childList: true, subtree: true });
 })();

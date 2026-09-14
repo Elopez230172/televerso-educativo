@@ -109,14 +109,4 @@
   setTimeout(apply,0);
 
   let timer=null;
-  const observer=new MutationObserver(()=>{
-    if(currentField()!==FIELD) return;
-    clearTimeout(timer);
-    timer=setTimeout(()=>{
-      const grid=document.getElementById('student-missions-grid');
-      if(grid && !grid.querySelector('.tv-sp2-simple-card')) renderSimpleGrid();
-      cleanMissionModal();
-    },80);
-  });
-  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
