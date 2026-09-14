@@ -1,0 +1,62 @@
+name: Aplicar Saberes proyecto integrado
+
+on:
+  push:
+    paths:
+      - '.github/workflows/aplicar-saberes-proyecto-integrado.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convertir Saberes 2.º a un proyecto integrado
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('saberes-segundo.js')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('Alineado al cuaderno de Lenguajes 2.º: siete etapas oficiales, 3 proyectos académicos y 10 retos.','Alineado al cuaderno de Lenguajes 2.º: siete etapas, un proyecto integrado, un producto final y 10 retos.')
+          s=s.replace("  const STAGE5='Etapa 5 · Distintas fuentes de consulta';\n  const meta=(m,desc,paper,stage,pa,evidence)=>Object.assign(m,{\n    field:FIELD,fieldTitle:FIELD_TITLE,level:'2.º de Telesecundaria',grade:2,\n    cognitiveLevel:'comprender-aplicar-analizar',desc,paper,stage,pa,evidence\n  });",
+          "  const STAGE5='Etapa 5 · Distintas fuentes de consulta';\n  const PROJECT='Proyecto integrado · Informe científico visual de nuestra comunidad';\n  const meta=(m,desc,paper,stage,project,evidence)=>Object.assign(m,{\n    field:FIELD,fieldTitle:FIELD_TITLE,level:'2.º de Telesecundaria',grade:2,\n    cognitiveLevel:'comprender-aplicar-analizar',desc,paper,stage,project,evidence\n  });")
+          for old in ["'PA1 · Nuestra comunidad en gráficas'","'PA2 · La ciencia y sus cálculos'","'PA3 · Equidad de género en gráficas'","'Integración de PA1, PA2 y PA3'"]:
+              s=s.replace(old,'PROJECT')
+          s=s.replace("'Una mejora concreta en cada uno de los tres productos.'","'Una mejora concreta que aplicarás al informe científico visual final.'")
+          s=s.replace("'Relaciona distintos tipos de evidencia con formas de representación útiles para el proyecto sobre equidad.'","'Relaciona distintos tipos de evidencia con representaciones útiles para incorporar equidad y contexto al mismo informe científico visual.'")
+          s=s.replace('Justificación de una representación para el artículo.','Justificación de una representación para el informe.')
+          s=s.replace('Evalúa la trazabilidad de una fuente antes de incorporar datos a un artículo informativo.','Evalúa la trazabilidad de una fuente antes de incorporar datos al informe científico visual.')
+          s=s.replace('En nuestra colección observamos este patrón; señalamos sus límites y proponemos ampliar la búsqueda','En nuestro estudio observamos este patrón; señalamos sus límites y proponemos ampliar la búsqueda')
+          s=s.replace('¿Qué práctica fortalece un artículo científico escolar?','¿Qué práctica fortalece un informe científico escolar?')
+          s=s.replace('<div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><span class="text-[10px] uppercase tracking-widest font-black text-emerald-300">Ruta oficial del proyecto</span><h4 class="text-lg font-black text-white mt-1">Las siete etapas del PPA 1</h4></div><span class="text-[11px] text-slate-400">Cuaderno pp. 3-31</span></div>',
+          '<div class="flex flex-wrap items-center justify-between gap-3 mb-4"><div><span class="text-[10px] uppercase tracking-widest font-black text-emerald-300">Ruta del proyecto integrado</span><h4 class="text-lg font-black text-white mt-1">Un proyecto · un producto · siete etapas</h4><p class="text-[11px] text-slate-400 mt-1">Producto final: Informe científico visual de nuestra comunidad</p></div><span class="text-[11px] text-slate-400">Cuaderno pp. 3-31</span></div>')
+          s=s.replace("['1','¿Qué haremos?','Propósito, detonador y producto.'],\n        ['2','¡Ése es el problema!','R1 + diagnóstico de datos.'],\n        ['3','¡Una propuesta de solución!','Pregunta y horizonte.'],\n        ['4','Paso a paso','Plan, responsables y tiempos.'],\n        ['5','Distintas fuentes de consulta','R2-R9 + investigación de los 3 PA.'],\n        ['6','Unimos las piezas','Revisión de productos + R10.'],\n        ['7','¡Ya lo tenemos!','Presentación, valoración y retroalimentación.']",
+          "['1','¿Qué haremos?','Conocemos el reto y el único producto final.'],\n        ['2','¡Ése es el problema!','R1 + diagnóstico de datos.'],\n        ['3','¡Una propuesta de solución!','Pregunta de investigación y horizonte.'],\n        ['4','Paso a paso','Plan, responsables, fuentes y tiempos.'],\n        ['5','Distintas fuentes de consulta','R2-R9: datos, cálculos, gráficas, fuentes y equidad.'],\n        ['6','Unimos las piezas','Armamos y revisamos el informe + R10.'],\n        ['7','¡Ya lo tenemos!','Presentamos un solo informe, valoramos y mejoramos.']")
+          s=s.replace('7 etapas · 3 proyectos · 10 retos','7 etapas · 1 proyecto · 1 producto · 10 retos')
+          s=s.replace('R1-R3 · problema, conceptos y cálculos.','R1-R3 · problema, datos y cálculos del informe.')
+          s=s.replace('R4-R6 · artículo, fuentes y gráficas.','R4-R6 · gráficas, fuentes y comunicación científica.')
+          s=s.replace('R7-R10 · equidad, interpretación e integración.','R7-R10 · equidad, interpretación y cierre del informe.')
+          s=s.replace('${m.pa}','${m.project}')
+          s=s.replace('Saberes y pensamiento científico · 2.º grado · PPA 1 · 7 etapas · 10 retos','Saberes y pensamiento científico · 2.º grado · PPA 1 · proyecto integrado · 10 retos')
+          s=s.replace('cada uno de los tres productos','el producto integrado')
+          s=s.replace('los tres productos','el informe científico visual')
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check saberes-segundo.js
+          ! grep -qE "PA1 ·|PA2 ·|PA3 ·|3 proyectos|tres productos|m\.pa" saberes-segundo.js
+          rm -f .github/workflows/aplicar-saberes-proyecto-integrado.yml
+      - name: Guardar cambios
+        run: |
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add saberes-segundo.js .github/workflows/aplicar-saberes-proyecto-integrado.yml
+          if git diff --cached --quiet; then
+            echo 'Sin cambios'
+          else
+            git commit -m 'Unificar Saberes 2.º en un solo producto [skip ci]'
+            git push
+          fi
