@@ -15,15 +15,12 @@
   style.id = 'tv-mobile-stability-v3-style';
   style.textContent = `
     @media (hover: none), (pointer: coarse), (max-width: 820px) {
-      /* El scroll sigue siendo totalmente nativo. */
       html, body { scroll-behavior: auto !important; }
       body {
         background-attachment: scroll !important;
         min-height: 100svh !important;
       }
 
-      /* Evita que Chrome/Safari elijan un botón/tarjeta parcialmente visible
-         como ancla y corrijan el scroll una y otra vez cuando cambia el DOM. */
       html, body, main, header,
       #view-home, #view-student,
       #tv-curriculum-selector, #student-missions-grid,
@@ -31,7 +28,6 @@
         overflow-anchor: none !important;
       }
 
-      /* Evita saltos derivados del viewport dinámico y del encabezado sticky. */
       header {
         position: relative !important;
         top: auto !important;
@@ -40,7 +36,6 @@
         min-height: calc(100svh - 90px) !important;
       }
 
-      /* Los filtros de fondo y transforms son costosos en scroll móvil. */
       .glass-panel, .glass-card, header, .telesec-logo-card {
         -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
@@ -116,8 +111,6 @@
     ].join('|');
   };
 
-  /* Firestore escucha toda la colección students. Si cambia otro alumno,
-     no reconstruimos el tablero del alumno activo si su estado visible es igual. */
   const baseDashboard = window.renderStudentDashboard;
   if (typeof baseDashboard === 'function' && !baseDashboard.__tvMobileStableV3) {
     let lastSignature = null;
@@ -133,9 +126,6 @@
     try { renderStudentDashboard = stableDashboard; } catch (_) {}
   }
 
-  /* El acceso QR permanece en la URL. checkUrlLogin() se ejecuta en cada
-     snapshot de estudiantes; si la sesión ya corresponde a ese QR, no repite
-     render ni vuelve a entrar a la misma vista. */
   const baseCheckUrlLogin = window.checkUrlLogin;
   if (typeof baseCheckUrlLogin === 'function' && !baseCheckUrlLogin.__tvMobileStableV3) {
     const stableCheckUrlLogin = function(...args) {
@@ -149,8 +139,6 @@
     try { checkUrlLogin = stableCheckUrlLogin; } catch (_) {}
   }
 
-  /* switchView() recrea el logo del alumno con un setTimeout. Evitamos hacerlo
-     si la vista solicitada ya está activa, sin tocar el scroll del navegador. */
   const baseSwitchView = window.switchView;
   if (typeof baseSwitchView === 'function' && !baseSwitchView.__tvMobileStableV3) {
     const stableSwitchView = function(viewId, ...rest) {
@@ -169,11 +157,13 @@
   }
 })();
 
-/* TeleVerso Educativo · Progresión secuencial de misiones
-   Regla global para todos los campos formativos y grados:
-   dentro de cada Campo + Periodo + PPA, no se puede abrir una misión nueva
-   hasta completar todas las anteriores. Las misiones ya completadas sí pueden repetirse.
-   No usa MutationObserver, IntersectionObserver ni listeners de scroll.
+/* TeleVerso Educativo · Progresión secuencial global V2
+   Se aplica a TODOS los campos, grados, periodos y PPA.
+   - Sólo la primera actividad pendiente queda disponible.
+   - Las posteriores muestran “En espera”.
+   - Una actividad completada puede repetirse.
+   - La protección se valida también al intentar abrir la misión.
+   No usa observers ni listeners de scroll/touch/resize.
 */
 (() => {
   if (typeof missionCatalog === 'undefined') return;
@@ -187,121 +177,166 @@
   };
 
   const completedMap = () => currentStudent()?.completed || {};
+
+  const catalogEntries = () => Object.entries(missionCatalog || {}).map(([key, mission], insertion) => ({
+    key: String(key),
+    mission,
+    id: String(mission?.id || key),
+    insertion
+  })).filter(x => x.mission);
+
+  function entryForId(id) {
+    const wanted = String(id || '');
+    if (!wanted) return null;
+    const direct = missionCatalog?.[wanted];
+    if (direct) {
+      const entries = catalogEntries();
+      return entries.find(x => x.key === wanted) || { key: wanted, mission: direct, id: String(direct.id || wanted), insertion: 0 };
+    }
+    return catalogEntries().find(x => x.id === wanted) || null;
+  }
+
   const missionScope = mission => [
     mission?.field || 'general',
     Number(mission?.period || 1),
     Number(mission?.ppa || 1)
   ].join('|');
 
-  const missionById = id => missionCatalog?.[id] || null;
-
-  function visibleOrderForScope(scope) {
-    const grid = document.getElementById('student-missions-grid');
-    if (!grid) return [];
-
-    const ids = [...grid.querySelectorAll('[id^="badge-mission-"]')]
-      .map(el => String(el.id || '').replace('badge-mission-', ''))
-      .filter(Boolean)
-      .filter(id => missionById(id) && missionScope(missionById(id)) === scope);
-
-    return [...new Set(ids)];
+  function isMissionCompleted(entry) {
+    if (!entry) return false;
+    const completed = completedMap();
+    if (completed[entry.id] || completed[entry.key]) return true;
+    return catalogEntries()
+      .filter(x => x.mission === entry.mission)
+      .some(x => completed[x.id] || completed[x.key]);
   }
 
-  function catalogOrderForScope(scope) {
-    return Object.values(missionCatalog)
-      .filter(m => m?.id && missionScope(m) === scope)
-      .map(m => m.id);
+  function missionRank(entry) {
+    const mission = entry?.mission || {};
+    const explicit = Number(mission.sequence ?? mission.order ?? mission.position ?? mission.challengeNumber);
+    if (Number.isFinite(explicit) && explicit > 0) return explicit;
+
+    const title = String(mission.title || '');
+    const titleMatch = title.match(/\bR(?:eto)?\s*[-.:]?\s*(\d+)\b/i);
+    if (titleMatch) return Number(titleMatch[1]);
+
+    const idMatch = String(entry?.id || '').match(/(\d+)(?!.*\d)/);
+    if (idMatch) return Number(idMatch[1]);
+
+    return 100000 + Number(entry?.insertion || 0);
   }
 
-  function orderedIdsForMission(missionId) {
-    const mission = missionById(missionId);
-    if (!mission) return [];
-    const scope = missionScope(mission);
-    const visible = visibleOrderForScope(scope);
-    if (visible.includes(missionId)) return visible;
-    return catalogOrderForScope(scope);
+  function orderedEntriesForScope(scope) {
+    return catalogEntries()
+      .filter(x => missionScope(x.mission) === scope)
+      .sort((a, b) => {
+        const rankDiff = missionRank(a) - missionRank(b);
+        return rankDiff || a.insertion - b.insertion;
+      });
   }
 
   function progressionState(missionId) {
-    const mission = missionById(missionId);
-    if (!mission) return null;
+    const entry = entryForId(missionId);
+    if (!entry) return null;
 
-    const completed = completedMap();
-    const ordered = orderedIdsForMission(missionId);
-    const index = ordered.indexOf(missionId);
-    const done = !!completed[missionId];
+    const ordered = orderedEntriesForScope(missionScope(entry.mission));
+    const index = ordered.findIndex(x => x.mission === entry.mission || x.id === entry.id || x.key === entry.key);
+    const done = isMissionCompleted(entry);
 
     if (index <= 0) {
-      return { mission, ordered, index, done, unlocked: true, firstMissingId: null };
+      return { entry, ordered, index, done, unlocked: true, firstMissing: null };
     }
 
     const previous = ordered.slice(0, index);
-    const firstMissingId = previous.find(id => !completed[id]) || null;
+    const firstMissing = previous.find(x => !isMissionCompleted(x)) || null;
     return {
-      mission,
+      entry,
       ordered,
       index,
       done,
-      unlocked: done || !firstMissingId,
-      firstMissingId
+      unlocked: !firstMissing,
+      firstMissing
     };
   }
 
-  function rememberButton(button) {
-    if (!button) return;
-    if (button.dataset.tvSeqOriginalHtml === undefined) {
-      button.dataset.tvSeqOriginalHtml = button.innerHTML;
-    }
-    if (button.dataset.tvSeqOriginalTitle === undefined) {
-      button.dataset.tvSeqOriginalTitle = button.getAttribute('title') || '';
-    }
+  function rememberAction(el) {
+    if (!el) return;
+    if (el.dataset.tvSeqOriginalHtml === undefined) el.dataset.tvSeqOriginalHtml = el.innerHTML;
+    if (el.dataset.tvSeqOriginalTitle === undefined) el.dataset.tvSeqOriginalTitle = el.getAttribute('title') || '';
+    if (el.dataset.tvSeqOriginalDisabled === undefined) el.dataset.tvSeqOriginalDisabled = el.disabled ? '1' : '0';
   }
 
-  function restoreButton(button) {
-    if (!button) return;
-    rememberButton(button);
-    button.disabled = false;
-    button.removeAttribute('aria-disabled');
-    button.style.opacity = '';
-    button.style.cursor = '';
-    button.style.filter = '';
-    button.style.boxShadow = '';
-    button.title = button.dataset.tvSeqOriginalTitle || '';
+  function restoreAction(el) {
+    if (!el) return;
+    rememberAction(el);
+    if ('disabled' in el) el.disabled = el.dataset.tvSeqOriginalDisabled === '1';
+    el.removeAttribute('aria-disabled');
+    el.style.opacity = '';
+    el.style.cursor = '';
+    el.style.filter = '';
+    el.style.boxShadow = '';
+    el.style.pointerEvents = '';
+    el.title = el.dataset.tvSeqOriginalTitle || '';
   }
 
-  function paintCard(card, icon, button, state) {
-    if (!card || !button || !state) return;
-    rememberButton(button);
+  function actionElements(card) {
+    if (!card) return [];
+    return [...card.querySelectorAll('button, a[href], [role="button"]')];
+  }
+
+  function primaryAction(card) {
+    if (!card) return null;
+    return card.querySelector('button[onclick*="launchMission"], a[onclick*="launchMission"], button, [role="button"], a[href]');
+  }
+
+  function paintCard(card, icon, state) {
+    if (!card || !state) return;
+
+    const actions = actionElements(card);
+    const primary = primaryAction(card);
+    actions.forEach(rememberAction);
+    if (primary) rememberAction(primary);
 
     const locked = !state.unlocked;
     card.dataset.tvSequenceLocked = locked ? '1' : '0';
-    card.style.opacity = locked ? '0.58' : '';
-    card.style.filter = locked ? 'grayscale(0.28)' : '';
+    card.dataset.tvMissionId = state.entry.id;
+    card.style.opacity = locked ? '0.52' : '';
+    card.style.filter = locked ? 'grayscale(0.45)' : '';
 
     if (state.done) {
-      restoreButton(button);
-      button.innerHTML = '<i class="fa-solid fa-rotate-right"></i><span>Repetir reto</span>';
-      button.title = 'Este reto ya fue completado. Puedes repetirlo.';
+      actions.forEach(restoreAction);
+      if (primary) {
+        primary.innerHTML = '<i class="fa-solid fa-rotate-right mr-1"></i><span>Repetir reto</span>';
+        primary.title = 'Actividad completada. Puedes repetirla.';
+      }
       if (icon) icon.className = 'fa-solid fa-circle-check text-emerald-400 text-base';
       return;
     }
 
     if (locked) {
-      button.disabled = true;
-      button.setAttribute('aria-disabled', 'true');
-      button.innerHTML = '<i class="fa-solid fa-lock"></i><span>Completa el reto anterior</span>';
-      button.title = 'Debes completar primero las misiones anteriores de este PPA.';
-      button.style.opacity = '0.68';
-      button.style.cursor = 'not-allowed';
-      button.style.filter = 'grayscale(0.35)';
-      button.style.boxShadow = 'none';
+      actions.forEach(el => {
+        if ('disabled' in el) el.disabled = true;
+        el.setAttribute('aria-disabled', 'true');
+        el.style.opacity = '0.66';
+        el.style.cursor = 'not-allowed';
+        el.style.filter = 'grayscale(0.45)';
+        el.style.boxShadow = 'none';
+        if (el.tagName === 'A') el.style.pointerEvents = 'none';
+      });
+      if (primary) {
+        const previousTitle = state.firstMissing?.mission?.title || 'la actividad anterior';
+        primary.innerHTML = '<i class="fa-solid fa-hourglass-half mr-1"></i><span>En espera</span>';
+        primary.title = `Primero completa: ${previousTitle}`;
+      }
       if (icon) icon.className = 'fa-solid fa-lock text-slate-600 text-base';
       return;
     }
 
-    restoreButton(button);
-    button.innerHTML = button.dataset.tvSeqOriginalHtml || '<i class="fa-solid fa-play"></i><span>Iniciar reto</span>';
-    button.title = 'Reto disponible';
+    actions.forEach(restoreAction);
+    if (primary) {
+      primary.innerHTML = primary.dataset.tvSeqOriginalHtml || '<i class="fa-solid fa-play mr-1"></i><span>Iniciar reto</span>';
+      primary.title = 'Actividad disponible';
+    }
     if (icon) icon.className = 'fa-solid fa-lock-open text-cyan-300 text-base';
   }
 
@@ -309,25 +344,40 @@
     const grid = document.getElementById('student-missions-grid');
     if (!grid || !currentStudent()) return;
 
-    [...grid.querySelectorAll('[id^="badge-mission-"]')].forEach(icon => {
-      const missionId = String(icon.id || '').replace('badge-mission-', '');
-      const state = progressionState(missionId);
-      const card = icon.closest('.glass-card');
-      const button = card?.querySelector('button[onclick*="launchMission"]');
-      if (!state || !card || !button) return;
-      paintCard(card, icon, button, state);
+    [...grid.querySelectorAll('.glass-card')].forEach(card => {
+      const icon = card.querySelector('[id^="badge-mission-"]');
+      let rawId = icon ? String(icon.id || '').replace('badge-mission-', '') : '';
+
+      if (!rawId) {
+        const launcher = card.querySelector('[onclick*="launchMission"]');
+        const onclick = launcher?.getAttribute('onclick') || '';
+        const match = onclick.match(/launchMission\(\s*['"]([^'"]+)['"]/);
+        rawId = match?.[1] || '';
+      }
+
+      if (!rawId) return;
+      const state = progressionState(rawId);
+      if (!state) return;
+      paintCard(card, icon, state);
     });
   }
 
+  let lateApplyTimer = null;
+  function scheduleSequenceLocks() {
+    applySequenceLocks();
+    Promise.resolve().then(applySequenceLocks);
+    clearTimeout(lateApplyTimer);
+    lateApplyTimer = setTimeout(applySequenceLocks, 430);
+  }
+
   function blockedNotice(state) {
-    const missing = state?.firstMissingId ? missionById(state.firstMissingId) : null;
-    const missingTitle = missing?.title || 'el reto anterior';
+    const missingTitle = state?.firstMissing?.mission?.title || 'la actividad anterior';
     if (window.Swal?.fire) {
       window.Swal.fire({
         toast: true,
         position: 'top',
         icon: 'info',
-        title: 'Reto bloqueado',
+        title: 'Actividad en espera',
         text: `Primero completa: ${missingTitle}`,
         showConfirmButton: false,
         timer: 2600,
@@ -337,45 +387,47 @@
   }
 
   const baseLaunchMission = window.launchMission;
-  if (typeof baseLaunchMission === 'function' && !baseLaunchMission.__tvSequentialProgress) {
+  if (typeof baseLaunchMission === 'function' && !baseLaunchMission.__tvSequentialProgressV2) {
     const guardedLaunchMission = function(missionId, ...args) {
       const state = progressionState(missionId);
       if (state && !state.unlocked) {
         blockedNotice(state);
-        applySequenceLocks();
+        scheduleSequenceLocks();
         return;
       }
-      return baseLaunchMission.call(this, missionId, ...args);
+      const result = baseLaunchMission.call(this, missionId, ...args);
+      scheduleSequenceLocks();
+      return result;
     };
-    guardedLaunchMission.__tvSequentialProgress = true;
+    guardedLaunchMission.__tvSequentialProgressV2 = true;
     window.launchMission = guardedLaunchMission;
     try { launchMission = guardedLaunchMission; } catch (_) {}
   }
 
   const baseSaveMissionResults = window.saveMissionResults;
-  if (typeof baseSaveMissionResults === 'function' && !baseSaveMissionResults.__tvSequentialProgress) {
+  if (typeof baseSaveMissionResults === 'function' && !baseSaveMissionResults.__tvSequentialProgressV2) {
     const sequentialSaveMissionResults = function(...args) {
       const result = baseSaveMissionResults.apply(this, args);
       if (result && typeof result.finally === 'function') {
-        return result.finally(() => setTimeout(applySequenceLocks, 160));
+        return result.finally(scheduleSequenceLocks);
       }
-      setTimeout(applySequenceLocks, 160);
+      scheduleSequenceLocks();
       return result;
     };
-    sequentialSaveMissionResults.__tvSequentialProgress = true;
+    sequentialSaveMissionResults.__tvSequentialProgressV2 = true;
     window.saveMissionResults = sequentialSaveMissionResults;
     try { saveMissionResults = sequentialSaveMissionResults; } catch (_) {}
   }
 
-  function wrapAfter(name, delay = 260) {
+  function wrapAfter(name) {
     const fn = window[name];
-    if (typeof fn !== 'function' || fn.__tvSequentialProgressAfter) return;
+    if (typeof fn !== 'function' || fn.__tvSequentialProgressV2After) return;
     const wrapped = function(...args) {
       const result = fn.apply(this, args);
-      setTimeout(applySequenceLocks, delay);
+      scheduleSequenceLocks();
       return result;
     };
-    wrapped.__tvSequentialProgressAfter = true;
+    wrapped.__tvSequentialProgressV2After = true;
     window[name] = wrapped;
     try {
       if (name === 'renderStudentMissionsGrid') renderStudentMissionsGrid = wrapped;
@@ -384,16 +436,97 @@
     } catch (_) {}
   }
 
-  wrapAfter('renderStudentMissionsGrid', 300);
-  wrapAfter('renderStudentDashboard', 320);
-  wrapAfter('tvSetField', 280);
-  wrapAfter('tvCurrSelectField', 300);
-  wrapAfter('tvCurrSelectPeriod', 300);
-  wrapAfter('tvCurrSelectPpa', 300);
-  wrapAfter('tvProgSelectField', 320);
-  wrapAfter('tvProgSelectPeriod', 320);
-  wrapAfter('tvProgSelectPpa', 320);
+  [
+    'renderStudentMissionsGrid', 'renderStudentDashboard', 'tvSetField',
+    'tvCurrSelectField', 'tvCurrSelectPeriod', 'tvCurrSelectPpa',
+    'tvProgSelectField', 'tvProgSelectPeriod', 'tvProgSelectPpa'
+  ].forEach(wrapAfter);
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(applySequenceLocks, 900));
-  setTimeout(applySequenceLocks, 420);
+  document.addEventListener('click', event => {
+    const card = event.target?.closest?.('#student-missions-grid .glass-card[data-tv-sequence-locked="1"]');
+    if (!card) return;
+    const action = event.target.closest('button, a, [role="button"]');
+    if (!action) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    const state = progressionState(card.dataset.tvMissionId);
+    blockedNotice(state);
+    scheduleSequenceLocks();
+  }, true);
+
+  window.tvApplySequenceLocks = scheduleSequenceLocks;
+  document.addEventListener('DOMContentLoaded', scheduleSequenceLocks);
+  scheduleSequenceLocks();
+})();
+
+/* TeleVerso Educativo · Regreso visible desde cualquier actividad
+   Mantiene al alumno en el mismo campo / periodo / PPA y vuelve a la lista de retos.
+*/
+(() => {
+  function clearActiveMission() {
+    try { activeMissionKey = null; } catch (_) {}
+  }
+
+  function backToActivities() {
+    const modal = document.getElementById('modal-mission');
+    if (!modal) return;
+    if (typeof window.closeMissionModal === 'function') {
+      window.closeMissionModal();
+    } else {
+      modal.classList.add('hidden');
+      clearActiveMission();
+    }
+    if (typeof window.tvApplySequenceLocks === 'function') window.tvApplySequenceLocks();
+  }
+
+  function ensureBackButton() {
+    const modal = document.getElementById('modal-mission');
+    const area = document.getElementById('mission-content-area');
+    const panel = area?.parentElement;
+    if (!modal || !area || !panel || document.getElementById('tv-mission-back-bar')) return;
+
+    const bar = document.createElement('div');
+    bar.id = 'tv-mission-back-bar';
+    bar.className = 'sticky top-0 z-20 -mx-1 mb-4 pb-3 pt-1 bg-slate-950/95 border-b border-white/10';
+    bar.innerHTML = `
+      <button type="button" id="tv-mission-back-button"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-cyan-500/30 text-cyan-100 text-xs sm:text-sm font-black shadow-lg"
+        title="Cerrar esta actividad y volver a la lista de retos">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Volver a actividades</span>
+      </button>`;
+    panel.insertBefore(bar, area);
+    bar.querySelector('#tv-mission-back-button')?.addEventListener('click', backToActivities);
+
+    const closeButton = panel.querySelector('button[onclick="closeMissionModal()"]');
+    if (closeButton) {
+      closeButton.setAttribute('title', 'Volver a actividades');
+      closeButton.setAttribute('aria-label', 'Volver a actividades');
+    }
+  }
+
+  const baseCloseMissionModal = window.closeMissionModal;
+  if (typeof baseCloseMissionModal === 'function' && !baseCloseMissionModal.__tvBackToActivities) {
+    const stableClose = function(...args) {
+      const result = baseCloseMissionModal.apply(this, args);
+      clearActiveMission();
+      if (typeof window.tvApplySequenceLocks === 'function') window.tvApplySequenceLocks();
+      return result;
+    };
+    stableClose.__tvBackToActivities = true;
+    window.closeMissionModal = stableClose;
+    try { closeMissionModal = stableClose; } catch (_) {}
+  }
+
+  document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return;
+    const modal = document.getElementById('modal-mission');
+    if (!modal || modal.classList.contains('hidden')) return;
+    backToActivities();
+  });
+
+  window.tvBackToActivities = backToActivities;
+  ensureBackButton();
+  document.addEventListener('DOMContentLoaded', ensureBackButton);
 })();
