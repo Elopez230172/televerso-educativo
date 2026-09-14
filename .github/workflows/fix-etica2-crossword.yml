@@ -1,0 +1,42 @@
+name: Corregir crucigrama Ética 2
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-etica2-crossword.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Corregir cruces y validar
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('etica-segundo.js')
+          s=p.read_text(encoding='utf-8')
+          repl={
+            "{word:'RESPETO',r:7,c:4,dir:'H'":"{word:'RESPETO',r:8,c:5,dir:'H'",
+            "{word:'DERECHO',r:5,c:4,dir:'V'":"{word:'DERECHO',r:7,c:6,dir:'V'",
+            "{word:'LIBERTAD',r:4,c:5,dir:'V'":"{word:'LIBERTAD',r:5,c:9,dir:'V'",
+            "{word:'PERTENENCIA',r:7,c:7,dir:'V'":"{word:'PERTENENCIA',r:6,c:5,dir:'V'",
+            "{word:'TOLERANCIA',r:7,c:9,dir:'V'":"{word:'TOLERANCIA',r:7,c:11,dir:'V'",
+            "{word:'DIGNIDAD',r:13,c:4,dir:'H'":"{word:'DIGNIDAD',r:6,c:8,dir:'H'",
+            "{word:'INCLUSION',r:15,c:7,dir:'H'":"{word:'INCLUSION',r:15,c:5,dir:'H'",
+          }
+          for a,b in repl.items():
+              if b not in s:
+                  if a not in s: raise SystemExit('Patrón no encontrado: '+a)
+                  s=s.replace(a,b,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check etica-segundo.js
+      - name: Retirar instalador y publicar
+        run: |
+          rm .github/workflows/fix-etica2-crossword.yml
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add etica-segundo.js .github/workflows/fix-etica2-crossword.yml
+          git commit -m 'Corregir crucigrama de Ética 2 [skip ci]'
+          git push
