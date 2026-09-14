@@ -1,0 +1,46 @@
+name: Integrar QR premium tecnológico
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'qr-premium.js'
+      - '.github/workflows/install-qr-premium.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  integrar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Insertar módulo QR premium
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          script = '<script src="qr-premium.js"></script>'
+          if script not in text:
+              marker = '<script src="expediente-mejorado.js"></script>'
+              if marker not in text:
+                  raise SystemExit('No se encontró el punto de inserción expediente-mejorado.js')
+              text = text.replace(marker, marker + '\n    ' + script, 1)
+              p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Confirmar cambios
+        run: |
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          if git diff --quiet; then
+            echo 'El módulo QR premium ya estaba integrado.'
+          else
+            git add index.html
+            git commit -m 'Activar QR premium tecnológico [skip ci]'
+            git push origin main
+          fi
