@@ -1,7 +1,6 @@
 /* TeleVerso Educativo · Estabilidad visual en móviles
-   Evita saltos molestos al desplazar la pantalla en dispositivos táctiles.
-   Desactiva animaciones continuas y transformaciones hover en pantallas móviles,
-   estabiliza las unidades de alto y evita el fondo fijo durante el scroll.
+   Reduce saltos visuales sin bloquear el desplazamiento vertical.
+   En móvil se desactivan únicamente animaciones y transforms que mueven elementos.
 */
 (() => {
   if (document.getElementById('tv-mobile-stability-style')) return;
@@ -9,27 +8,39 @@
   const style = document.createElement('style');
   style.id = 'tv-mobile-stability-style';
   style.textContent = `
-    html, body {
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-
     @media (hover: none), (pointer: coarse), (max-width: 768px) {
       html {
         scroll-behavior: auto !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 100% !important;
+        touch-action: pan-y pinch-zoom !important;
       }
 
       body {
         background-attachment: scroll !important;
+        overflow-y: auto !important;
+        height: auto !important;
         min-height: 100svh !important;
-        overscroll-behavior-y: contain;
+        overscroll-behavior-y: auto !important;
+        touch-action: pan-y pinch-zoom !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      main,
+      #view-home,
+      #view-student,
+      #view-teacher {
+        overflow-y: visible !important;
+        height: auto !important;
+        max-height: none !important;
       }
 
       #view-home {
         min-height: 78svh !important;
       }
 
-      /* En táctil el estado :hover puede quedar “pegado” y provocar saltos. */
+      /* En táctil el estado :hover puede quedar pegado y mover las tarjetas. */
       .glass-card,
       .glass-card:hover,
       .tv-logo-brand,
@@ -42,14 +53,13 @@
         transform: none !important;
       }
 
-      /* El logo flotante y las entradas con rebote se vuelven estáticos en móvil. */
+      /* Se eliminan sólo las animaciones que cambian la posición del contenido. */
       .tv-home-logo-feature,
       .animate-pop {
         animation: none !important;
         transform: none !important;
       }
 
-      /* Evita transiciones de geometría durante el desplazamiento. */
       .glass-card {
         transition-property: border-color, background-color, box-shadow, opacity !important;
         transition-duration: 140ms !important;
@@ -65,11 +75,6 @@
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.001ms !important;
-      }
-
-      .tv-home-logo-feature,
-      .animate-pop {
-        animation: none !important;
       }
     }
   `;
