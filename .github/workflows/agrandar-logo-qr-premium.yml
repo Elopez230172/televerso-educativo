@@ -20,9 +20,19 @@ jobs:
 
       - name: Verificar diseño premium y equivalencia de impresión
         run: |
-          grep -F "Math.round(size*.46)" qr-premium.js
-          grep -F "background:rgba(255,255,255,.92)" qr-premium.js
-          grep -F "backdrop-filter:blur(10px)" qr-premium.js
-          grep -F "function groupStudentCard" qr-premium.js
-          grep -F "renderQr(document.getElementById(\`print-qr-\${st.id}\`),\`${base}?s=\${encodeURIComponent(st.id)}\`,176)" qr-premium.js
-          echo 'QR individual y QR grupal usan el mismo tamaño y estilo premium.'
+          python3 - <<'PY'
+          from pathlib import Path
+          s = Path('qr-premium.js').read_text(encoding='utf-8')
+          checks = [
+              "Math.round(size*.46)",
+              "background:rgba(255,255,255,.92)",
+              "backdrop-filter:blur(10px)",
+              "function groupStudentCard",
+              "grid-template-columns:repeat(2,340px)",
+              "renderQr(document.getElementById(`print-qr-${st.id}`),`${base}?s=${encodeURIComponent(st.id)}`,176)",
+          ]
+          missing = [item for item in checks if item not in s]
+          if missing:
+              raise SystemExit('Faltan comprobaciones del QR premium: ' + ' | '.join(missing))
+          print('QR individual y QR grupal usan el mismo tamaño y estilo premium.')
+          PY
