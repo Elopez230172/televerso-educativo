@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'navegacion-curricular.js'
+      - 'navegacion-progresiva.js'
       - 'modo-retos.js'
       - 'saberes2-retos-directos.js'
       - '.github/workflows/install-navegacion-curricular.yml'
@@ -16,6 +17,7 @@ jobs:
       - name: Validar JavaScript
         run: |
           node --check navegacion-curricular.js
+          node --check navegacion-progresiva.js
           node --check modo-retos.js
           node --check saberes2-retos-directos.js
       - name: Insertar módulos de interfaz
@@ -31,6 +33,12 @@ jobs:
               if nav_anchor not in s:
                   raise SystemExit('No se encontró acceso-por-grado.js en index.html')
               s=s.replace(nav_anchor, nav_anchor+nav, 1)
+
+          progressive='    <script src="navegacion-progresiva.js"></script>\n'
+          if progressive not in s:
+              if nav not in s:
+                  raise SystemExit('No se encontró navegacion-curricular.js en index.html')
+              s=s.replace(nav, nav+progressive, 1)
 
           direct='    <script src="modo-retos.js"></script>\n'
           direct_anchor='    <script src="expediente-mejorado.js"></script>\n'
@@ -53,5 +61,5 @@ jobs:
           git config user.name 'televerso-bot'
           git config user.email 'actions@users.noreply.github.com'
           git add index.html
-          git commit -m 'Integrar fichas directas de Saberes 2 [skip ci]'
+          git commit -m 'Integrar navegación curricular progresiva [skip ci]'
           git push
