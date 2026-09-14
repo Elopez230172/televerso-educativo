@@ -1,4 +1,4 @@
-name: Verificar QR premium
+name: Ajustar impresión grupal QR
 
 on:
   push:
@@ -9,30 +9,67 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  verificar-qr:
+  ajustar-impresion-grupal:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
-      - name: Verificar diseño premium y equivalencia de impresión
+      - name: Quitar encabezado y acomodar cuatro credenciales por hoja
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('qr-premium.js')
+          s = p.read_text(encoding='utf-8')
+
+          old_card = '''  function groupStudentCard({qrId,name,group}){return `<div class="print-card" style="position:relative;overflow:hidden;width:340px;border-radius:28px;padding:26px 24px 22px;text-align:center;font-family:Arial,sans-serif;background:linear-gradient(180deg,#07111f 0 31%,#ffffff 31% 100%);border:1px solid #cbd5e1;box-shadow:0 20px 48px rgba(15,23,42,.16);break-inside:avoid;page-break-inside:avoid;"><div style="position:absolute;left:18%;right:18%;top:0;height:3px;background:linear-gradient(90deg,transparent,#22d3ee,#818cf8,#7c3aed,transparent);"></div><img src="${BRAND_LOGO}" alt="TeleVerso Educativo" style="display:block;width:205px;height:auto;margin:0 auto 9px;"><div style="display:inline-block;padding:6px 11px;border-radius:999px;background:rgba(99,102,241,.15);border:1px solid rgba(165,180,252,.30);font-size:9px;letter-spacing:.14em;font-weight:900;color:#c7d2fe;text-transform:uppercase;">Credencial escolar</div><h3 style="margin:12px 0 4px;color:#fff;font-size:18px;font-weight:900;">Acceso del estudiante</h3><p style="margin:0 0 18px;color:#b6c2d3;font-size:10px;line-height:1.4;">Código personal de entrada a TeleVerso Educativo.</p><div style="display:inline-block;padding:12px;background:#ffffff;border-radius:23px;border:1px solid #e2e8f0;box-shadow:0 12px 28px rgba(15,23,42,.15);"><div id="${qrId}" style="display:flex;justify-content:center;position:relative;"></div></div><h2 style="margin:15px 0 3px;color:#0f172a;font-size:19px;font-weight:900;">${name}</h2><p style="margin:0;color:#4f46e5;font-size:11px;font-weight:800;">Grupo: ${group}</p><p style="margin:14px auto 0;padding-top:10px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:8.5px;line-height:1.4;max-width:245px;">Escanea con la cámara para entrar directamente a tus retos.</p></div>`;}'''
+          new_card = '''  function groupStudentCard({qrId,name,group}){return `<div class="print-card" style="position:relative;overflow:hidden;width:322px;border-radius:22px;padding:15px 16px 13px;text-align:center;font-family:Arial,sans-serif;background:linear-gradient(180deg,#07111f 0 28%,#ffffff 28% 100%);border:1px solid #cbd5e1;box-shadow:0 13px 30px rgba(15,23,42,.12);break-inside:avoid;page-break-inside:avoid;"><div style="position:absolute;left:18%;right:18%;top:0;height:3px;background:linear-gradient(90deg,transparent,#22d3ee,#818cf8,#7c3aed,transparent);"></div><img src="${BRAND_LOGO}" alt="TeleVerso Educativo" style="display:block;width:168px;height:auto;margin:0 auto 5px;"><div style="display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(99,102,241,.15);border:1px solid rgba(165,180,252,.30);font-size:8px;letter-spacing:.13em;font-weight:900;color:#c7d2fe;text-transform:uppercase;">Credencial escolar</div><h3 style="margin:7px 0 2px;color:#fff;font-size:15px;font-weight:900;">Acceso del estudiante</h3><p style="margin:0 0 9px;color:#b6c2d3;font-size:8.5px;line-height:1.3;">Código personal de entrada a TeleVerso Educativo.</p><div style="display:inline-block;padding:8px;background:#ffffff;border-radius:18px;border:1px solid #e2e8f0;box-shadow:0 9px 20px rgba(15,23,42,.12);"><div id="${qrId}" style="display:flex;justify-content:center;position:relative;"></div></div><h2 style="margin:8px 0 2px;color:#0f172a;font-size:15px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</h2><p style="margin:0;color:#4f46e5;font-size:9.5px;font-weight:800;">Grupo: ${group}</p><p style="margin:7px auto 0;padding-top:6px;border-top:1px solid #e2e8f0;color:#94a3b8;font-size:7.5px;line-height:1.3;max-width:230px;">Escanea con la cámara para entrar directamente a tus retos.</p></div>`;}'''
+          if old_card not in s:
+              raise SystemExit('No se encontró la tarjeta grupal esperada')
+          s = s.replace(old_card, new_card, 1)
+
+          old_group = '''  window.printGroupQrs=function(groupId){const g=localState?.groups?.[groupId];if(!g||!Array.isArray(g.students)||!g.students.length){Swal.fire('Atención','Este grupo no tiene alumnos registrados para imprimir.','info');return;}const p=document.getElementById('print-area'),base=window.location.origin+window.location.pathname;if(!p)return;let h=`<div style="font-family:Arial,sans-serif;padding:8px;"><div style="position:relative;overflow:hidden;text-align:center;border-radius:22px;padding:16px 18px;margin-bottom:18px;background:#07111f;border:1px solid #cbd5e1;"><div style="position:absolute;left:25%;right:25%;top:0;height:3px;background:linear-gradient(90deg,transparent,#22d3ee,#818cf8,#7c3aed,transparent);"></div><img src="${BRAND_LOGO}" alt="TeleVerso Educativo" style="display:block;width:220px;height:auto;margin:0 auto 8px;"><div style="font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:#a5b4fc;">Credenciales digitales</div><h2 style="margin:5px 0 0;color:#fff;font-size:18px;font-weight:900;">${g.name}</h2><p style="margin:4px 0 0;color:#aab7ca;font-size:10px;">${g.students.length} estudiantes · mismo diseño de credencial individual</p></div><div style="display:grid;grid-template-columns:repeat(2,340px);justify-content:center;align-items:start;gap:18px 20px;">`;g.students.forEach(id=>{const st=localState.students[id];if(!st)return;h+=groupStudentCard({qrId:`print-qr-${st.id}`,name:st.name,group:g.name});});h+='</div></div>';p.innerHTML=h;g.students.forEach(id=>{const st=localState.students[id];if(!st)return;renderQr(document.getElementById(`print-qr-${st.id}`),`${base}?s=${encodeURIComponent(st.id)}`,176);});setTimeout(()=>window.print(),650);};'''
+          new_group = '''  window.printGroupQrs=function(groupId){const g=localState?.groups?.[groupId];if(!g||!Array.isArray(g.students)||!g.students.length){Swal.fire('Atención','Este grupo no tiene alumnos registrados para imprimir.','info');return;}const p=document.getElementById('print-area'),base=window.location.origin+window.location.pathname;if(!p)return;const ids=g.students.filter(id=>localState.students[id]);let h=`<div style="font-family:Arial,sans-serif;padding:0;margin:0;">`;for(let i=0;i<ids.length;i+=4){const pageIds=ids.slice(i,i+4),more=i+4<ids.length;h+=`<div style="display:grid;grid-template-columns:repeat(2,322px);justify-content:center;align-items:start;gap:12px 16px;padding:8px 0;${more?'break-after:page;page-break-after:always;':''}">`;pageIds.forEach(id=>{const st=localState.students[id];h+=groupStudentCard({qrId:`print-qr-${st.id}`,name:st.name,group:g.name});});h+='</div>';}h+='</div>';p.innerHTML=h;ids.forEach(id=>{const st=localState.students[id];renderQr(document.getElementById(`print-qr-${st.id}`),`${base}?s=${encodeURIComponent(st.id)}`,160);});setTimeout(()=>window.print(),650);};'''
+          if old_group not in s:
+              raise SystemExit('No se encontró la función de impresión grupal esperada')
+          s = s.replace(old_group, new_group, 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Verificar cuatro QR por hoja y sin encabezado
         run: |
           python3 - <<'PY'
           from pathlib import Path
           s = Path('qr-premium.js').read_text(encoding='utf-8')
           checks = [
-              "Math.round(size*.46)",
-              "background:rgba(255,255,255,.92)",
-              "backdrop-filter:blur(10px)",
-              "function groupStudentCard",
-              "grid-template-columns:repeat(2,340px)",
-              "renderQr(document.getElementById(`print-qr-${st.id}`),`${base}?s=${encodeURIComponent(st.id)}`,176)",
+              "grid-template-columns:repeat(2,322px)",
+              "for(let i=0;i<ids.length;i+=4)",
+              "page-break-after:always",
+              "renderQr(document.getElementById(`print-qr-${st.id}`),`${base}?s=${encodeURIComponent(st.id)}`,160)",
           ]
           missing = [item for item in checks if item not in s]
           if missing:
-              raise SystemExit('Faltan comprobaciones del QR premium: ' + ' | '.join(missing))
-          print('QR individual y QR grupal usan el mismo tamaño y estilo premium.')
+              raise SystemExit('Faltan ajustes de impresión grupal: ' + ' | '.join(missing))
+          if 'Credenciales digitales</div><h2' in s:
+              raise SystemExit('El encabezado grupal anterior todavía aparece')
+          print('Impresión grupal lista: sin encabezado y cuatro credenciales por hoja.')
           PY
+
+      - name: Publicar cambio
+        run: |
+          if git diff --quiet -- qr-premium.js; then
+            echo 'Sin cambios pendientes.'
+            exit 0
+          fi
+          git config user.name 'televerso-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add qr-premium.js
+          git commit -m 'Optimizar impresión grupal a cuatro QR por hoja [skip ci]'
+          git push origin main
