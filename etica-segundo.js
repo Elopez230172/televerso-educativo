@@ -71,13 +71,13 @@
       ['Libertad','Capacidad de decidir y expresarse dentro del marco de los derechos de los demás.']
     ]}),
     et2_8:meta({id:'et2_8',title:'R8 · Crucigrama del respeto',type:'et2-crossword',icon:'✍️',size:17,entries:[
-      {word:'RESPETO',r:7,c:4,dir:'H',clue:'Reconocer la dignidad y los derechos de otras personas.'},
-      {word:'DERECHO',r:5,c:4,dir:'V',clue:'Facultad o garantía que protege a las personas.'},
-      {word:'LIBERTAD',r:4,c:5,dir:'V',clue:'Principio que permite decidir y expresarse responsablemente.'},
-      {word:'PERTENENCIA',r:7,c:7,dir:'V',clue:'Sentirse parte de un grupo o comunidad.'},
-      {word:'TOLERANCIA',r:7,c:9,dir:'V',clue:'Disposición a convivir con ideas o prácticas distintas sin agredir.'},
-      {word:'DIGNIDAD',r:13,c:4,dir:'H',clue:'Valor inherente de toda persona.'},
-      {word:'INCLUSION',r:15,c:7,dir:'H',clue:'Participación sin exclusiones injustificadas.'}
+      {word:'RESPETO',r:8,c:5,dir:'H',clue:'Reconocer la dignidad y los derechos de otras personas.'},
+      {word:'DERECHO',r:7,c:6,dir:'V',clue:'Facultad o garantía que protege a las personas.'},
+      {word:'LIBERTAD',r:5,c:9,dir:'V',clue:'Principio que permite decidir y expresarse responsablemente.'},
+      {word:'PERTENENCIA',r:6,c:5,dir:'V',clue:'Sentirse parte de un grupo o comunidad.'},
+      {word:'TOLERANCIA',r:7,c:11,dir:'V',clue:'Disposición a convivir con ideas o prácticas distintas sin agredir.'},
+      {word:'DIGNIDAD',r:6,c:8,dir:'H',clue:'Valor inherente de toda persona.'},
+      {word:'INCLUSION',r:15,c:5,dir:'H',clue:'Participación sin exclusiones injustificadas.'}
     ]}),
     et2_9:meta({id:'et2_9',title:'R9 · Ruta contra la discriminación',type:'et2-story',icon:'🧭',scenes:[
       {q:'Escuchas una burla sobre la forma de vestir de un compañero. ¿Qué haces?',opts:['Me uno para no quedar fuera.','Detengo la burla y recuerdo que la diferencia no justifica descalificar.'],ans:1},
