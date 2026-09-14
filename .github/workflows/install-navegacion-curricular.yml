@@ -4,6 +4,7 @@ on:
     paths:
       - 'navegacion-curricular.js'
       - 'modo-retos.js'
+      - 'saberes2-retos-directos.js'
       - '.github/workflows/install-navegacion-curricular.yml'
 permissions:
   contents: write
@@ -16,6 +17,7 @@ jobs:
         run: |
           node --check navegacion-curricular.js
           node --check modo-retos.js
+          node --check saberes2-retos-directos.js
       - name: Insertar módulos de interfaz
         run: |
           python - <<'PY'
@@ -37,6 +39,12 @@ jobs:
                   raise SystemExit('No se encontró expediente-mejorado.js en index.html')
               s=s.replace(direct_anchor, direct_anchor+direct, 1)
 
+          sp2='    <script src="saberes2-retos-directos.js"></script>\n'
+          if sp2 not in s:
+              if direct not in s:
+                  raise SystemExit('No se encontró modo-retos.js en index.html')
+              s=s.replace(direct, direct+sp2, 1)
+
           p.write_text(s, encoding='utf-8')
           PY
       - name: Publicar cambio
@@ -45,5 +53,5 @@ jobs:
           git config user.name 'televerso-bot'
           git config user.email 'actions@users.noreply.github.com'
           git add index.html
-          git commit -m 'Integrar navegación curricular y modo de retos [skip ci]'
+          git commit -m 'Integrar fichas directas de Saberes 2 [skip ci]'
           git push
