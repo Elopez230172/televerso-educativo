@@ -124,6 +124,4 @@
 
   patchMissionMeta();
   document.addEventListener('DOMContentLoaded',()=>setTimeout(enhanceGrid,250));
-  const obs=new MutationObserver(()=>{ if(currentField()===FIELD) setTimeout(enhanceGrid,0); });
-  obs.observe(document.documentElement,{childList:true,subtree:true});
 })();

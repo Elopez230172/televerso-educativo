@@ -136,6 +136,4 @@
 
   patchCatalog();
   document.addEventListener('DOMContentLoaded',()=>setTimeout(organize,400));
-  const observer=new MutationObserver(()=>{if(currentField()===FIELD)setTimeout(organize,80);});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
 })();
