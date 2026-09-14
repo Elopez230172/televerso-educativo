@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userPath() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function hasProfile() { return signedIn() && exists(userPath()); }
+    function u() { return get(userPath()).data; }
+    function sameSchool(schoolId) { return hasProfile() && u().active == true && u().schoolId == schoolId; }
+    function isAdmin() { return hasProfile() && u().role == 'Administrador'; }
+    function isControl() { return hasProfile() && u().role == 'Control Escolar'; }
+    function roleCan(permission) {
+      return (u().role == 'Control Escolar' && permission in [
+        'escuela.ver','escuela.editar','ciclos.ver','ciclos.crear','ciclos.editar','ciclos.activar','ciclos.promover',
+        'alumnos.ver','alumnos.crear','alumnos.editar','alumnos.eliminar','alumnos.documentos','alumnos.expediente',
+        'asistencias.ver','asistencias.reportes','actividades.ver','calificaciones.ver','calificaciones.reportes',
+        'docentes.ver','docentes.crear','docentes.editar','docentes.eliminar','grupos.ver','grupos.crear','grupos.editar','grupos.eliminar',
+        'documentos.ver','documentos.crear','documentos.editar','documentos.eliminar','documentos.generar_pdf',
+        'papelera.ver','papelera.restaurar','configuracion.ver'
+      ]) || (u().role == 'Docente' && permission in [
+        'escuela.ver','ciclos.ver','alumnos.ver','alumnos.crear','alumnos.editar','alumnos.eliminar','alumnos.documentos','alumnos.expediente',
+        'asistencias.ver','asistencias.capturar','asistencias.editar','asistencias.reportes',
+        'actividades.ver','actividades.crear','actividades.editar','actividades.eliminar',
+        'calificaciones.ver','calificaciones.capturar','calificaciones.editar','calificaciones.eliminar','calificaciones.reportes',
+        'grupos.ver','documentos.ver','documentos.crear','documentos.editar','documentos.generar_pdf'
+      ]) || (u().role == 'Tutor' && permission in [
+        'escuela.ver','ciclos.ver','alumnos.ver','asistencias.ver','calificaciones.ver','calificaciones.reportes','documentos.ver','documentos.generar_pdf'
+      ]) || (u().role == 'Finanzas' && permission in ['escuela.ver','ciclos.ver','alumnos.ver','documentos.ver']);
+    }
+    function can(permission) {
+      return isAdmin() || (hasProfile() && (permission in u().permissions ? u().permissions[permission] == true : roleCan(permission)));
+    }
+    function groupAllowed(groupId) {
+      return isAdmin() || isControl() || (hasProfile() && groupId in u().allowedGroupIds);
+    }
+
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /licenseKeys/{id} { allow read, write: if false; }
+
+    match /schools/{schoolId} {
+      allow read: if sameSchool(schoolId);
+      allow write: if sameSchool(schoolId) && (isAdmin() || can('escuela.editar'));
+
+      match /cycles/{id} {
+        allow read: if sameSchool(schoolId) && can('ciclos.ver');
+        allow create: if sameSchool(schoolId) && can('ciclos.crear');
+        allow update: if sameSchool(schoolId) && (can('ciclos.editar') || can('ciclos.activar'));
+        allow delete: if sameSchool(schoolId) && can('ciclos.eliminar');
+      }
+      match /students/{id} {
+        allow read: if sameSchool(schoolId) && can('alumnos.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('alumnos.crear') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('alumnos.editar') && groupAllowed(resource.data.groupId) && groupAllowed(request.resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('alumnos.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /teachers/{id} {
+        allow read: if sameSchool(schoolId) && can('docentes.ver');
+        allow write: if sameSchool(schoolId) && (isAdmin() || isControl());
+      }
+      match /groups/{id} {
+        allow read: if sameSchool(schoolId) && can('grupos.ver');
+        allow write: if sameSchool(schoolId) && (isAdmin() || isControl());
+      }
+      match /attendance/{id} {
+        allow read: if sameSchool(schoolId) && can('asistencias.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('asistencias.capturar') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('asistencias.editar') && groupAllowed(resource.data.groupId) && groupAllowed(request.resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('asistencias.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /activities/{id} {
+        allow read: if sameSchool(schoolId) && can('actividades.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('actividades.crear') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('actividades.editar') && groupAllowed(resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('actividades.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /activityGrades/{id} {
+        allow read: if sameSchool(schoolId) && can('calificaciones.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('calificaciones.capturar') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('calificaciones.editar') && groupAllowed(resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('calificaciones.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /incidents/{id} {
+        allow read: if sameSchool(schoolId) && can('documentos.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('documentos.crear') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('documentos.editar') && groupAllowed(resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('documentos.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /summons/{id} {
+        allow read: if sameSchool(schoolId) && can('documentos.ver') && groupAllowed(resource.data.groupId);
+        allow create: if sameSchool(schoolId) && can('documentos.crear') && groupAllowed(request.resource.data.groupId);
+        allow update: if sameSchool(schoolId) && can('documentos.editar') && groupAllowed(resource.data.groupId);
+        allow delete: if sameSchool(schoolId) && can('documentos.eliminar') && groupAllowed(resource.data.groupId);
+      }
+      match /trash/{id} {
+        allow read: if sameSchool(schoolId) && can('papelera.ver');
+        allow create: if sameSchool(schoolId);
+        allow update: if sameSchool(schoolId) && can('papelera.restaurar');
+        allow delete: if sameSchool(schoolId) && can('papelera.eliminar');
+      }
+      match /audit/{id} {
+        allow read: if sameSchool(schoolId) && isAdmin();
+        allow create: if sameSchool(schoolId);
+        allow update, delete: if false;
+      }
+      match /settings/{id} {
+        allow read: if sameSchool(schoolId) && can('configuracion.ver');
+        allow write: if sameSchool(schoolId) && can('configuracion.editar');
+      }
+      match /{document=**} {
+        allow read: if sameSchool(schoolId);
+        allow write: if sameSchool(schoolId) && isAdmin();
+      }
+    }
+  }
+}
