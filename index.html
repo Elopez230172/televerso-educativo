@@ -854,8 +854,13 @@
             activeStudent.totalHits = (activeStudent.totalHits || 0) + (missionGameState.hits || 0);
             activeStudent.totalErrors = (activeStudent.totalErrors || 0) + (missionGameState.errors || 0);
 
+            const previousActivity = activeStudent.history[activeMissionKey];
             activeStudent.history[activeMissionKey] = {
                 missionTitle: missionCatalog[activeMissionKey].title,
+                field: missionCatalog[activeMissionKey].field || 'ens',
+                assessmentType: missionCatalog[activeMissionKey].type || '',
+                completedAtISO: new Date().toISOString(),
+                assessmentTrail: window.TeleversoAssessment ? window.TeleversoAssessment.trail(previousActivity) : (previousActivity?.assessmentTrail || []),
                 hits: missionGameState.hits || 0,
                 errors: missionGameState.errors || 0,
                 completedAt: new Date().toLocaleString(),
@@ -866,7 +871,9 @@
 
             if (db) {
                 try {
-                    await db.collection("students").doc(activeStudent.id).set(activeStudent);
+                    // Preserve teacher reviews written from another device.
+                    const { formativeReview, ...studentProgress } = activeStudent;
+                    await db.collection("students").doc(activeStudent.id).set(studentProgress, { merge: true });
                 } catch (e) {
                     console.error("Error al guardar:", e);
                 }
@@ -1322,6 +1329,7 @@
     <script src="saberes2-retos-directos.js"></script>
     <script src="movil-estable-v3.js"></script>
     <script src="qr-premium.js"></script>
+    <script src="evaluacion-integrada.js?v=20260915-1"></script>
     
     
 </body>
