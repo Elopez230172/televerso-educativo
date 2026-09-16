@@ -56,3 +56,184 @@
     {text:'Identifiquemos qué voces aparecen, cuáles faltan y contrastemos la crónica con testimonios, mapas y otros documentos.',cat:'P',exp:'Propone crítica de fuente y corroboración desde distintas perspectivas.'}
   ];
 })();
+
+/* TeleVerso Educativo · Orden personalizado por alumno · GLOBAL
+   - Aplica a todos los grados, campos, periodos, PPA y retos del catálogo.
+   - Mantiene exactamente el mismo contenido y dificultad.
+   - Cada alumno recibe un orden determinístico distinto por actividad.
+   - Al reabrir un reto, el mismo alumno conserva su orden.
+   - En secuencias/cronologías no altera la solución correcta: sólo controla
+     la aleatorización que hace el motor al presentar las piezas.
+*/
+(() => {
+  if (window.__tvOrdenPorAlumnoGlobalV1 || typeof missionCatalog === 'undefined') return;
+  window.__tvOrdenPorAlumnoGlobalV1 = true;
+
+  const originalByMission = new WeakMap();
+
+  const currentStudent = () => {
+    try { return typeof activeStudent !== 'undefined' ? activeStudent : null; }
+    catch (_) { return null; }
+  };
+
+  function hashSeed(text) {
+    let h = 2166136261 >>> 0;
+    const s = String(text || '');
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    h += h << 13; h ^= h >>> 7;
+    h += h << 3;  h ^= h >>> 17;
+    h += h << 5;
+    return h >>> 0;
+  }
+
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function() {
+      a |= 0;
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function clone(value) {
+    if (value === undefined) return undefined;
+    try { return structuredClone(value); }
+    catch (_) { return JSON.parse(JSON.stringify(value)); }
+  }
+
+  function shuffle(array, rng) {
+    const out = [...array];
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  const shuffleKeys = ['statements','pairs','qs','scenes','entries','words','locks','cards','questions','prompts','challenges','items'];
+
+  function captureOriginal(mission) {
+    if (originalByMission.has(mission)) return originalByMission.get(mission);
+    const snap = {};
+    shuffleKeys.forEach(k => {
+      if (Array.isArray(mission[k])) snap[k] = clone(mission[k]);
+    });
+    originalByMission.set(mission, snap);
+    return snap;
+  }
+
+  function restoreOriginal(mission) {
+    const snap = captureOriginal(mission);
+    Object.entries(snap).forEach(([k,v]) => { mission[k] = clone(v); });
+  }
+
+  function shuffledOptions(options, correct, rng) {
+    if (!Array.isArray(options) || options.length < 2) return {options: clone(options), correct};
+    const tagged = options.map((value,index) => ({value,index}));
+    const mixed = shuffle(tagged, rng);
+    let newCorrect = correct;
+    if (Number.isInteger(correct)) newCorrect = mixed.findIndex(x => x.index === correct);
+    return {options: mixed.map(x => clone(x.value)), correct: newCorrect};
+  }
+
+  function mixQuestion(q, rng) {
+    if (Array.isArray(q)) {
+      const copy = clone(q);
+      if (Array.isArray(copy[1])) {
+        const mixed = shuffledOptions(copy[1], copy[2], rng);
+        copy[1] = mixed.options;
+        if (Number.isInteger(copy[2])) copy[2] = mixed.correct;
+      }
+      return copy;
+    }
+    if (!q || typeof q !== 'object') return q;
+    const copy = clone(q);
+    const optKey = Array.isArray(copy.opts) ? 'opts' : (Array.isArray(copy.options) ? 'options' : null);
+    if (!optKey) return copy;
+    const ansKey = Object.prototype.hasOwnProperty.call(copy,'ans') ? 'ans'
+      : Object.prototype.hasOwnProperty.call(copy,'answer') ? 'answer'
+      : Object.prototype.hasOwnProperty.call(copy,'correct') ? 'correct'
+      : Object.prototype.hasOwnProperty.call(copy,'correctIndex') ? 'correctIndex' : null;
+    const oldCorrect = ansKey ? copy[ansKey] : undefined;
+    const mixed = shuffledOptions(copy[optKey], oldCorrect, rng);
+    copy[optKey] = mixed.options;
+    if (ansKey && Number.isInteger(oldCorrect)) copy[ansKey] = mixed.correct;
+    return copy;
+  }
+
+  function typeIsOrdered(mission) {
+    const t = String(mission?.type || '').toLowerCase();
+    return /(sequence|secuencia|timeline|cronolog|orden|order)/.test(t);
+  }
+
+  function prepareMission(mission, missionId, student) {
+    restoreOriginal(mission);
+    if (!student?.id) return;
+
+    const base = `${student.id}|${missionId || mission.id || mission.title || 'mission'}|tv-order-v1`;
+    const rngFor = suffix => mulberry32(hashSeed(`${base}|${suffix}`));
+
+    if (Array.isArray(mission.statements)) mission.statements = shuffle(mission.statements, rngFor('statements'));
+    if (Array.isArray(mission.pairs)) mission.pairs = shuffle(mission.pairs, rngFor('pairs'));
+    if (Array.isArray(mission.entries)) mission.entries = shuffle(mission.entries, rngFor('entries'));
+    if (Array.isArray(mission.words)) mission.words = shuffle(mission.words, rngFor('words'));
+    if (Array.isArray(mission.cards)) mission.cards = shuffle(mission.cards, rngFor('cards'));
+    if (Array.isArray(mission.prompts)) mission.prompts = shuffle(mission.prompts, rngFor('prompts'));
+    if (Array.isArray(mission.challenges)) mission.challenges = shuffle(mission.challenges, rngFor('challenges'));
+
+    if (Array.isArray(mission.qs)) {
+      const rq = rngFor('qs-options');
+      mission.qs = shuffle(mission.qs.map(q => mixQuestion(q, rq)), rngFor('qs-order'));
+    }
+    if (Array.isArray(mission.questions)) {
+      const rq = rngFor('questions-options');
+      mission.questions = shuffle(mission.questions.map(q => mixQuestion(q, rq)), rngFor('questions-order'));
+    }
+    if (Array.isArray(mission.scenes)) {
+      const rq = rngFor('scenes-options');
+      mission.scenes = shuffle(mission.scenes.map(q => mixQuestion(q, rq)), rngFor('scenes-order'));
+    }
+    if (Array.isArray(mission.locks)) {
+      const rq = rngFor('locks-options');
+      mission.locks = shuffle(mission.locks.map(q => mixQuestion(q, rq)), rngFor('locks-order'));
+    }
+
+    // Las actividades de clasificación sí pueden cambiar el orden de sus casos.
+    // Las secuencias conservan el orden correcto interno y el motor recibe una
+    // semilla distinta por alumno para desordenar las piezas visuales.
+    if (Array.isArray(mission.items) && !typeIsOrdered(mission)) {
+      mission.items = shuffle(mission.items, rngFor('items'));
+    }
+  }
+
+  const previousLaunchMission = window.launchMission;
+  if (typeof previousLaunchMission !== 'function') return;
+
+  const personalizedLaunchMission = function(missionId, ...args) {
+    const mission = missionCatalog?.[missionId];
+    const student = currentStudent();
+    if (!mission || !student?.id) return previousLaunchMission.call(this, missionId, ...args);
+
+    prepareMission(mission, missionId, student);
+
+    // También sustituimos Math.random sólo durante la inicialización síncrona
+    // del reto. Así memoramas, secuencias, tarjetas y otros motores que ya
+    // barajan internamente reciben una mezcla estable y distinta por alumno.
+    const nativeRandom = Math.random;
+    Math.random = mulberry32(hashSeed(`${student.id}|${missionId}|engine|tv-order-v1`));
+    try {
+      return previousLaunchMission.call(this, missionId, ...args);
+    } finally {
+      Math.random = nativeRandom;
+    }
+  };
+
+  personalizedLaunchMission.__tvStudentOrderGlobalV1 = true;
+  window.launchMission = personalizedLaunchMission;
+  try { launchMission = personalizedLaunchMission; } catch (_) {}
+})();
