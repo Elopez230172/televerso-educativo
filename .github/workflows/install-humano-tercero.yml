@@ -1,0 +1,47 @@
+name: Instalar De lo Humano 3.º PPA 1 en TeleVerso
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'humano-tercero.js'
+      - '.github/workflows/install-humano-tercero.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  instalar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Integrar banco De lo Humano de tercer grado
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          tag='<script src="humano-tercero.js"></script>'
+          if tag not in s:
+              anchor='<script src="acceso-por-grado.js"></script>'
+              if anchor in s:
+                  s=s.replace(anchor, tag+'\n    '+anchor, 1)
+              else:
+                  s=s.replace('</body>', '    '+tag+'\n</body>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Publicar cambios
+        run: |
+          if git diff --quiet; then
+            echo "De lo Humano 3.º ya estaba integrado."
+            exit 0
+          fi
+          git config user.name "televerso-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html
+          git commit -m "Integrar De lo Humano 3.º PPA 1 en TeleVerso [skip ci]"
+          git push
